@@ -14,11 +14,9 @@ export default function Login({
 }) {
   const { pending } = useFormStatus();
 
-  // const searchParams = useSearchParams();
-  // const myParam = searchParams.get("message");
   return (
-    <div className="w-full lg:grid lg:min-h-[600px]  xl:min-h-[800px]">
-      <div className="flex items-center justify-center py-12">
+    <div className="overflow-hidden w-full lg:grid lg:min-h-[600px]  xl:min-h-[800px] ">
+      <div className="flex items-center justify-center py-12  ">
         <div className="mx-auto grid w-[350px] gap-6">
           <div className="grid gap-2 text-center">
             <h1 className="text-3xl font-bold">Sign in to your account</h1>
@@ -52,7 +50,7 @@ export default function Login({
               <SubmitButton
                 className="w-full"
                 formAction={login}
-                pendingText="Loging in"
+                pendingText="Loging in..."
               >
                 Login
               </SubmitButton>

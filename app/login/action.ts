@@ -19,8 +19,8 @@ export async function login(formData: FormData) {
       "/login?message=  Please check your password and account name and try again."
     );
   }
-  revalidatePath("/", "layout");
-  redirect("/");
+  revalidatePath("/admin", "layout");
+  redirect("/admin");
 }
 
 export async function signOut() {
@@ -31,8 +31,8 @@ export async function signOut() {
   if (error) {
     redirect("/error");
   } else {
-    revalidatePath("/", "layout");
-    redirect("/");
+    revalidatePath("/admin", "layout");
+    redirect("/admin");
   }
 }
 

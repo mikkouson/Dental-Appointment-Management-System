@@ -28,7 +28,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <Navigation />
-            <main className="content-area flex flex-col items-center justify-center ">
+            <main className="content-area flex flex-col items-center justify-center">
               {children}
             </main>
           </ThemeProvider>
