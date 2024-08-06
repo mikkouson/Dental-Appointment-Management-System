@@ -4,16 +4,13 @@ import { login, loginWithGoogle } from "./action";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useFormStatus } from "react-dom";
-import SubmitButton from "./submitBtn";
+import SubmitButton from "@/components/submitBtn";
 
 export default function Login({
   searchParams,
 }: {
   searchParams: { message: string };
 }) {
-  const { pending } = useFormStatus();
-
   return (
     <div className="overflow-hidden w-full lg:grid lg:min-h-[600px]  xl:min-h-[800px] ">
       <div className="flex items-center justify-center py-12  ">

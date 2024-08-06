@@ -8,7 +8,7 @@ export async function User() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return <div>User not found</div>;
+    return;
   }
-  return <div>{user.email}</div>;
+  return <div>{user ? user.email : ""}</div>;
 }
