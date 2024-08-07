@@ -1,3 +1,6 @@
+import { CalendarDemo } from "@/components/Calendar";
+import List from "@/components/List";
+
 export default function Admin() {
-  return <div></div>;
+  return <CalendarDemo />;
 }

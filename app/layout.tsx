@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import Navigation from "@/components/Navigation";
+import { SWRProvider } from "./swr-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,8 +29,8 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <Navigation />
-            <main className="content-area flex flex-col items-center justify-center">
-              {children}
+            <main className="content-area flex flex-col ">
+              <SWRProvider>{children}</SWRProvider>
             </main>
           </ThemeProvider>
         </body>
