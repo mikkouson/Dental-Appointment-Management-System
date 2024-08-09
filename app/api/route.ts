@@ -18,7 +18,8 @@ export async function GET(req: NextRequest, res: NextResponse) {
       )
     `
     )
-    .eq("date", req.nextUrl.searchParams.get("date"));
+    .eq("date", req.nextUrl.searchParams.get("date"))
+    .eq("status", req.nextUrl.searchParams.get("status"));
 
   return NextResponse.json(data);
 }

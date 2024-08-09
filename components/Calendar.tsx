@@ -8,16 +8,13 @@ import List from "./List";
 export function CalendarDemo() {
   const [date, setDate] = React.useState<Date | undefined>(new Date());
   const currentDate = moment(date).format("MM/DD/YYYY");
-  // const route = useRouter();
-
-  // route.push(`/admin?date=${currentDate}`);
   return (
     <div className="flex  xl:mx-40   justify-between mt-10">
       <Calendar
         mode="single"
         selected={date}
         onSelect={setDate}
-        className="rounded-md border"
+        className="rounded-md border max-h-80"
       />
       <List date={currentDate} />
     </div>
