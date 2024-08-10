@@ -1,5 +1,6 @@
 "use client";
 
+import { cancelAppointment } from "@/app/login/action";
 import moment from "moment";
 import useSWR from "swr";
 
@@ -66,12 +67,17 @@ const AppointmentList = ({
             <p>{appointment.patients?.name}</p>
           </div>
           <div className="flex space-x-2">
-            <button className="bg-blue-500 text-white px-3 py-1 rounded">
-              Reschedule
-            </button>
-            <button className="bg-red-500 text-white px-3 py-1 rounded">
-              Cancel
-            </button>
+            <form>
+              <button className="bg-blue-500 text-white px-3 py-1 rounded">
+                Reschedule
+              </button>
+              <button
+                className="bg-red-500 text-white px-3 py-1 rounded"
+                formAction={cancelAppointment}
+              >
+                Cancel
+              </button>
+            </form>
           </div>
         </div>
       ))

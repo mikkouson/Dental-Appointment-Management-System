@@ -54,3 +54,20 @@ export async function loginWithGoogle() {
     return redirect(data.url);
   }
 }
+
+export async function cancelAppointment() {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from("appointments")
+    .update({ status: "canceled" })
+    .eq("id", 13);
+  // .select();
+
+  if (error) {
+    redirect("/error");
+  } else {
+    revalidatePath("/admin", "layout");
+    redirect("/admin");
+  }
+}
