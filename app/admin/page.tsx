@@ -8,11 +8,20 @@ import { CheckboxDemo } from "@/components/CheckBox";
 
 export default function Admin() {
   const [date, setDate] = React.useState<Date | undefined>(new Date());
-  const [status, setStatus] = React.useState<string | undefined>();
+  const [statuses, setStatuses] = React.useState<string[]>([]); // Array to hold selected statuses
+  console.log(statuses);
   const currentDate = moment(date).format("MM/DD/YYYY");
 
-  const handleCheckboxChange = (selectedStatus: string) => {
-    setStatus(selectedStatus);
+  const handleCheckboxChange = (status: string, checked: boolean) => {
+    setStatuses((prevStatuses) => {
+      if (checked) {
+        // Add the status to the array if checked
+        return [...prevStatuses, status];
+      } else {
+        // Remove the status from the array if unchecked
+        return prevStatuses.filter((s) => s !== status);
+      }
+    });
   };
 
   return (
@@ -24,19 +33,24 @@ export default function Admin() {
           onSelect={setDate}
           className="rounded-md border max-h-80"
         />
-
-        <div onClick={() => handleCheckboxChange("accepted")}>
-          <CheckboxDemo label={"Accepted"} id={"accepted"} />
-        </div>
-        <div onClick={() => handleCheckboxChange("canceled")}>
-          <CheckboxDemo label={"Canceled"} id={"canceled"} />
-        </div>
-        <div onClick={() => handleCheckboxChange("pending")}>
-          <CheckboxDemo label={"Pending"} id={"pending"} />
-        </div>
+        <CheckboxDemo
+          label={"Accepted"}
+          id={"accepted"}
+          formAction={handleCheckboxChange}
+        />
+        <CheckboxDemo
+          label={"Canceled"}
+          id={"canceled"}
+          formAction={handleCheckboxChange}
+        />
+        <CheckboxDemo
+          label={"Pending"}
+          id={"pending"}
+          formAction={handleCheckboxChange}
+        />
       </div>
 
-      <List date={currentDate} status={status} />
+      <List date={currentDate} status={statuses} />
     </div>
   );
 }

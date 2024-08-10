@@ -89,10 +89,11 @@ interface ListProps {
 // Updated List component with typed props and SWR data
 export default function List({ date, status }: ListProps) {
   const { data, error } = useSWR<Appointment[]>(
-    `/api?date=${date}&status=${status}`,
+    `/api?date=${date}&status=${status.join(",")}`,
     fetcher
   );
 
+  console.log(`/api?date=${date}&status=${status.join(" || ")}`);
   if (error) return <div>Failed to load</div>;
 
   const appointmentsByHour = data ? groupAppointmentsByHour(data) : {};
