@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,8 +12,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DatePickerDemo } from "./DatePicker";
+import { useGetDate } from "@/app/store";
+import moment from "moment";
 
 export function DialogDemo() {
+  const selectedDate = useGetDate((state) => state.selectedDate);
+  const currentDate = moment(selectedDate).format("MM/DD/YYYY");
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -32,6 +38,7 @@ export function DialogDemo() {
           <DialogFooter>
             <Button type="submit">Save changes</Button>
           </DialogFooter>
+          {currentDate}
         </form>
       </DialogContent>
     </Dialog>
