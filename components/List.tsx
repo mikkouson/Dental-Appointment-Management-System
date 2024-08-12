@@ -3,6 +3,7 @@
 import { cancelAppointment } from "@/app/login/action";
 import moment from "moment";
 import useSWR from "swr";
+import { DialogDemo } from "./Dialog";
 
 // Define the Appointment type
 interface Appointment {
@@ -71,6 +72,7 @@ const AppointmentList = ({
               <button className="bg-blue-500 text-white px-3 py-1 rounded">
                 Reschedule
               </button>
+              <DialogDemo />
               <button
                 className="bg-red-500 text-white px-3 py-1 rounded"
                 formAction={cancelAppointment}
