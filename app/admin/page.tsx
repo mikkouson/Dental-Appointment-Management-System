@@ -5,6 +5,7 @@ import { Calendar } from "@/components/ui/calendar";
 import moment from "moment";
 import List from "@/components/List";
 import { CheckboxDemo } from "@/components/CheckBox";
+import Lis from "@/components/Lis";
 
 export default function Admin() {
   const [date, setDate] = React.useState<Date | undefined>(new Date());

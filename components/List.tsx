@@ -1,14 +1,16 @@
 "use client";
 
-import { cancelAppointment } from "@/app/login/action";
+import { cancelAppointment, getAppointments } from "@/app/admin/action";
 import moment from "moment";
-import useSWR from "swr";
+import useSWR, { mutate, preload } from "swr";
 import { DialogDemo } from "./Dialog";
+import SubmitButton from "./submitBtn";
 
 // Define the Appointment type
 interface Appointment {
   id: string;
   time: string; // Assuming time is a string in "HH:mm" format
+  status: string;
   patients?: {
     name: string;
   };
@@ -52,6 +54,8 @@ interface AppointmentListProps {
 const AppointmentList = ({
   appointmentsByHour,
   hour,
+  status,
+  date,
 }: AppointmentListProps) => (
   <div key={hour} className="mb-6">
     <h2 className="text-lg font-semibold mb-2">{hour}</h2>
@@ -66,19 +70,28 @@ const AppointmentList = ({
           </div>
           <div className="text-start flex-grow">
             <p>{appointment.patients?.name}</p>
+            <p>Status:{appointment.status}</p>
           </div>
           <div className="flex space-x-2">
             <form>
+              {/* Hidden input field to pass the aptId */}
+              <input type="hidden" name="aptId" value={appointment.id} />
               <button className="bg-blue-500 text-white px-3 py-1 rounded">
                 Reschedule
               </button>
               <DialogDemo />
-              <button
-                className="bg-red-500 text-white px-3 py-1 rounded"
-                formAction={cancelAppointment}
-              >
-                Cancel
-              </button>
+              {appointment.status === "pending" && (
+                <SubmitButton
+                  className="bg-red-500 text-white px-3 py-1 rounded"
+                  formAction={async () => {
+                    await cancelAppointment(appointment.id);
+                    mutate(`/api?date=${date}&status=${status.join(",")}`);
+                  }}
+                  pendingText="Cancelling..."
+                >
+                  Cancel
+                </SubmitButton>
+              )}
             </form>
           </div>
         </div>
@@ -124,6 +137,8 @@ export default function List({ date, status }: ListProps) {
           key={hour}
           appointmentsByHour={appointmentsByHour}
           hour={hour}
+          date={date}
+          status={status}
         />
       ))}
     </div>
