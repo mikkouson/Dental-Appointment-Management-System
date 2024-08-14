@@ -9,7 +9,11 @@ import Lis from "@/components/Lis";
 
 export default function Admin() {
   const [date, setDate] = React.useState<Date | undefined>(new Date());
-  const [statuses, setStatuses] = React.useState<string[]>([]); // Array to hold selected statuses
+  const [statuses, setStatuses] = React.useState<string[]>([
+    "accepted",
+    "pending",
+    "canceled",
+  ]); // Array to hold selected statuses
   console.log(statuses);
   const currentDate = moment(date).format("MM/DD/YYYY");
 

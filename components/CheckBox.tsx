@@ -4,7 +4,7 @@ import * as React from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 
 export function CheckboxDemo({ label, id, formAction }) {
-  const [checked, setChecked] = React.useState(false);
+  const [checked, setChecked] = React.useState(true);
 
   const handleChange = (isChecked) => {
     setChecked(isChecked);

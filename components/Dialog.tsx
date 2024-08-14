@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import React from "react";
 import {
   Dialog,
   DialogContent,
@@ -12,12 +13,26 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DatePickerDemo } from "./DatePicker";
-import { useGetDate } from "@/app/store";
+import { useGetDate, usegetTime } from "@/app/store";
 import moment from "moment";
+import SubmitButton from "./submitBtn";
+import {
+  cancelAppointment,
+  rescheduleAppointment,
+  tryA,
+} from "@/app/admin/action";
+import { mutate } from "swr";
+import { useState } from "react";
 
-export function DialogDemo() {
+export function DialogDemo({ id, status, date }) {
   const selectedDate = useGetDate((state) => state.selectedDate);
+  const selectedTime = usegetTime((state) => state.getTime);
+  const selectTime = usegetTime((state) => state.selectedTime);
+  const formattedTime = moment(selectTime, "HH:mm").format("hh:mm A");
   const currentDate = moment(selectedDate).format("MM/DD/YYYY");
+  const [time, setTime] = React.useState("");
+  console.log("date:", date);
+  console.log("currentDate:", currentDate);
 
   return (
     <Dialog>
@@ -34,11 +49,35 @@ export function DialogDemo() {
         <form>
           <div className="grid gap-4 py-4"></div>
           <DatePickerDemo />
-          <Input type="time" className="w-[280px]  py-6" />{" "}
+          <Input
+            type="time"
+            name="time"
+            className="w-[280px]  py-6"
+            onChange={(e) => selectedTime(e.target.value)}
+          />
+          {/* <input type="text" name="date" value={currentDate} />
+          <input type="text" name="id" value={id} />
+          <input type="text" name="status" value={status} /> */}
+
           <DialogFooter>
-            <Button type="submit">Save changes</Button>
+            {/* <SubmitButton
+              formAction={rescheduleAppointment}
+              pendingText="Submiting..."
+            >
+              Save changes
+            </SubmitButton> */}
+            <SubmitButton
+              formAction={async () => {
+                await rescheduleAppointment(id, currentDate, formattedTime);
+                mutate(`/api?date=${date}&status=${status.join(",")}`);
+              }}
+              pendingText="Submiting..."
+            >
+              Submits
+            </SubmitButton>
           </DialogFooter>
-          {currentDate}
+          {formattedTime}
+          {time}
         </form>
       </DialogContent>
     </Dialog>
