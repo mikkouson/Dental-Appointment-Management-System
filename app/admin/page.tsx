@@ -5,7 +5,9 @@ import { Calendar } from "@/components/ui/calendar";
 import moment from "moment";
 import List from "@/components/List";
 import { CheckboxDemo } from "@/components/CheckBox";
-import Lis from "@/components/Lis";
+import TimeSlot from "@/components/TimeSlot";
+import { RadioGroup } from "@radix-ui/react-dropdown-menu";
+import { SheetDemo } from "@/components/Sheet";
 
 export default function Admin() {
   const [date, setDate] = React.useState<Date | undefined>(new Date());
@@ -13,8 +15,7 @@ export default function Admin() {
     "accepted",
     "pending",
     "canceled",
-  ]); // Array to hold selected statuses
-  console.log(statuses);
+  ]);
   const currentDate = moment(date).format("MM/DD/YYYY");
 
   const handleCheckboxChange = (status: string, checked: boolean) => {
@@ -53,7 +54,11 @@ export default function Admin() {
           id={"pending"}
           formAction={handleCheckboxChange}
         />
+        <RadioGroup />
+        {/* <TimeSlot date={date} /> */}
+        {/* <SheetDemo /> */}
       </div>
+      {/* <AppointmentForm /> */}
 
       <List date={currentDate} status={statuses} />
     </div>
