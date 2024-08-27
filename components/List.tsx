@@ -1,26 +1,38 @@
 "use client";
 
-import { cancelAppointment, getAppointments } from "@/app/admin/action";
+import { cancelAppointment } from "@/app/admin/action";
 import moment from "moment";
-import useSWR, { mutate, preload } from "swr";
-import { DialogDemo } from "./Dialog";
+import useSWR, { mutate } from "swr";
+import { SheetDemo } from "./Sheet";
 import SubmitButton from "./submitBtn";
 
-// Define the Appointment type
 interface Appointment {
   id: string;
-  time: string; // Assuming time is a string in "HH:mm" format
+  time: string;
   status: string;
   patients?: {
     name: string;
   };
+  time_slots?: {
+    time: string;
+  };
 }
 
-// Fetcher function with proper typing
+interface AppointmentListProps {
+  appointmentsByHour: { [key: string]: Appointment[] };
+  hour: string;
+  status: string[];
+  date: string;
+}
+
+interface ListProps {
+  date: string;
+  status: string[];
+}
+
 const fetcher = (url: string): Promise<Appointment[]> =>
   fetch(url).then((res) => res.json());
 
-// Update the groupAppointmentsByHour function with the typed parameter
 const groupAppointmentsByHour = (appointments: Appointment[]) => {
   const hours: { [key: string]: Appointment[] } = {
     "8 AM": [],
@@ -35,7 +47,7 @@ const groupAppointmentsByHour = (appointments: Appointment[]) => {
   };
 
   appointments.forEach((appointment) => {
-    const hour = moment(appointment.time, "HH:mm").format("h A");
+    const hour = moment(appointment.time_slots?.time, "HH:mm").format("h A");
     if (hours[hour]) {
       hours[hour].push(appointment);
     }
@@ -44,78 +56,74 @@ const groupAppointmentsByHour = (appointments: Appointment[]) => {
   return hours;
 };
 
-// Typing for AppointmentList props
-interface AppointmentListProps {
-  appointmentsByHour: { [key: string]: Appointment[] };
-  hour: string;
-}
-
-// Updated AppointmentList component with typed props
-const AppointmentList = ({
+function AppointmentList({
   appointmentsByHour,
   hour,
   status,
   date,
-}: AppointmentListProps) => (
-  <div key={hour} className="mb-6">
-    <h2 className="text-lg font-semibold mb-2">{hour}</h2>
-    {appointmentsByHour[hour] && appointmentsByHour[hour].length > 0 ? (
-      appointmentsByHour[hour].map((appointment) => (
-        <div
-          key={appointment.id}
-          className="flex justify-between items-center border-2 border-gray-muted-foreground p-2 mb-2"
-        >
-          <div className="mr-6">
-            <p>{moment(appointment.time, "HH:mm").format("h:mm A")}</p>
+}: AppointmentListProps) {
+  return (
+    <div key={hour} className="mb-6">
+      <h2 className="text-lg font-semibold mb-2">{hour}</h2>
+      {appointmentsByHour[hour] && appointmentsByHour[hour].length > 0 ? (
+        appointmentsByHour[hour].map((appointment) => (
+          <div
+            key={appointment.id}
+            className="flex justify-between items-center border-2 border-gray-muted-foreground p-2 mb-2"
+          >
+            <div className="mr-6">
+              <p>
+                {moment(appointment.time_slots?.time, "HH:mm").format("h:mm A")}
+              </p>
+            </div>
+            <div className="text-start flex-grow">
+              <p>{appointment.patients?.name}</p>
+              <p>Status: {appointment.status}</p>
+            </div>
+            <div className="flex space-x-2">
+              <form>
+                <button className="bg-blue-500 text-white px-3 py-1 rounded">
+                  Reschedule
+                </button>
+                <SheetDemo id={appointment.id} status={status} date={date} />
+                {appointment.status === "accepted" && (
+                  <SubmitButton
+                    className="bg-red-500 text-white px-3 py-1 rounded"
+                    formAction={async () => {
+                      await cancelAppointment({ aptId: appointment.id });
+                      mutate(
+                        `/api/appointments?date=${date}&status=${status.join(
+                          ","
+                        )}`
+                      );
+                    }}
+                    pendingText="Cancelling..."
+                  >
+                    Cancel
+                  </SubmitButton>
+                )}
+              </form>
+            </div>
           </div>
-          <div className="text-start flex-grow">
-            <p>{appointment.patients?.name}</p>
-            <p>Status:{appointment.status}</p>
-          </div>
-          <div className="flex space-x-2">
-            <form>
-              <button className="bg-blue-500 text-white px-3 py-1 rounded">
-                Reschedule
-              </button>
-              <DialogDemo id={appointment.id} status={status} date={date} />
-              {appointment.status === "accepted" && (
-                <SubmitButton
-                  className="bg-red-500 text-white px-3 py-1 rounded"
-                  formAction={async () => {
-                    await cancelAppointment(appointment.id);
-                    mutate(`/api?date=${date}&status=${status.join(",")}`);
-                  }}
-                  pendingText="Cancelling..."
-                >
-                  Cancel
-                </SubmitButton>
-              )}
-            </form>
-          </div>
-        </div>
-      ))
-    ) : (
-      <p className="text-gray-500">No appointments</p>
-    )}
-  </div>
-);
-
-// Typing for List component props
-interface ListProps {
-  date: string;
+        ))
+      ) : (
+        <p className="text-gray-500">No appointments</p>
+      )}
+    </div>
+  );
 }
 
-// Updated List component with typed props and SWR data
 export default function List({ date, status }: ListProps) {
-  const { data, error } = useSWR<Appointment[]>(
-    `/api?date=${date}&status=${status.join(",")}`,
+  const { data: appointments, error } = useSWR<Appointment[]>(
+    `/api/appointments?date=${date}&status=${status.join(",")}`,
     fetcher
   );
 
-  console.log(`/api?date=${date}&status=${status.join(" || ")}`);
   if (error) return <div>Failed to load</div>;
 
-  const appointmentsByHour = data ? groupAppointmentsByHour(data) : {};
+  const appointmentsByHour = appointments
+    ? groupAppointmentsByHour(appointments)
+    : {};
   const hoursArray = [
     "8 AM",
     "9 AM",
