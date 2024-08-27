@@ -21,10 +21,8 @@ export default function Admin() {
   const handleCheckboxChange = (status: string, checked: boolean) => {
     setStatuses((prevStatuses) => {
       if (checked) {
-        // Add the status to the array if checked
         return [...prevStatuses, status];
       } else {
-        // Remove the status from the array if unchecked
         return prevStatuses.filter((s) => s !== status);
       }
     });
@@ -55,10 +53,7 @@ export default function Admin() {
           formAction={handleCheckboxChange}
         />
         <RadioGroup />
-        {/* <TimeSlot date={date} /> */}
-        {/* <SheetDemo /> */}
       </div>
-      {/* <AppointmentForm /> */}
 
       <List date={currentDate} status={statuses} />
     </div>
