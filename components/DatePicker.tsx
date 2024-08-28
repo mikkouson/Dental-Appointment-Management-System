@@ -15,8 +15,10 @@ import {
 import { cn } from "@/lib/utils";
 
 export function DatePickerDemo() {
-  const [date, setDate] = React.useState<Date | undefined>(undefined);
+  const selectedDate = useGetDate((state) => state.selectedDate);
   const getDate = useGetDate((state) => state.getDate);
+
+  const [date, setDate] = React.useState<Date | undefined>(selectedDate);
 
   const handleSetDate = (date: Date | undefined) => {
     if (date) {
@@ -36,7 +38,7 @@ export function DatePickerDemo() {
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, "PPP") : <span>Pick a date</span>}
+          {date ? format(date, "PPP") : <span>no date</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">
