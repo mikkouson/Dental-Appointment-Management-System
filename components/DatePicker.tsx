@@ -18,7 +18,9 @@ export function DatePickerDemo() {
   const selectedDate = useGetDate((state) => state.selectedDate);
   const getDate = useGetDate((state) => state.getDate);
 
-  const [date, setDate] = React.useState<Date | undefined>(selectedDate);
+  const [date, setDate] = React.useState<Date | undefined>(
+    selectedDate || undefined
+  );
 
   const handleSetDate = (date: Date | undefined) => {
     if (date) {
