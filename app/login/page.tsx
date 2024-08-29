@@ -30,6 +30,7 @@ export default function Login({
                   type="email"
                   placeholder="m@example.com"
                   required
+                  name="email"
                 />
               </div>
               <div className="grid gap-2">
@@ -42,7 +43,7 @@ export default function Login({
                     Forgot your password?
                   </Link>
                 </div>
-                <Input id="password" type="password" required />
+                <Input id="password" type="password" required name="password" />
               </div>
               <SubmitButton
                 className="w-full"
