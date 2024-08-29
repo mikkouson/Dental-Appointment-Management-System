@@ -1,13 +1,11 @@
 "use client";
 
-import * as React from "react";
-import { Calendar } from "@/components/ui/calendar";
-import moment from "moment";
-import List from "@/components/List";
 import { CheckboxDemo } from "@/components/CheckBox";
-import TimeSlot from "@/components/TimeSlot";
+import List from "@/components/List";
+import { Calendar } from "@/components/ui/calendar";
 import { RadioGroup } from "@radix-ui/react-dropdown-menu";
-import { SheetDemo } from "@/components/Sheet";
+import moment from "moment";
+import * as React from "react";
 
 export default function Admin() {
   const [date, setDate] = React.useState<Date | undefined>(new Date());
@@ -35,7 +33,7 @@ export default function Admin() {
           mode="single"
           selected={date}
           onSelect={setDate}
-          className="rounded-md border max-h-80"
+          className="rounded-md border "
         />
         <CheckboxDemo
           label={"Accepted"}
