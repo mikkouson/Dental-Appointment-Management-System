@@ -29,18 +29,12 @@ export function SheetDemo({ id, status, date }: SheetDemoProps) {
   const selectedDate = useGetDate((state) => state.selectedDate);
   const selectTime = useGetDate((state) => state.selectedTime);
   const getDate = useGetDate((state) => state.getDate);
-
   const currentDate = moment(selectedDate).format("MM/DD/YYYY");
-
-  // Ensure handleOpen receives a date or change it according to your needs
-  const handleOpen = () => {
-    getDate(date); // Assume `date` is a valid date string
-  };
 
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" onClick={handleOpen}>
+        <Button variant="outline" onClick={() => getDate(new Date(date))}>
           Open
         </Button>
       </SheetTrigger>
@@ -55,7 +49,7 @@ export function SheetDemo({ id, status, date }: SheetDemoProps) {
           <div className="grid gap-4 py-4">
             <DatePickerDemo />
           </div>
-          <TimeSlot date={selectedDate} />
+          <TimeSlot />
 
           <SheetFooter>
             <SubmitButton
