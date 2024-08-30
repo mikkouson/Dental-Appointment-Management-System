@@ -42,7 +42,7 @@ export function SheetDemo({ id, status, date }: SheetDemoProps) {
         <SheetHeader>
           <SheetTitle>Edit Appointment</SheetTitle>
           <SheetDescription>
-            Make changes to the appointment here. Click save when you're done.
+            Make changes to the appointment here. Click save when youre done.
           </SheetDescription>
         </SheetHeader>
         <form>
