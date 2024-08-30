@@ -1,5 +1,11 @@
 "use client";
 import { SWRConfig } from "swr";
-export const SWRProvider = ({ children }) => {
+import { ReactNode } from "react";
+
+interface SWRProviderProps {
+  children: ReactNode;
+}
+
+export const SWRProvider = ({ children }: SWRProviderProps) => {
   return <SWRConfig>{children}</SWRConfig>;
 };
