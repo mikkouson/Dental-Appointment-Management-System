@@ -1,29 +1,30 @@
 "use client";
 
-import { CheckboxDemo } from "@/components/CheckBox";
-import List from "@/components/List";
+import { DropdownMenuCheckboxes } from "@/components/ComboBox";
 import { Calendar } from "@/components/ui/calendar";
-import { RadioGroup } from "@radix-ui/react-dropdown-menu";
+import List from "@/components/List";
 import moment from "moment";
 import * as React from "react";
+import { useGetDate } from "../store";
+type Status = "accepted" | "pending" | "canceled";
+
+const statuses: Status[] = ["accepted", "pending", "canceled"];
 
 export default function Admin() {
   const [date, setDate] = React.useState<Date | undefined>(new Date());
-  const [statuses, setStatuses] = React.useState<string[]>([
-    "accepted",
-    "pending",
-    "canceled",
-  ]);
+
   const currentDate = moment(date).format("MM/DD/YYYY");
 
-  const handleCheckboxChange = (status: string, checked: boolean) => {
-    setStatuses((prevStatuses) => {
-      if (checked) {
-        return [...prevStatuses, status];
-      } else {
-        return prevStatuses.filter((s) => s !== status);
-      }
-    });
+  const { status: storeStatus, setStatus } = useGetDate((state) => ({
+    status: state.status,
+    setStatus: state.setStatus,
+  }));
+
+  const activeStatuses = statuses.filter((s) => storeStatus[s]);
+
+  const handleCheckedChange = (item: Status) => {
+    const newStatus = { ...storeStatus, [item]: !storeStatus[item] };
+    setStatus(newStatus);
   };
 
   return (
@@ -33,27 +34,17 @@ export default function Admin() {
           mode="single"
           selected={date}
           onSelect={setDate}
-          className="rounded-md border "
+          className="rounded-md border"
         />
-        <CheckboxDemo
-          label={"Accepted"}
-          id={"accepted"}
-          formAction={handleCheckboxChange}
+
+        <DropdownMenuCheckboxes
+          item={statuses}
+          formAction={handleCheckedChange}
+          store={storeStatus}
         />
-        <CheckboxDemo
-          label={"Canceled"}
-          id={"canceled"}
-          formAction={handleCheckboxChange}
-        />
-        <CheckboxDemo
-          label={"Pending"}
-          id={"pending"}
-          formAction={handleCheckboxChange}
-        />
-        <RadioGroup />
       </div>
 
-      <List date={currentDate} status={statuses} />
+      <List date={currentDate} status={activeStatuses} />
     </div>
   );
 }
