@@ -3,10 +3,16 @@ import * as React from "react";
 
 import { Checkbox } from "@/components/ui/checkbox";
 
-export function CheckboxDemo({ label, id, formAction }) {
-  const [checked, setChecked] = React.useState(true);
+interface CheckboxDemoProps {
+  label: string;
+  id: string;
+  formAction: (id: string, isChecked: boolean) => void;
+}
 
-  const handleChange = (isChecked) => {
+export function CheckboxDemo({ label, id, formAction }: CheckboxDemoProps) {
+  const [checked, setChecked] = React.useState<boolean>(true);
+
+  const handleChange = (isChecked: boolean) => {
     setChecked(isChecked);
     formAction(id, isChecked); // Pass the checked state to the parent
   };
