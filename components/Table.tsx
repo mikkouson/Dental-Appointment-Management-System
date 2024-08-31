@@ -69,17 +69,15 @@ export function DataTable<T>({ data, columns }: TableProps<T>) {
     const value = event.target.value;
     setFilterInput(value);
 
-    // Apply the filter to all columns
     const filterValue = value.toLowerCase();
     table.getColumn("item_name")?.setFilterValue(filterValue);
-    table.getColumn("description")?.setFilterValue(filterValue);
   };
 
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter inventory"
+          placeholder="Search inventory"
           value={filterInput}
           onChange={handleFilterChange}
           className="max-w-sm"
