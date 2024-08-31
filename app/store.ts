@@ -1,9 +1,9 @@
 import { create } from "zustand";
 
-// Define the state type
 type State = {
-  selectedDate: Date | null; // Use Date or null to handle uninitialized state
-  selectedTime: string; // Use lowercase 'string' for type
+  selectedDate: Date | null;
+  selectedTime: string;
+  branch: number;
   status: {
     accepted: boolean;
     pending: boolean;
@@ -11,10 +11,10 @@ type State = {
   };
 };
 
-// Define the actions type
 type Actions = {
   getDate: (selectedDate: Date) => void;
   getTime: (selectedTime: string) => void;
+  setBranch: (branch: number) => void;
   setStatus: (status: {
     accepted: boolean;
     pending: boolean;
@@ -22,10 +22,10 @@ type Actions = {
   }) => void;
 };
 
-// Create Zustand store with proper typing
 export const useGetDate = create<State & Actions>((set) => ({
-  selectedDate: null, // Initialize as null
-  selectedTime: "", // Initialize as empty string
+  selectedDate: null,
+  selectedTime: "",
+  branch: 1,
   status: {
     accepted: true,
     pending: true,
@@ -33,5 +33,6 @@ export const useGetDate = create<State & Actions>((set) => ({
   },
   getDate: (selectedDate) => set({ selectedDate }),
   getTime: (selectedTime) => set({ selectedTime }),
+  setBranch: (branch) => set({ branch }),
   setStatus: (status) => set({ status }),
 }));
