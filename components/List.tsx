@@ -5,6 +5,7 @@ import moment from "moment";
 import useSWR, { mutate } from "swr";
 import { SheetDemo } from "./Sheet";
 import SubmitButton from "./submitBtn";
+import { useGetDate } from "@/app/store";
 
 interface Appointment {
   id: string;
@@ -111,8 +112,11 @@ function AppointmentList({
 }
 
 export default function List({ date, status }: ListProps) {
+  const branch = useGetDate((state) => state.branch);
   const { data: appointments, error } = useSWR<Appointment[]>(
-    `/api/appointments?date=${date}&status=${status.join(",")}`,
+    `/api/appointments?date=${date}&branch=${branch}&status=${status.join(
+      ","
+    )}`,
     fetcher
   );
 
@@ -134,7 +138,7 @@ export default function List({ date, status }: ListProps) {
   ];
 
   return (
-    <div className="w-full pl-10">
+    <div>
       {hoursArray.map((hour) => (
         <AppointmentList
           key={hour}
