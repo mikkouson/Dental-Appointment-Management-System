@@ -10,35 +10,38 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDownIcon } from "lucide-react";
-type Status = "accepted" | "pending" | "canceled";
-interface DropdownMenuCheckboxesProps {
-  item: Status[]; // Use Status type here
-  store: { [key in Status]: boolean }; // Use Status type here
-  formAction: (item: Status) => void; // Use Status type here
+
+// Make the component generic
+interface DropdownMenuCheckboxesProps<T extends string> {
+  items: T[];
+  store: { [key in T]: boolean };
+  formAction: (item: T) => void;
+  label: string;
 }
 
-export function DropdownMenuCheckboxes({
-  item,
+export function DropdownMenuCheckboxes<T extends string>({
+  items,
   store,
   formAction,
-}: DropdownMenuCheckboxesProps) {
+  label,
+}: DropdownMenuCheckboxesProps<T>) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline">
-          Open <ChevronDownIcon className="ml-2 h-4 w-4" />
+          {label} <ChevronDownIcon className="ml-2 h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
         <DropdownMenuLabel>Appearance</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {item.map((s) => (
-          <div key={s}>
+        {items.map((item) => (
+          <div key={item}>
             <DropdownMenuCheckboxItem
-              checked={store[s]}
-              onCheckedChange={() => formAction(s)}
+              checked={store[item]}
+              onCheckedChange={() => formAction(item)}
             >
-              {s}
+              {item}
             </DropdownMenuCheckboxItem>
           </div>
         ))}
