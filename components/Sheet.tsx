@@ -18,7 +18,6 @@ import { DatePickerDemo } from "./DatePicker";
 import SubmitButton from "./submitBtn";
 import TimeSlot from "./TimeSlot";
 
-// Define prop types
 interface SheetDemoProps {
   id: string;
   status: string[];
