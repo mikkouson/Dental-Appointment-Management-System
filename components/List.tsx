@@ -6,6 +6,9 @@ import useSWR, { mutate } from "swr";
 import { SheetDemo } from "./Sheet";
 import SubmitButton from "./submitBtn";
 import { useGetDate } from "@/app/store";
+import { useEffect } from "react";
+import { createClient } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
 
 interface Appointment {
   id: string;
@@ -63,6 +66,30 @@ function AppointmentList({
   status,
   date,
 }: AppointmentListProps) {
+  const branch = useGetDate((state) => state.branch);
+  const supabase = createClient();
+  const router = useRouter();
+  useEffect(() => {
+    const channel = supabase
+      .channel("realtime appointments")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "appointments" },
+        () => {
+          mutate(
+            `/api/appointments?date=${date}&branch=${branch}&status=${status.join(
+              ","
+            )}`
+          );
+          console.log("asd");
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [supabase, mutate]);
   return (
     <div key={hour} className="mb-6">
       <h2 className="text-lg font-semibold mb-2">{hour}</h2>
@@ -83,17 +110,12 @@ function AppointmentList({
             </div>
             <div className="flex space-x-2">
               <form>
-                <SheetDemo id={appointment.id} status={status} date={date} />
+                <SheetDemo id={appointment.id} date={date} />
                 {appointment.status === "accepted" && (
                   <SubmitButton
                     className="bg-red-500 text-white px-3 py-1 rounded"
                     formAction={async () => {
                       await cancelAppointment({ aptId: appointment.id });
-                      mutate(
-                        `/api/appointments?date=${date}&status=${status.join(
-                          ","
-                        )}`
-                      );
                     }}
                     pendingText="Cancelling..."
                   >
@@ -113,6 +135,8 @@ function AppointmentList({
 
 export default function List({ date, status }: ListProps) {
   const branch = useGetDate((state) => state.branch);
+  const supabase = createClient();
+  const router = useRouter();
   const { data: appointments, error } = useSWR<Appointment[]>(
     `/api/appointments?date=${date}&branch=${branch}&status=${status.join(
       ","
