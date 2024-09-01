@@ -6,6 +6,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
   const status = req.nextUrl.searchParams.get("status")?.split(","); // Split by comma
   const date = req.nextUrl.searchParams.get("date");
+  const branch = req.nextUrl.searchParams.get("branch");
 
   if (!status || !date) {
     return NextResponse.json(
@@ -32,7 +33,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
       { count: "exact" }
     )
     .eq("date", date)
-    // .eq("branch", 1)
+    .eq("branch", branch)
     .in("status", status);
 
   if (error) {

@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(req: NextRequest) {
   const supabase = createClient();
   const date = req.nextUrl.searchParams.get("date");
+  const branch = req.nextUrl.searchParams.get("branch");
 
   // Call the Supabase function
   let { data, error } = await supabase
@@ -14,7 +15,8 @@ export async function GET(req: NextRequest) {
       appointments(*)
     `
     )
-    .eq("appointments.date", date);
+    .eq("appointments.date", date)
+    .eq("appointments.branch", branch);
 
   // Check for errors
   if (error) {

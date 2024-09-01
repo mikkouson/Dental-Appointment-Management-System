@@ -15,6 +15,8 @@ import {
 import { cn } from "@/lib/utils";
 
 export function DatePickerDemo() {
+  const [isCalendarOpen, setIsCalendarOpen] = React.useState(false);
+
   const selectedDate = useGetDate((state) => state.selectedDate);
   const getDate = useGetDate((state) => state.getDate);
 
@@ -26,11 +28,12 @@ export function DatePickerDemo() {
     if (date) {
       setDate(date);
       getDate(date);
+      setIsCalendarOpen(false);
     }
   };
 
   return (
-    <Popover>
+    <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
       <PopoverTrigger asChild>
         <Button
           variant={"outline"}

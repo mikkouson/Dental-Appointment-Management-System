@@ -13,19 +13,16 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import moment from "moment";
-import { mutate } from "swr";
 import { DatePickerDemo } from "./DatePicker";
 import SubmitButton from "./submitBtn";
 import TimeSlot from "./TimeSlot";
 
-// Define prop types
 interface SheetDemoProps {
   id: string;
-  status: string[];
   date: string;
 }
 
-export function SheetDemo({ id, status, date }: SheetDemoProps) {
+export function SheetDemo({ id, date }: SheetDemoProps) {
   const selectedDate = useGetDate((state) => state.selectedDate);
   const selectTime = useGetDate((state) => state.selectedTime);
   const getDate = useGetDate((state) => state.getDate);
@@ -60,11 +57,6 @@ export function SheetDemo({ id, status, date }: SheetDemoProps) {
                     date: currentDate,
                     time: selectTime,
                   });
-                  mutate(
-                    `/api/appointments?date=${date}&status=${status.join(",")}`
-                  );
-                } else {
-                  alert("Please select a date and time.");
                 }
               }}
               pendingText="Submitting..."

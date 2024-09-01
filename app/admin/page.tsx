@@ -1,11 +1,13 @@
 "use client";
 
+import BranchSelect from "@/components/BranchSelect";
 import { DropdownMenuCheckboxes } from "@/components/ComboBox";
-import { Calendar } from "@/components/ui/calendar";
 import List from "@/components/List";
+import { Calendar } from "@/components/ui/calendar";
 import moment from "moment";
 import * as React from "react";
 import { useGetDate } from "../store";
+
 type Status = "accepted" | "pending" | "canceled";
 
 const statuses: Status[] = ["accepted", "pending", "canceled"];
@@ -36,15 +38,20 @@ export default function Admin() {
           onSelect={setDate}
           className="rounded-md border"
         />
-
-        <DropdownMenuCheckboxes
-          item={statuses}
-          formAction={handleCheckedChange}
-          store={storeStatus}
-        />
       </div>
-
-      <List date={currentDate} status={activeStatuses} />
+      <div className="w-full pl-10 flex-col">
+        <form action="">{/* <Input></Input> */}</form>
+        <div className="flex justify-end">
+          <DropdownMenuCheckboxes
+            items={statuses}
+            formAction={handleCheckedChange}
+            store={storeStatus}
+            label="Status"
+          />
+          <BranchSelect />
+        </div>
+        <List date={currentDate} status={activeStatuses} />
+      </div>
     </div>
   );
 }
