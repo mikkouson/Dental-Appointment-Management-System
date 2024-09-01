@@ -55,7 +55,7 @@ export default function RadioComboBox<T extends DropdownItem>({
           {data.map((item) => (
             <DropdownMenuRadioGroup
               key={item.id}
-              value={store.id.toString()}
+              value={store.toString()}
               onValueChange={(value) => {
                 action(Number(value));
               }}
