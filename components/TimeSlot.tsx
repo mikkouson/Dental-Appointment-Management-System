@@ -7,14 +7,15 @@ import useSWR from "swr";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-interface TimeSlotProps {
-  date: string;
-}
-
 export default function TimeSlot() {
   const { getTime, selectedTime, selectedDate } = useGetDate();
+  const branch = useGetDate((state) => state.branch);
+
   const date = moment(selectedDate).format("MM/DD/YYYY");
-  const { data, error } = useSWR(`/api/timeslots?date=${date}`, fetcher);
+  const { data, error } = useSWR(
+    `/api/timeslots?date=${date}&branch=${branch}`,
+    fetcher
+  );
 
   if (error) return <div>Error loading timeslots.</div>;
   if (!data) return <div>Loading...</div>;
