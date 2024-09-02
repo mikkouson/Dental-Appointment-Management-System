@@ -1,9 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  ChevronDownIcon,
-} from "@radix-ui/react-icons";
+import { ChevronDownIcon } from "@radix-ui/react-icons";
 import {
   ColumnDef,
   SortingState,
@@ -16,7 +14,14 @@ import {
   getFilteredRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogFooter, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -33,7 +38,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { createClient } from "@/utils/supabase/client"; 
+import { createClient } from "@/utils/supabase/client";
 
 type InventoryItem = {
   id: number;
@@ -49,15 +54,18 @@ type TableProps = {
 
 export function DataTable({ data, columns }: TableProps) {
   const [editingRow, setEditingRow] = useState<InventoryItem | null>(null);
+  const [addingNew, setAddingNew] = useState(false);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
   const [filterInput, setFilterInput] = React.useState("");
+  const [formData, setFormData] = useState<Partial<InventoryItem>>({});
   const supabase = createClient();
 
-  const handleEdit = async (row: InventoryItem) => {
+  const handleEdit = (row: InventoryItem) => {
     setEditingRow(row);
+    setFormData(row);
   };
 
   const handleDelete = async (id: number) => {
@@ -71,18 +79,30 @@ export function DataTable({ data, columns }: TableProps) {
     }
   };
 
-  const handleSave = async (updatedRow: InventoryItem) => {
-    const { id, ...updateData } = updatedRow;
-    const { error } = await supabase
-      .from("inventory")
-      .update(updateData)
-      .eq("id", id);
+  const handleSave = async () => {
+    if (editingRow) {
+      const { id, ...updateData } = formData as InventoryItem;
+      const { error } = await supabase
+        .from("inventory")
+        .update(updateData)
+        .eq("id", id);
 
-    if (error) {
-      console.error("Error updating item:", error);
-    } else {
-      setEditingRow(null);  
+      if (error) {
+        console.error("Error updating item:", error);
+      }
+    } else if (addingNew) {
+      const { error } = await supabase
+        .from("inventory")
+        .insert([formData as InventoryItem]);
+
+      if (error) {
+        console.error("Error adding item:", error);
+      }
     }
+
+    setEditingRow(null);
+    setAddingNew(false);
+    setFormData({});
   };
 
   const table = useReactTable({
@@ -155,6 +175,7 @@ export function DataTable({ data, columns }: TableProps) {
               ))}
           </DropdownMenuContent>
         </DropdownMenu>
+        <Button className="ml-2" onClick={() => { setAddingNew(true); setFormData({}); }}>Add New Item</Button>
       </div>
       <div className="rounded-md border">
         <Table>
@@ -219,12 +240,12 @@ export function DataTable({ data, columns }: TableProps) {
           </Button>
         </div>
       </div>
-      {editingRow && (
-        <Dialog open={Boolean(editingRow)} onOpenChange={() => setEditingRow(null)}>
+      {(editingRow || addingNew) && (
+        <Dialog open={Boolean(editingRow || addingNew)} onOpenChange={() => { setEditingRow(null); setAddingNew(false); }}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Edit Item</DialogTitle>
-              <DialogDescription>Make changes to the item and save.</DialogDescription>
+              <DialogTitle>{editingRow ? "Edit Item" : "Add New Item"}</DialogTitle>
+              <DialogDescription>{editingRow ? "Make changes to the item and save." : "Fill in the details for the new item."}</DialogDescription>
             </DialogHeader>
             
             <div className="space-y-4">
@@ -236,8 +257,8 @@ export function DataTable({ data, columns }: TableProps) {
                   type="text"
                   id="item_name"
                   name="item_name"
-                  value={editingRow.item_name}
-                  onChange={(e) => setEditingRow({ ...editingRow, item_name: e.target.value })}
+                  value={formData.item_name || ""}
+                  onChange={(e) => setFormData({ ...formData, item_name: e.target.value })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
               </div>
@@ -249,8 +270,8 @@ export function DataTable({ data, columns }: TableProps) {
                 <textarea
                   id="description"
                   name="description"
-                  value={editingRow.description}
-                  onChange={(e) => setEditingRow({ ...editingRow, description: e.target.value })}
+                  value={formData.description || ""}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
               </div>
@@ -263,18 +284,18 @@ export function DataTable({ data, columns }: TableProps) {
                   type="number"
                   id="quantity"
                   name="quantity"
-                  value={editingRow.quantity}
-                  onChange={(e) => setEditingRow({ ...editingRow, quantity: parseInt(e.target.value) })}
+                  value={formData.quantity || ""}
+                  onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
               </div>
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setEditingRow(null)}>
+              <Button variant="outline" onClick={() => { setEditingRow(null); setAddingNew(false); }}>
                 Cancel
               </Button>
-              <Button onClick={() => handleSave(editingRow)}>
+              <Button onClick={handleSave}>
                 Save
               </Button>
             </DialogFooter>
