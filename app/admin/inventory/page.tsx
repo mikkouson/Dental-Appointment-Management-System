@@ -2,14 +2,14 @@
 
 import React from "react";
 import useSWR from "swr";
-import { DataTable } from "@/components/Table"; 
-import { createClient } from "@/utils/supabase/client"; 
+import { DataTable } from "@/components/Table";
+import { createClient } from "@/utils/supabase/client";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 type InventoryItem = {
-  id: string;
-  name: string;
+  id: number; 
+  item_name: string; 
   description: string;
   quantity: number;
 };
