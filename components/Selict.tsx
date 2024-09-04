@@ -1,21 +1,33 @@
-import * as React from "react";
-
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { FormControl } from "./ui/form";
 
-export function SelectDemo({ data, field }) {
+type FieldProps = {
+  value: string;
+  onChange: (value: string) => void;
+};
+
+type DataItem = {
+  id: string;
+  name: string;
+};
+
+export function SelectDemo({
+  data,
+  field,
+}: {
+  data: DataItem[];
+  field: FieldProps;
+}) {
   return (
     <Select
       onValueChange={(value) => field.onChange(value)}
-      value={field.value} // Use value here to show the selected item
+      value={field.value}
     >
       <FormControl>
         <SelectTrigger>
@@ -24,7 +36,7 @@ export function SelectDemo({ data, field }) {
       </FormControl>
       <SelectContent>
         {data.map((item) => (
-          <SelectItem key={item.id} value={`${item.id}`}>
+          <SelectItem key={item.id} value={item.id}>
             {item.name}
           </SelectItem>
         ))}

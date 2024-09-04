@@ -1,7 +1,4 @@
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-import { z } from "zod";
-
+import { useGetDate } from "@/app/store";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { FormControl } from "@/components/ui/form";
@@ -11,23 +8,25 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
 import React from "react";
-import { useGetDate } from "@/app/store";
 
-const FormSchema = z.object({
-  dob: z.date({
-    required_error: "A date of birth is required.",
-  }),
-});
+type FieldProps = {
+  value: Date | null;
+  onChange: (date: Date) => void;
+};
 
-export function CalendarForm({ field }) {
+export function CalendarForm({ field }: { field: FieldProps }) {
   const [isCalendarOpen, setIsCalendarOpen] = React.useState(false);
   const getDate = useGetDate((state) => state.getDate);
 
-  const handleSetDate = (date) => {
-    field.onChange(date); // Pass the selected date to the onChange handler
-    getDate(date);
-    setIsCalendarOpen(false); // Close the calendar popover
+  const handleSetDate = (date: Date | undefined) => {
+    if (date) {
+      field.onChange(date);
+      getDate(date);
+      setIsCalendarOpen(false);
+    }
   };
 
   return (
@@ -53,8 +52,8 @@ export function CalendarForm({ field }) {
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
           mode="single"
-          selected={field.value}
-          onSelect={(date) => handleSetDate(date)}
+          selected={field.value ?? undefined}
+          onSelect={handleSetDate}
           initialFocus
         />
       </PopoverContent>

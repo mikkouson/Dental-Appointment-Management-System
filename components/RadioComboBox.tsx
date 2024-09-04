@@ -45,7 +45,12 @@ export default function RadioComboBox<T extends DropdownItem>({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline">
-            {label} : {selectedItem ? selectedItem.name : "Select a branch"}
+            {label} :{" "}
+            {selectedItem
+              ? selectedItem.name
+              : data.length > 0
+              ? data[0].name
+              : "Select a branch"}
             <ChevronDownIcon className="ml-2 h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>

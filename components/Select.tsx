@@ -71,6 +71,8 @@ export function SelectForm() {
     "/api/service/",
     fetcher
   );
+  const selectedBranch = useGetDate((state) => state.branch);
+
   const { data: branch, error: branchError } = useSWR("/api/branch/", fetcher);
   const selectedDate = useGetDate((state) => state.selectedDate);
 
@@ -127,6 +129,7 @@ export function SelectForm() {
             <FormItem>
               <FormLabel>Branch</FormLabel>
               <SelectDemo field={field} data={branch} />
+
               <FormMessage />
             </FormItem>
           )}
@@ -169,7 +172,13 @@ export function SelectForm() {
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Date of birth</FormLabel>
-              {dob ? <TimeSlot /> : <>disabled</>}
+              {dob ? (
+                <TimeSlot
+                  branch={selectedBranch === 0 ? branch[0].id : branch}
+                />
+              ) : (
+                <>disabled</>
+              )}
               <FormDescription>
                 Your date of birth is used to calculate your age.
               </FormDescription>

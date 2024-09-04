@@ -20,9 +20,10 @@ import TimeSlot from "./TimeSlot";
 interface SheetDemoProps {
   id: string;
   date: string;
+  branch: string;
 }
 
-export function SheetDemo({ id, date }: SheetDemoProps) {
+export function SheetDemo({ id, date, branch }: SheetDemoProps) {
   const selectedDate = useGetDate((state) => state.selectedDate);
   const selectTime = useGetDate((state) => state.selectedTime);
   const getDate = useGetDate((state) => state.getDate);
@@ -46,7 +47,7 @@ export function SheetDemo({ id, date }: SheetDemoProps) {
           <div className="grid gap-4 py-4">
             <DatePickerDemo />
           </div>
-          <TimeSlot />
+          <TimeSlot branch={branch} />
 
           <SheetFooter>
             <SubmitButton

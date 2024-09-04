@@ -7,9 +7,8 @@ import useSWR from "swr";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-export default function TimeSlot() {
+export default function TimeSlot({ branch }: any) {
   const { getTime, selectedTime, selectedDate } = useGetDate();
-  const branch = useGetDate((state) => state.branch);
 
   const date = moment(selectedDate).format("MM/DD/YYYY");
   const { data, error } = useSWR(

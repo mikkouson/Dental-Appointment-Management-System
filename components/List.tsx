@@ -109,7 +109,7 @@ function AppointmentList({
             </div>
             <div className="flex space-x-2">
               <form>
-                <SheetDemo id={appointment.id} date={date} />
+                <SheetDemo id={appointment.id} date={date} branch={branch} />
                 {appointment.status === "accepted" && (
                   <SubmitButton
                     className="bg-red-500 text-white px-3 py-1 rounded"
