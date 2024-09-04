@@ -1,14 +1,12 @@
 "use client";
 
 import { cancelAppointment } from "@/app/admin/action";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import moment from "moment";
+import { useEffect } from "react";
 import useSWR, { mutate } from "swr";
 import { SheetDemo } from "./Sheet";
 import SubmitButton from "./submitBtn";
-import { useGetDate } from "@/app/store";
-import { useEffect } from "react";
-import { createClient } from "@/utils/supabase/client";
-import { useRouter } from "next/navigation";
 
 interface Appointment {
   id: string;
@@ -27,11 +25,13 @@ interface AppointmentListProps {
   hour: string;
   status: string[];
   date: string;
+  branch: string;
 }
 
 interface ListProps {
   date: string;
   status: string[];
+  branch: string;
 }
 
 const fetcher = (url: string): Promise<Appointment[]> =>
@@ -65,10 +65,9 @@ function AppointmentList({
   hour,
   status,
   date,
+  branch,
 }: AppointmentListProps) {
-  const branch = useGetDate((state) => state.branch);
-  const supabase = createClient();
-  const router = useRouter();
+  const supabase = createClientComponentClient();
   useEffect(() => {
     const channel = supabase
       .channel("realtime appointments")
@@ -89,7 +88,7 @@ function AppointmentList({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [supabase, mutate]);
+  }, [supabase, date, branch, status]);
   return (
     <div key={hour} className="mb-6">
       <h2 className="text-lg font-semibold mb-2">{hour}</h2>
@@ -133,10 +132,7 @@ function AppointmentList({
   );
 }
 
-export default function List({ date, status }: ListProps) {
-  const branch = useGetDate((state) => state.branch);
-  const supabase = createClient();
-  const router = useRouter();
+export default function List({ date, status, branch }: ListProps) {
   const { data: appointments, error } = useSWR<Appointment[]>(
     `/api/appointments?date=${date}&branch=${branch}&status=${status.join(
       ","
@@ -170,6 +166,7 @@ export default function List({ date, status }: ListProps) {
           hour={hour}
           date={date}
           status={status}
+          branch={branch}
         />
       ))}
     </div>

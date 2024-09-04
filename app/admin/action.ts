@@ -42,3 +42,22 @@ export async function rescheduleAppointment({
   revalidatePath("/");
   redirect("/admin");
 }
+
+export async function newAppointment() {
+  const supabase = createClient();
+  await supabase
+    .from("appointments")
+    .insert([
+      {
+        patient_id: "7",
+        date: "09/01/2024",
+        statu: "1",
+        time: "1",
+        branch: "1",
+      },
+    ])
+    .select("*");
+
+  revalidatePath("/");
+  redirect("/admin");
+}
