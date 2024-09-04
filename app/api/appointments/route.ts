@@ -34,7 +34,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
     )
     .eq("date", date)
     .eq("branch", branch)
-    .in("status", status);
+    .in("statu", status);
 
   if (error) {
     console.error("Supabase error:", error);
