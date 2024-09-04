@@ -31,7 +31,7 @@ export default function BranchSelect() {
       <RadioComboBox
         data={data}
         selectedItem={selectedBranch}
-        store={branch1}
+        store={branch1 === 0 ? data[0].id : branch1}
         action={setBranch}
         label={"Branch"}
       />
