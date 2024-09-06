@@ -122,7 +122,7 @@ export function DataTable({ data, columns, mutate }: TableProps) {
       }
   
       if (existingItems && existingItems.length > 0) {
-        alert("An item with this name already exists.");
+        alert("This item already exists.");
         return;
       }
   
