@@ -1,53 +1,37 @@
-import Link from "next/link";
+"use client";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { newApp } from "@/app/admin/action";
 import { toast } from "@/components/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import {
   Form,
-  FormControl,
   FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "./ui/input";
+import { ChevronDownIcon } from "lucide-react";
 import useSWR from "swr";
-import { SelectDemo } from "./Selict";
-import { DatePickerDemo } from "./DatePicker";
-import { Calendar } from "./ui/calendar";
-import moment from "moment";
-import { cn } from "@/lib/utils";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@radix-ui/react-popover";
-import { CalendarIcon } from "lucide-react";
-import { format } from "path";
 import { CalendarForm } from "./DateSelect";
-import TimeSlot from "./TimeSlot";
-import { useGetDate } from "@/app/store";
+import { RadioBtn } from "./RadioBtn";
+import TimeSlot from "./SelectTime";
+type Patient = {
+  id: string;
+  // Add other patient properties as needed
+};
+
+type Appointment = {
+  id: string;
+  patient_id: number;
+  date: Date;
+};
 
 const FormSchema = z.object({
-  // name: z
-  //   .string()
-  //   .min(2, {
-  //     message: "Name must be at least 2 characters.",
-  //   })
-  //   .max(30, {
-  //     message: "Name must not be longer than 30 characters.",
-  //   }),
   patient: z.string({
     required_error: "Please select a patient to display.",
   }),
@@ -57,30 +41,35 @@ const FormSchema = z.object({
   branch: z.string({
     required_error: "Please select an email to display.",
   }),
-  dob: z.date({
+  date: z.date({
+    required_error: "A date of birth is required.",
+  }),
+  time: z.number({
+    required_error: "A date of birth is required.",
+  }),
+  type: z.string({
     required_error: "A date of birth is required.",
   }),
 });
 
-const fetcher = (url: string): Promise<{ id: string; name: string }[]> =>
+const fetcher = (url: string): Promise<any[]> =>
   fetch(url).then((res) => res.json());
 
-export function SelectForm() {
-  const { data, error } = useSWR("/api/patients/", fetcher);
-  const { data: services, error: serviceError } = useSWR(
-    "/api/service/",
-    fetcher
-  );
-  const selectedBranch = useGetDate((state) => state.branch);
+const type = [
+  { name: "Walk in", id: "walk in" },
+  { name: "Phone Call", id: "phone call" },
+] as const;
 
-  const { data: branch, error: branchError } = useSWR("/api/branch/", fetcher);
-  const selectedDate = useGetDate((state) => state.selectedDate);
+export function SelectForm({ setOpen }: { setOpen: (open: boolean) => void }) {
+  const { data, error } = useSWR("/api/data/", fetcher);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   });
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
+    newApp(data);
+    setOpen(false);
     toast({
       title: "You submitted the following values:",
       description: (
@@ -91,102 +80,142 @@ export function SelectForm() {
     });
   }
 
-  if (!data || !services || !branch) return <>Loading ...</>;
-  const dob = form.watch("dob");
+  if (!data) return <>Loading ...</>;
+  const date = form.watch("date");
+  const selectedBranch = form.watch("branch");
+  const patient = form.watch("patient");
+
+  const clear = () => {};
+
+  const patientsTable = data.find((item) => item.table_name === "patients");
+  const appointmentsTable = data.find(
+    (item) => item.table_name === "appointments"
+  );
+
+  const services = data.find((item) => item.table_name === "services");
+  const branch = data.find((item) => item.table_name === "branch");
+  const patientId = parseInt(patient);
+
+  const patientAppointments = (appointmentsTable.row_data as Appointment[])
+    .filter((item) => item.patient_id === patientId)
+    .map((item) => item.date);
+
+  console.log(patientAppointments);
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
-        <FormField
-          control={form.control}
-          name="patient"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <SelectDemo field={field} data={data} />
-              <FormDescription>
-                You can manage email addresses in your{" "}
-                <Link href="/examples/forms">email settings</Link>.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="service"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Services</FormLabel>
-              <SelectDemo field={field} data={services} />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="branch"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Branch</FormLabel>
-              <SelectDemo field={field} data={branch} />
-
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* <FormField
-          control={form.control}
-          name="date"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <Calendar
-                mode="single"
-                selected={field.value}
-                onSelect={field.onChange}
-                initialFocus
-              />
-              <FormMessage />
-            </FormItem>
-          )}
-        /> */}
-
-        <FormField
-          control={form.control}
-          name="dob"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Date of birth</FormLabel>
-              <CalendarForm field={field} />
-              <FormDescription>
-                Your date of birth is used to calculate your age.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="dob"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Date of birth</FormLabel>
-              {dob ? (
-                <TimeSlot
-                  branch={selectedBranch === 0 ? branch[0].id : branch}
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <FormField
+            control={form.control}
+            name="patient"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Patient</FormLabel>
+                <RadioBtn field={field} data={patientsTable.row_data} />
+                <FormMessage />
+                {patient}
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="branch"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Branch</FormLabel>
+                <RadioBtn
+                  field={field}
+                  data={branch.row_data}
+                  form={form}
+                  timeclear={true}
                 />
-              ) : (
-                <>disabled</>
-              )}
-              <FormDescription>
-                Your date of birth is used to calculate your age.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit">Submit</Button>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="service"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Services</FormLabel>
+                <RadioBtn field={field} data={services.row_data} form={form} />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="type"
+            render={({ field }) => (
+              <FormItem className="flex flex-col justify-between">
+                <FormLabel>Appointment Type</FormLabel>
+                <RadioBtn field={field} data={type} />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="date"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Date</FormLabel>
+                {selectedBranch ? (
+                  <CalendarForm
+                    field={field}
+                    form={form}
+                    patientAppointments={patientAppointments}
+                  />
+                ) : (
+                  <div className="cursor-not-allowed">
+                    <Button
+                      variant="outline"
+                      className="w-full flex justify-between "
+                      disabled
+                    >
+                      Select Date <ChevronDownIcon className="ml-2 h-4 w-4" />
+                    </Button>
+                    <FormDescription>
+                      Please select clinic branch to enable date button
+                    </FormDescription>
+                  </div>
+                )}
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="time"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Time</FormLabel>
+                {date ? (
+                  <TimeSlot branch={selectedBranch} field={field} date={date} />
+                ) : (
+                  <div className="cursor-not-allowed">
+                    <Button
+                      variant="outline"
+                      className="w-full flex justify-between"
+                      disabled
+                    >
+                      Select Time <ChevronDownIcon className="ml-2 h-4 w-4" />
+                    </Button>
+                    <FormDescription>
+                      Please select available date to enable time button
+                    </FormDescription>
+                  </div>
+                )}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="flex justify-end">
+          <Button type="submit">Submit</Button>
+        </div>
       </form>
     </Form>
   );
