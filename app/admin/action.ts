@@ -50,33 +50,26 @@ type Inputz = z.infer<typeof schemas>;
 export async function cancelAppointment({ aptId }: AppointmentActionProps) {
   const supabase = createClient();
 
-  await supabase
-    .from("appointments")
-    .update({ status: "canceled" })
-    .eq("id", aptId);
+  await supabase.from("appointments").update({ status: 3 }).eq("id", aptId);
 
   revalidatePath("/");
-  redirect("/admin");
+  redirect("/admin/appointments");
 }
 
-// In "@/app/admin/action"
 export async function rescheduleAppointment(data: Inputz) {
   const result = schemas.safeParse(data);
   if (!result.success) {
     console.log("Validation errors:", result.error.format());
     return;
   }
-
   const supabase = createClient();
-
-  // Adjust date and time formats as necessary
-  const formattedDate = moment(data.date).format("YYYY-MM-DD"); // Adjust format as needed
+  const formattedDate = moment(data.date).format("YYYY-MM-DD");
 
   const { error } = await supabase
     .from("appointments")
     .update({
       date: formattedDate,
-      time: data.time, // Adjust format as needed
+      time: data.time,
     })
     .eq("id", data.id);
 
@@ -99,15 +92,14 @@ export async function newApp(data: Inputs) {
 
   const supabase = createClient();
 
-  // Insert data into Supabase
   const { error } = await supabase.from("appointments").insert([
     {
       patient_id: data.patient,
       service: data.service,
       branch: data.branch,
-      date: moment(data.date).format("MM/DD/YYYY"), // Convert date to ISO string if needed
+      date: moment(data.date).format("MM/DD/YYYY"),
       time: data.time,
-      status: "1", // Assuming default status
+      status: "1",
       type: data.type,
     },
   ]);

@@ -38,18 +38,22 @@ export default function AppointmentsMap({
               <div>
                 {filteredAppointments.map((apt) => (
                   <div
-                    className="flex items-center border-2 p-2 mb-2 rounded-lg"
+                    className="flex items-center border-2 p-2 px-4 mb-2 rounded-lg justify-between"
                     key={apt.id}
                   >
-                    <span className="mr-2">
-                      {apt.services?.name || "Unknown Service"} -
-                    </span>
-
-                    <div className="flex flex-col">
-                      <span>
-                        Patient: {apt.patients?.name || "Unknown Patient"}
+                    <div className="flex items-center">
+                      <span className="mr-2">
+                        {apt.services?.name || "Unknown Service"} -
                       </span>
-                      <span>Status: {apt.status?.name || "Not specified"}</span>
+
+                      <div className="flex flex-col">
+                        <span>
+                          Patient: {apt.patients?.name || "Unknown Patient"}
+                        </span>
+                        <span>
+                          Status: {apt.status?.name || "Not specified"}
+                        </span>
+                      </div>
                     </div>
                     <form>
                       <SheetDemo
