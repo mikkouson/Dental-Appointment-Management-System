@@ -24,7 +24,7 @@ const FormSchema = z.object({
       })
     )
     .refine((value) => value.length > 0, {
-      message: "You have to select at least one item.",
+      message: " You have to select at least one item.",
     }),
 });
 
@@ -82,7 +82,8 @@ export function CheckboxReactHookFormMultiple({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline">
-                    {label} <ChevronDownIcon className="ml-2 h-4 w-4" />
+                    {label} <ChevronDownIcon className="ml-2 h-4 w-4" />{" "}
+                    <FormMessage />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56">
@@ -109,7 +110,6 @@ export function CheckboxReactHookFormMultiple({
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
-              <FormMessage />
             </FormItem>
           )}
         />
