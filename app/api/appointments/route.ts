@@ -28,13 +28,16 @@ export async function GET(req: NextRequest, res: NextResponse) {
       ),
       time_slots (
         *
+      ),
+       status (
+        *
       )
     `,
       { count: "exact" }
     )
     .eq("date", date)
     .eq("branch", branch)
-    .in("statu", status);
+    .in("status", status);
 
   if (error) {
     console.error("Supabase error:", error);
