@@ -17,16 +17,44 @@ type FieldProps = {
   onChange: (date: Date) => void;
 };
 
-export function CalendarForm({ field }: { field: FieldProps }) {
+export function CalendarForm({
+  field,
+  form,
+  patientAppointments,
+  dontdis,
+}: {
+  field: FieldProps;
+  form: any; // Add appropriate type for form here
+  patientAppointments: (Date | string)[]; // Adjust type if needed
+  dontdis?: Date; // Optional date that should not be disabled
+}) {
   const [isCalendarOpen, setIsCalendarOpen] = React.useState(false);
   const getDate = useGetDate((state) => state.getDate);
 
+  console.log(patientAppointments);
   const handleSetDate = (date: Date | undefined) => {
     if (date) {
       field.onChange(date);
       getDate(date);
       setIsCalendarOpen(false);
+      form.setValue("time", null);
     }
+  };
+
+  const parseDate = (date: Date | string): Date => {
+    return typeof date === "string" ? new Date(date) : date;
+  };
+
+  const isDateDisabled = (date: Date) => {
+    const dateStr = date.toDateString();
+    const dontdisStr = dontdis?.toDateString();
+    return (
+      (patientAppointments.some(
+        (apptDate) => parseDate(apptDate).toDateString() === dateStr
+      ) ||
+        date < new Date()) &&
+      dontdisStr !== dateStr
+    );
   };
 
   return (
@@ -36,7 +64,7 @@ export function CalendarForm({ field }: { field: FieldProps }) {
           <Button
             variant={"outline"}
             className={cn(
-              "w-[240px] pl-3 text-left font-normal",
+              "w-full flex pl-3 text-left font-normal",
               !field.value && "text-muted-foreground"
             )}
           >
@@ -55,6 +83,7 @@ export function CalendarForm({ field }: { field: FieldProps }) {
           selected={field.value ?? undefined}
           onSelect={handleSetDate}
           initialFocus
+          disabled={isDateDisabled}
         />
       </PopoverContent>
     </Popover>
