@@ -1,16 +1,14 @@
-import type { Database } from "@/app/schema"; // Adjust path as necessary
 import { cancelAppointment } from "@/app/admin/action";
+import type {
+  Appointment,
+  Patient,
+  Service,
+  Status,
+  TimeSlot,
+} from "@/app/schema";
 import { SheetDemo } from "./Sheet";
 import SubmitButton from "./submitBtn";
 
-// Define types based on the `Database` schema
-type TimeSlot = Database["public"]["Tables"]["time_slots"]["Row"];
-type Appointment = Database["public"]["Tables"]["appointments"]["Row"];
-type Service = Database["public"]["Tables"]["services"]["Row"];
-type Status = Database["public"]["Tables"]["status"]["Row"];
-type Patient = Database["public"]["Tables"]["patients"]["Row"];
-
-// Ensure that appointments are mapped with service, patient, and status information
 interface AppointmentsMapProps {
   timeSlots: TimeSlot[];
   appointments: (Appointment & {
@@ -58,7 +56,7 @@ export default function AppointmentsMap({
                     <form>
                       <SheetDemo
                         date={apt.date || ""}
-                        pid={String(apt.patients?.id || "")} // Convert to string
+                        pid={String(apt.patients?.id || "")}
                         time={Number(apt.time || "")}
                         aptId={apt.id}
                       />
