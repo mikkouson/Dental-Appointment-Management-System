@@ -13,7 +13,7 @@ export default function BranchSelect() {
   const branch1 = useGetDate((state) => state.branch);
   const setBranch = useGetDate((state) => state.setBranch);
 
-  const { data, error } = useSWR("api/branch/", fetcher);
+  const { data, error } = useSWR("/api/branch/", fetcher);
 
   if (error) return <>Failed to load</>;
   if (!data)
