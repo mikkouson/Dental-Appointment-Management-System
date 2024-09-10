@@ -7,6 +7,9 @@ export type Json =
   | Json[];
 export type TimeSlot = Database["public"]["Tables"]["time_slots"]["Row"];
 export type Appointment = Database["public"]["Tables"]["appointments"]["Row"];
+export type Service = Database["public"]["Tables"]["services"]["Row"];
+export type Status = Database["public"]["Tables"]["status"]["Row"];
+export type Patient = Database["public"]["Tables"]["patients"]["Row"];
 export type Database = {
   public: {
     Tables: {

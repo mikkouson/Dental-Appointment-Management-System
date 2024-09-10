@@ -1,16 +1,14 @@
-import type { Database } from "@/app/schema"; // Adjust path as necessary
 import { cancelAppointment } from "@/app/admin/action";
+import type {
+  Appointment,
+  Patient,
+  Service,
+  Status,
+  TimeSlot,
+} from "@/app/schema";
 import { SheetDemo } from "./Sheet";
 import SubmitButton from "./submitBtn";
 
-// Define types based on the `Database` schema
-type TimeSlot = Database["public"]["Tables"]["time_slots"]["Row"];
-type Appointment = Database["public"]["Tables"]["appointments"]["Row"];
-type Service = Database["public"]["Tables"]["services"]["Row"];
-type Status = Database["public"]["Tables"]["status"]["Row"];
-type Patient = Database["public"]["Tables"]["patients"]["Row"];
-
-// Ensure that appointments are mapped with service, patient, and status information
 interface AppointmentsMapProps {
   timeSlots: TimeSlot[];
   appointments: (Appointment & {
@@ -28,7 +26,7 @@ export default function AppointmentsMap({
     <>
       {timeSlots.map((time) => {
         const filteredAppointments = appointments.filter(
-          (apt) => apt.time === time.id
+          (apt: any) => apt.time === time.id
         );
 
         return (
@@ -36,7 +34,7 @@ export default function AppointmentsMap({
             <h3 className="text-lg font-semibold mb-2">{time.time}</h3>
             {filteredAppointments.length > 0 ? (
               <div>
-                {filteredAppointments.map((apt) => (
+                {filteredAppointments.map((apt: any) => (
                   <div
                     className="flex items-center border-2 p-2 px-4 mb-2 rounded-lg justify-between"
                     key={apt.id}
@@ -56,15 +54,9 @@ export default function AppointmentsMap({
                       </div>
                     </div>
                     <form>
-                      <SheetDemo
-                        date={apt.date || ""}
-                        pid={String(apt.patients?.id || "")} // Convert to string
-                        time={Number(apt.time || "")}
-                        aptId={apt.id}
-                      />
                       {apt.status?.id === 1 && (
                         <SubmitButton
-                          className="bg-red-500 text-white px-3 py-1 rounded"
+                          className="bg-red-500 text-white px-3 py-1 rounded mr-2"
                           formAction={async () => {
                             try {
                               await cancelAppointment({ aptId: apt.id });
@@ -80,6 +72,13 @@ export default function AppointmentsMap({
                           Cancel
                         </SubmitButton>
                       )}
+                      <SheetDemo
+                        date={apt.date || ""}
+                        pid={String(apt.patients?.id || "")}
+                        time={Number(apt.time || "")}
+                        aptId={apt.id}
+                        apt={apt}
+                      />
                     </form>
                   </div>
                 ))}

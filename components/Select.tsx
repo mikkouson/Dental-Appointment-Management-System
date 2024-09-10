@@ -20,6 +20,7 @@ import useSWR from "swr";
 import { CalendarForm } from "./DateSelect";
 import { RadioBtn } from "./RadioBtn";
 import TimeSlot from "./SelectTime";
+import Field from "./FormField";
 type Patient = {
   id: string;
   // Add other patient properties as needed
@@ -32,13 +33,11 @@ type Appointment = {
 };
 
 const FormSchema = z.object({
-  patient: z.string({
-    required_error: "Please select a patient to display.",
-  }),
-  service: z.string({
+  patient: z.string(),
+  service: z.number({
     required_error: "Please select an email to display.",
   }),
-  branch: z.string({
+  branch: z.number({
     required_error: "Please select an email to display.",
   }),
   date: z.date({
@@ -68,8 +67,8 @@ export function SelectForm({ setOpen }: { setOpen: (open: boolean) => void }) {
   });
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    newApp(data);
-    setOpen(false);
+    // newApp(data);
+    // setOpen(false);
     toast({
       title: "You submitted the following values:",
       description: (
@@ -84,8 +83,6 @@ export function SelectForm({ setOpen }: { setOpen: (open: boolean) => void }) {
   const date = form.watch("date");
   const selectedBranch = form.watch("branch");
   const patient = form.watch("patient");
-
-  const clear = () => {};
 
   const patientsTable = data.find((item) => item.table_name === "patients");
   const appointmentsTable = data.find(
@@ -105,56 +102,28 @@ export function SelectForm({ setOpen }: { setOpen: (open: boolean) => void }) {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          <FormField
-            control={form.control}
-            name="patient"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Patient</FormLabel>
-                <RadioBtn field={field} data={patientsTable.row_data} />
-                <FormMessage />
-                {patient}
-              </FormItem>
-            )}
+          <Field
+            form={form}
+            name={"patient"}
+            label={"patient"}
+            data={patientsTable.row_data}
           />
-          <FormField
-            control={form.control}
-            name="branch"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Branch</FormLabel>
-                <RadioBtn
-                  field={field}
-                  data={branch.row_data}
-                  form={form}
-                  timeclear={true}
-                />
-                <FormMessage />
-              </FormItem>
-            )}
+          <Field
+            form={form}
+            name={"branch"}
+            label={"Branch"}
+            data={branch.row_data}
+            num={true}
           />
-          <FormField
-            control={form.control}
-            name="service"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Services</FormLabel>
-                <RadioBtn field={field} data={services.row_data} form={form} />
-                <FormMessage />
-              </FormItem>
-            )}
+          <Field
+            form={services}
+            name={"service"}
+            label={"Service"}
+            data={services.row_data}
+            num={true}
           />
-          <FormField
-            control={form.control}
-            name="type"
-            render={({ field }) => (
-              <FormItem className="flex flex-col justify-between">
-                <FormLabel>Appointment Type</FormLabel>
-                <RadioBtn field={field} data={type} />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <Field form={form} name={"type"} label={"Type"} data={type} />
+
           <FormField
             control={form.control}
             name="date"
@@ -193,7 +162,11 @@ export function SelectForm({ setOpen }: { setOpen: (open: boolean) => void }) {
               <FormItem>
                 <FormLabel>Time</FormLabel>
                 {date ? (
-                  <TimeSlot branch={selectedBranch} field={field} date={date} />
+                  <TimeSlot
+                    branch={selectedBranch.toString()}
+                    field={field}
+                    date={date}
+                  />
                 ) : (
                   <div className="cursor-not-allowed">
                     <Button
