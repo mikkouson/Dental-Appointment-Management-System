@@ -106,7 +106,7 @@ export default function Appointments() {
   if (appointmentsError) return <div>Error loading appointments</div>;
 
   return (
-    <div className="flex xl:mx-40 justify-between mt-10">
+    <div className="flex  justify-between mx-10 ">
       <div>
         <Calendar
           mode="single"
@@ -118,9 +118,9 @@ export default function Appointments() {
 
       <div className="w-full pl-10 flex-col">
         <div className="flex justify-end">
-          <DrawerDialogDemo label={"New Appointment"} />
           <CheckboxReactHookFormMultiple items={statuses} label="Status" />
           <BranchSelect />
+          <DrawerDialogDemo label={"New Appointment"} />
         </div>
         <div>
           {isLoading ? (

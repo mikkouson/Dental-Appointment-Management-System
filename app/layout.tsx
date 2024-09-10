@@ -29,8 +29,8 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <Navigation />
-            <main className="content-area flex flex-col ">
+            {/* <Navigation /> */}
+            <main className="h-screen flex flex-col  ">
               <SWRProvider>{children}</SWRProvider>
             </main>
             <Toaster />

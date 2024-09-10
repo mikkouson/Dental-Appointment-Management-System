@@ -27,7 +27,7 @@ export default function BranchSelect() {
   const selectedBranch = data.find((branch) => branch.id === branch1);
 
   return (
-    <div>
+    <div className="mr-2">
       <RadioComboBox
         data={data}
         selectedItem={selectedBranch}

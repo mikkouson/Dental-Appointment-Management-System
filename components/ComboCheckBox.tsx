@@ -80,7 +80,7 @@ export function CheckboxReactHookFormMultiple({
           render={({ field }) => (
             <FormItem>
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+                <DropdownMenuTrigger asChild className="mr-2">
                   <Button variant="outline">
                     {label} <ChevronDownIcon className="ml-2 h-4 w-4" />{" "}
                     <FormMessage />
