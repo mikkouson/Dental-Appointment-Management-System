@@ -26,7 +26,7 @@ export default function AppointmentsMap({
     <>
       {timeSlots.map((time) => {
         const filteredAppointments = appointments.filter(
-          (apt) => apt.time === time.id
+          (apt: any) => apt.time === time.id
         );
 
         return (
@@ -34,7 +34,7 @@ export default function AppointmentsMap({
             <h3 className="text-lg font-semibold mb-2">{time.time}</h3>
             {filteredAppointments.length > 0 ? (
               <div>
-                {filteredAppointments.map((apt) => (
+                {filteredAppointments.map((apt: any) => (
                   <div
                     className="flex items-center border-2 p-2 px-4 mb-2 rounded-lg justify-between"
                     key={apt.id}
@@ -54,15 +54,9 @@ export default function AppointmentsMap({
                       </div>
                     </div>
                     <form>
-                      <SheetDemo
-                        date={apt.date || ""}
-                        pid={String(apt.patients?.id || "")}
-                        time={Number(apt.time || "")}
-                        aptId={apt.id}
-                      />
                       {apt.status?.id === 1 && (
                         <SubmitButton
-                          className="bg-red-500 text-white px-3 py-1 rounded"
+                          className="bg-red-500 text-white px-3 py-1 rounded mr-2"
                           formAction={async () => {
                             try {
                               await cancelAppointment({ aptId: apt.id });
@@ -78,6 +72,13 @@ export default function AppointmentsMap({
                           Cancel
                         </SubmitButton>
                       )}
+                      <SheetDemo
+                        date={apt.date || ""}
+                        pid={String(apt.patients?.id || "")}
+                        time={Number(apt.time || "")}
+                        aptId={apt.id}
+                        apt={apt}
+                      />
                     </form>
                   </div>
                 ))}
