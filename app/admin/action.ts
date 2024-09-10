@@ -10,23 +10,25 @@ interface AppointmentActionProps {
 }
 
 const schema = z.object({
-  patient: z.string({
-    invalid_type_error: "Invalid patient",
+  id: z.number(),
+  patient: z.string(),
+  service: z.number({
+    required_error: "Please select an email to display.",
   }),
-  service: z.string({
-    invalid_type_error: "Invalid service",
-  }),
-  branch: z.string({
-    invalid_type_error: "Invalid branch",
+  branch: z.number({
+    required_error: "Please select an email to display.",
   }),
   date: z.date({
-    invalid_type_error: "Invalid date of birth",
+    required_error: "A date of birth is required.",
   }),
   time: z.number({
-    invalid_type_error: "Invalid time",
+    required_error: "A date of birth is required.",
   }),
   type: z.string({
-    invalid_type_error: "Invalid time",
+    required_error: "A date of birth is required.",
+  }),
+  status: z.number({
+    required_error: "A date of birth is required.",
   }),
 });
 
@@ -56,7 +58,7 @@ export async function cancelAppointment({ aptId }: AppointmentActionProps) {
   redirect("/admin/appointments");
 }
 
-export async function rescheduleAppointment(data: Inputz) {
+export async function rescheduleAppointment(data: Inputs) {
   const result = schemas.safeParse(data);
   if (!result.success) {
     console.log("Validation errors:", result.error.format());
@@ -68,8 +70,12 @@ export async function rescheduleAppointment(data: Inputz) {
   const { error } = await supabase
     .from("appointments")
     .update({
-      date: formattedDate,
+      service: data.service,
+      branch: data.branch,
+      date: moment(data.date).format("MM/DD/YYYY"),
       time: data.time,
+      status: data.status,
+      type: data.type,
     })
     .eq("id", data.id);
 
