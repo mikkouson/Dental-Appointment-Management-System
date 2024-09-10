@@ -1,7 +1,5 @@
 "use client";
 
-import { z } from "zod";
-import * as React from "react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -10,12 +8,15 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import * as React from "react";
+import { z } from "zod";
 import { CalendarForm } from "./DateSelect";
 import TimeSlot from "./SelectTime";
 
 const fetcher = (url: string): Promise<any[]> =>
   fetch(url).then((res) => res.json());
 
+import { rescheduleAppointment } from "@/app/admin/action";
 import { useGetDate } from "@/app/store";
 import {
   Sheet,
@@ -26,32 +27,59 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { zodResolver } from "@hookform/resolvers/zod";
-import moment from "moment";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import useSWR from "swr";
+import Field from "./FormField";
 import { toast } from "./hooks/use-toast";
-import { rescheduleAppointment } from "@/app/admin/action";
+import { Input } from "./ui/input";
+
+interface Appointment {
+  branch: number;
+  status: { id: number };
+  service: number;
+  type: string;
+  patients: { name: string };
+  id: number;
+}
 
 interface SheetDemoProps {
   pid: string;
   date: string;
   time: number;
   aptId: number;
+  apt: Appointment;
 }
 
 const FormSchema = z.object({
+  id: z.number(),
+  patient: z.string(),
+  service: z.number({
+    required_error: "Please select an email to display.",
+  }),
+  branch: z.number({
+    required_error: "Please select an email to display.",
+  }),
   date: z.date({
     required_error: "A date of birth is required.",
   }),
   time: z.number({
-    required_error: "A time is required.",
+    required_error: "A date of birth is required.",
   }),
-  id: z.number(),
+  type: z.string({
+    required_error: "A date of birth is required.",
+  }),
+  status: z.number({
+    required_error: "A date of birth is required.",
+  }),
 });
-
 type FormSchemaType = z.infer<typeof FormSchema>;
+const type = [
+  { name: "Walk in", id: "walk in" },
+  { name: "Phone Call", id: "phone call" },
+  { name: "Online", id: "online" },
+] as const;
 
-export function SheetDemo({ date, pid, time, aptId }: SheetDemoProps) {
+export function SheetDemo({ date, pid, time, aptId, apt }: SheetDemoProps) {
   const [open, setOpen] = React.useState(false);
   const selectedBranch = useGetDate((state) => state.setBranch);
   const { data, error } = useSWR("/api/data/", fetcher);
@@ -74,6 +102,11 @@ export function SheetDemo({ date, pid, time, aptId }: SheetDemoProps) {
     form.setValue("date", new Date(date));
     form.setValue("id", aptId);
     form.setValue("time", time);
+    form.setValue("branch", apt.branch);
+    form.setValue("status", apt.status.id);
+    form.setValue("service", apt.service);
+    form.setValue("type", apt.type);
+    form.setValue("patient", apt.patients.name);
   };
 
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
@@ -89,12 +122,16 @@ export function SheetDemo({ date, pid, time, aptId }: SheetDemoProps) {
     });
   };
 
-  if (!data) return <>Loading ...</>;
+  const b = form.watch("type");
+  console.log(typeof b);
 
+  if (!data) return <>Loading ...</>;
+  const services = data.find((item) => item.table_name === "services");
+  const statuses = data.find((item) => item.table_name === "status");
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button onClick={() => set()}>Open</Button>
+        <Button onClick={() => set()}>Edit</Button>
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
@@ -109,7 +146,47 @@ export function SheetDemo({ date, pid, time, aptId }: SheetDemoProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
               <FormField
                 control={form.control}
+                name="patient"
+                render={() => (
+                  <FormItem>
+                    <FormLabel>Patients Name</FormLabel>
+                    <Input disabled defaultValue={apt.patients.name} />
+                  </FormItem>
+                )}
+              />
+              <Input disabled defaultValue={apt.id} />
+
+              <Field
+                form={form}
+                name={"branch"}
+                label={"Branch"}
+                data={branchTable.row_data}
+                num={true}
+              />
+
+              <Field
+                form={form}
+                name={"service"}
+                label={"Service"}
+                data={services.row_data}
+                num={true}
+              />
+              <Field
+                form={form}
+                name={"status"}
+                label={"Status"}
+                data={statuses.row_data}
+                num={true}
+              />
+              <Field
+                form={form}
+                name={"type"}
+                label={"Appointment type"}
+                data={type}
+              />
+              <FormField
                 name="date"
+                control={form.control}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Date</FormLabel>
