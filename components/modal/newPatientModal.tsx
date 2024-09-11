@@ -21,7 +21,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Plus } from "lucide-react";
-import { SelectForm } from "./Select";
+import { SelectForm } from "../forms/new-appointment-form";
 
 export function DrawerDialogDemo({ label }: { label: string }) {
   const [open, setOpen] = React.useState(false);
@@ -31,7 +31,7 @@ export function DrawerDialogDemo({ label }: { label: string }) {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" className="bg-primary ">
+          <Button className="bg-primary ">
             <Plus size={20} className="mr-2" />
             {label}
           </Button>

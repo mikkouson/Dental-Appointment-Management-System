@@ -31,6 +31,8 @@ import {
   Calendar,
   X,
   Package,
+  Users,
+  BriefcaseMedical,
 } from "lucide-react";
 
 export type Icon = LucideIcon;
@@ -64,6 +66,8 @@ export const Icons = {
   laptop: Laptop,
   appwindow: Calendar,
   inventory: Package,
+  patients: Users,
+  services: BriefcaseMedical,
   gitHub: ({ ...props }: LucideProps) => (
     <svg
       aria-hidden="true"

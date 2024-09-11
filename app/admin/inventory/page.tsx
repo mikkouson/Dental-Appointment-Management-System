@@ -2,7 +2,7 @@
 
 import React from "react";
 import useSWR, { mutate as globalMutate } from "swr";
-import { DataTable } from "@/components/Table";
+import { DataTable } from "@/components/tables/Table";
 import { createClient } from "@/utils/supabase/client";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -34,7 +34,10 @@ const columns = [
 ];
 
 const Inventory = () => {
-  const { data, error, mutate } = useSWR<InventoryItem[]>("/api/inventory", fetcher);
+  const { data, error, mutate } = useSWR<InventoryItem[]>(
+    "/api/inventory",
+    fetcher
+  );
 
   if (error) return <div>Error loading inventory.</div>;
   if (!data) return <div>Loading...</div>;

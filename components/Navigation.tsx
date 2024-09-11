@@ -1,7 +1,7 @@
 import Logo from "@/images/logo.png";
 import Image from "next/image";
 import { ModeToggle } from "@/components/toggle";
-import { AuthButton } from "./AuthButton";
+import { AuthButton } from "./buttons/signout-btn";
 import Link from "next/link";
 
 export default function Navigation() {

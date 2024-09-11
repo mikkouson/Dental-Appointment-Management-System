@@ -124,23 +124,30 @@ export const navItems: NavItem[] = [
     label: "Appointments",
   },
   {
+    title: "Patients",
+    href: "/admin/patients",
+    icon: "patients",
+    label: "patients",
+  },
+  {
     title: "Inventory",
     href: "/admin/inventory",
     icon: "inventory",
     label: "Inventory",
   },
-  // {
-  //   title: "Profile",
-  //   href: "/dashboard/profile",
-  //   icon: "profile",
-  //   label: "profile",
-  // },
-  // {
-  //   title: "Kanban",
-  //   href: "/dashboard/kanban",
-  //   icon: "kanban",
-  //   label: "kanban",
-  // },
+  {
+    title: "Services",
+    href: "/admin/services",
+    icon: "services",
+    label: "Services",
+  },
+
+  {
+    title: "settings",
+    href: "/admin/settings",
+    icon: "settings",
+    label: "settings",
+  },
   // {
   //   title: "Login",
   //   href: "/",

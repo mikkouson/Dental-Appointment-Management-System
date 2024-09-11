@@ -1,16 +1,16 @@
 "use client";
 
 import { useGetDate } from "@/app/store";
-import BranchSelect from "@/components/BranchSelect";
-import { CheckboxReactHookFormMultiple } from "@/components/ComboCheckBox";
-import { DrawerDialogDemo } from "@/components/NewPatient";
-import AppointmentsMap from "@/components/Appointments";
+import BranchSelect from "@/components/buttons/selectbranch-btn";
+import { CheckboxReactHookFormMultiple } from "@/components/buttons/comboBoxSelect";
+import { DrawerDialogDemo } from "@/components/modal/newPatientModal";
 import { Calendar } from "@/components/ui/calendar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import useSWR, { mutate } from "swr";
+import AppointmentsMap from "@/components/appointmentsList";
 
 const fetcher = (url: string): Promise<any[]> =>
   fetch(url).then((res) => res.json());

@@ -17,10 +17,10 @@ import {
 } from "@/components/ui/form";
 import { ChevronDownIcon } from "lucide-react";
 import useSWR from "swr";
-import { CalendarForm } from "./DateSelect";
-import { RadioBtn } from "./RadioBtn";
-import TimeSlot from "./SelectTime";
-import Field from "./FormField";
+import { CalendarForm } from "../buttons/selectDate";
+import { RadioBtn } from "../buttons/radioBtn";
+import TimeSlot from "../buttons/SelectTime";
+import Field from "./formField";
 type Patient = {
   id: string;
   // Add other patient properties as needed

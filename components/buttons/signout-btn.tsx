@@ -1,6 +1,6 @@
 import { signOut } from "@/app/login/action";
 import SubmitButton from "./submitBtn";
-import { User } from "./user";
+import { User } from "../user";
 import { createClient } from "@/utils/supabase/server";
 
 export async function AuthButton() {

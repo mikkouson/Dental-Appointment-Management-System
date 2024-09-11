@@ -1,5 +1,5 @@
-import { RadioBtn } from "./RadioBtn";
-import { FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
+import { RadioBtn } from "../buttons/radioBtn";
+import { FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 
 interface FieldProps {
   form: any;

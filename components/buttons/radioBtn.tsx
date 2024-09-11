@@ -5,7 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FormControl } from "./ui/form";
+import { FormControl } from "../ui/form";
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 
