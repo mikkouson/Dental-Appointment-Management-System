@@ -33,7 +33,7 @@ type Appointment = {
 };
 
 const FormSchema = z.object({
-  patient: z.string(),
+  patient: z.number(),
   service: z.number({
     required_error: "Please select an email to display.",
   }),
@@ -91,10 +91,9 @@ export function SelectForm({ setOpen }: { setOpen: (open: boolean) => void }) {
 
   const services = data.find((item) => item.table_name === "services");
   const branch = data.find((item) => item.table_name === "branch");
-  const patientId = parseInt(patient);
 
   const patientAppointments = (appointmentsTable.row_data as Appointment[])
-    .filter((item) => item.patient_id === patientId)
+    .filter((item) => item.patient_id === patient)
     .map((item) => item.date);
 
   console.log(patientAppointments);
