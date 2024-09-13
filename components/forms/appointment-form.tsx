@@ -11,7 +11,7 @@ import {
 import * as React from "react";
 import { z } from "zod";
 import { CalendarForm } from "../buttons/selectDate";
-import TimeSlot from "../buttons/SelectTime";
+import TimeSlot from "../buttons/selectTime";
 
 const fetcher = (url: string): Promise<any[]> =>
   fetch(url).then((res) => res.json());
