@@ -1,17 +1,31 @@
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { FormControl } from "../ui/form";
+"use client";
+
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
+import { FormControl } from "../ui/form";
+
+import { Check, ChevronsUpDown } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 type FieldProps = {
-  value: string | number; // Allow both string and number
-  onChange: (value: string | number) => void; // Allow both string and number
+  value: string | number;
+  onChange: (value: string | number) => void;
 };
 
 type DataItem = {
@@ -55,40 +69,75 @@ export function RadioBtn({
   timeclear = false,
   num = false,
 }: RadioBtnProps) {
-  const handleSetDate = (value: string) => {
-    const newValue = num ? Number(value) : value;
-    field.onChange(newValue);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [open, setOpen] = useState(false);
+  const filtered = data.filter((item) =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
+  );
 
-    if (timeclear && value && form) {
+  console.log("Search Query:", searchQuery);
+  console.log("Filtered Data:", filtered);
+
+  const handleSetData = (id: string) => {
+    field.onChange(id);
+    setOpen(false);
+    if (timeclear && id && form) {
       form.setValue("time", 0);
     }
   };
+  const handleOpenChange = (isOpen: boolean) => {
+    if (!isOpen) {
+      setSearchQuery(""); // Clear search query when closing
+    }
+    setOpen(isOpen);
+  };
 
   return (
-    <Select
-      value={
-        num
-          ? typeof field.value === "number"
-            ? field.value.toString()
-            : ""
-          : typeof field.value === "string"
-          ? field.value
-          : ""
-      }
-      onValueChange={(value) => handleSetDate(value)}
-    >
-      <FormControl>
-        <SelectTrigger>
-          <SelectValue placeholder="Select an option" />
-        </SelectTrigger>
-      </FormControl>
-      <SelectContent>
-        {data.map((item) => (
-          <SelectItem key={item.id} value={item.id.toString()}>
-            {item.name}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <Popover open={open} onOpenChange={handleOpenChange}>
+      <PopoverTrigger asChild>
+        <FormControl>
+          <Button
+            variant="outline"
+            role="combobox"
+            className={cn(
+              "w-[200px] justify-between",
+              !field.value && "text-muted-foreground"
+            )}
+          >
+            {field.value
+              ? data.find((item) => item.id === field.value)?.name
+              : "Select option"}
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </FormControl>
+      </PopoverTrigger>
+      <PopoverContent className="w-[200px] p-0">
+        <Command>
+          <CommandInput
+            placeholder="Search option..."
+            onValueChange={(value) => setSearchQuery(value.toString())}
+          />
+          <CommandList>
+            <CommandEmpty>No option found.</CommandEmpty>
+            <CommandGroup>
+              {filtered.map((item) => (
+                <CommandItem
+                  key={item.id}
+                  onSelect={() => handleSetData(item.id)}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      item.id === field.value ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  {item.name}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 }
