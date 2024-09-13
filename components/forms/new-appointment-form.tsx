@@ -19,7 +19,7 @@ import { ChevronDownIcon } from "lucide-react";
 import useSWR from "swr";
 import { CalendarForm } from "../buttons/selectDate";
 import { RadioBtn } from "../buttons/radioBtn";
-import TimeSlot from "../buttons/SelectTime";
+import TimeSlot from "../buttons/selectTime";
 import Field from "./formField";
 type Patient = {
   id: string;
