@@ -30,20 +30,14 @@ const timeSlots = [
 export default function Appointments() {
   const [date, setDate] = useState<Date | undefined>(new Date());
 
-  const { data: patients, error: patientsError } = useSWR(
-    "/api/patients/",
-    fetcher
-  );
+  const { data, error } = useSWR("/api/data/", fetcher);
+
   const { data: statuses, error: statusesError } = useSWR(
     "/api/status/",
     fetcher
   );
   const { data: branches, error: branchesError } = useSWR(
     "/api/branch/",
-    fetcher
-  );
-  const { data: statusData, error: statusDataError } = useSWR(
-    "/api/status/",
     fetcher
   );
 
@@ -55,8 +49,8 @@ export default function Appointments() {
   const branch = useGetDate((state) => state.branch);
   const formatDate = moment(date).format("MM/DD/YYYY");
   const statusList = React.useMemo(
-    () => statusData?.map((s) => s.id) || [],
-    [statusData]
+    () => statuses?.map((s) => s.id) || [],
+    [statuses]
   );
 
   const supabase = createClientComponentClient();
@@ -99,9 +93,8 @@ export default function Appointments() {
     fetcher
   );
 
-  if (!patients || !statuses || !branches) return <>Loading ...</>;
-  if (patientsError || statusesError || branchesError)
-    return <>Error loading data</>;
+  if (!statuses || !branches) return <>Loading ...</>;
+  if (statusesError || branchesError) return <>Error loading data</>;
 
   if (appointmentsError) return <div>Error loading appointments</div>;
 
