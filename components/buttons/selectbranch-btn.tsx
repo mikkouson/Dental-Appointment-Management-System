@@ -4,7 +4,7 @@ import { useGetDate } from "@/app/store";
 import { Button } from "@/components/ui/button";
 import { ChevronDownIcon } from "lucide-react";
 import useSWR from "swr";
-import RadioComboBox from "./RadioComboBox";
+import RadioComboBox from "./radioComboBox";
 
 const fetcher = (url: string): Promise<any[]> =>
   fetch(url).then((res) => res.json());
