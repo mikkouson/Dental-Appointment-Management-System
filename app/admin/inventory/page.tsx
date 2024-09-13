@@ -1,15 +1,15 @@
 "use client";
 
 import React from "react";
-import useSWR from "swr";
-import { DataTable } from "@/components/Table"; 
-import { createClient } from "@/utils/supabase/client"; 
+import useSWR, { mutate as globalMutate } from "swr";
+import { DataTable } from "@/components/tables/Table";
+import { createClient } from "@/utils/supabase/client";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 type InventoryItem = {
-  id: string;
-  name: string;
+  id: number;
+  item_name: string;
   description: string;
   quantity: number;
 };
@@ -34,14 +34,17 @@ const columns = [
 ];
 
 const Inventory = () => {
-  const { data, error } = useSWR<InventoryItem[]>("/api/inventory", fetcher);
+  const { data, error, mutate } = useSWR<InventoryItem[]>(
+    "/api/inventory",
+    fetcher
+  );
 
   if (error) return <div>Error loading inventory.</div>;
   if (!data) return <div>Loading...</div>;
 
   return (
     <div className="p-4">
-      <DataTable data={data} columns={columns} />
+      <DataTable data={data} columns={columns} mutate={mutate} />
     </div>
   );
 };

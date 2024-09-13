@@ -28,6 +28,9 @@ export async function GET(req: NextRequest, res: NextResponse) {
       ),
       time_slots (
         *
+      ),
+       status (
+        *
       )
     `,
       { count: "exact" }

@@ -1,36 +1,29 @@
 import { create } from "zustand";
 
+type StatusItem = {
+  id: number;
+  name: string;
+};
+
 type State = {
   selectedDate: Date | null;
   selectedTime: string;
   branch: number;
-  status: {
-    accepted: boolean;
-    pending: boolean;
-    canceled: boolean;
-  };
+  status: StatusItem[];
 };
 
 type Actions = {
   getDate: (selectedDate: Date) => void;
   getTime: (selectedTime: string) => void;
   setBranch: (branch: number) => void;
-  setStatus: (status: {
-    accepted: boolean;
-    pending: boolean;
-    canceled: boolean;
-  }) => void;
+  setStatus: (status: StatusItem[]) => void;
 };
 
 export const useGetDate = create<State & Actions>((set) => ({
   selectedDate: null,
   selectedTime: "",
-  branch: 1,
-  status: {
-    accepted: true,
-    pending: true,
-    canceled: true,
-  },
+  branch: 0,
+  status: [],
   getDate: (selectedDate) => set({ selectedDate }),
   getTime: (selectedTime) => set({ selectedTime }),
   setBranch: (branch) => set({ branch }),

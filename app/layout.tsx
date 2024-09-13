@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
-import Navigation from "@/components/Navigation";
+import Navigation from "@/components/navigation";
 import { SWRProvider } from "./swr-provider";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,10 +29,11 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <Navigation />
-            <main className="content-area flex flex-col ">
+            {/* <Navigation /> */}
+            <main className="h-screen flex flex-col  ">
               <SWRProvider>{children}</SWRProvider>
             </main>
+            <Toaster />
           </ThemeProvider>
         </body>
       </html>
