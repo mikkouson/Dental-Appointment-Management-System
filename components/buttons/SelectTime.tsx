@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 import { Check, ChevronDownIcon, Loader2 } from "lucide-react";
 import useSWR from "swr";
 import moment from "moment";
-import { TooltipDemo } from "../ToolTip";
+import { TooltipDemo } from "../toolTip";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
