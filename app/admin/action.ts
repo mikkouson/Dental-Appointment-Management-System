@@ -10,8 +10,8 @@ interface AppointmentActionProps {
 }
 
 const schema = z.object({
-  id: z.number(),
-  patient: z.string(),
+  id: z.number().optional(),
+  patient: z.number(),
   service: z.number({
     required_error: "Please select an email to display.",
   }),
@@ -32,22 +32,7 @@ const schema = z.object({
   }),
 });
 
-const schemas = z.object({
-  time: z.number({
-    invalid_type_error: "Invalid time",
-  }),
-  date: z
-    .date({
-      invalid_type_error: "Invalid time",
-    })
-    .transform((date) => moment(date, "YYYY-MM-DD").toDate()),
-  id: z.number({
-    invalid_type_error: "Invalid time",
-  }),
-});
-
 type Inputs = z.infer<typeof schema>;
-type Inputz = z.infer<typeof schemas>;
 
 export async function cancelAppointment({ aptId }: AppointmentActionProps) {
   const supabase = createClient();
@@ -59,7 +44,7 @@ export async function cancelAppointment({ aptId }: AppointmentActionProps) {
 }
 
 export async function rescheduleAppointment(data: Inputs) {
-  const result = schemas.safeParse(data);
+  const result = schema.safeParse(data);
   if (!result.success) {
     console.log("Validation errors:", result.error.format());
     return;
@@ -105,7 +90,7 @@ export async function newApp(data: Inputs) {
       branch: data.branch,
       date: moment(data.date).format("MM/DD/YYYY"),
       time: data.time,
-      status: "1",
+      status: data.status,
       type: data.type,
     },
   ]);

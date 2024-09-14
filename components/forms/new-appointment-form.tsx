@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { newApp } from "@/app/admin/action";
 import { toast } from "@/components/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,13 +17,9 @@ import {
 import { ChevronDownIcon } from "lucide-react";
 import useSWR from "swr";
 import { CalendarForm } from "../buttons/selectDate";
-import { RadioBtn } from "../buttons/radioBtn";
 import TimeSlot from "../buttons/selectTime";
 import Field from "./formField";
-type Patient = {
-  id: string;
-  // Add other patient properties as needed
-};
+import { newApp } from "@/app/admin/action";
 
 type Appointment = {
   id: string;
@@ -49,6 +44,9 @@ const FormSchema = z.object({
   type: z.string({
     required_error: "A date of birth is required.",
   }),
+  status: z.number({
+    required_error: "Please select an email to display.",
+  }),
 });
 
 const fetcher = (url: string): Promise<any[]> =>
@@ -67,8 +65,8 @@ export function SelectForm({ setOpen }: { setOpen: (open: boolean) => void }) {
   });
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    // newApp(data);
-    // setOpen(false);
+    newApp(data);
+    setOpen(false);
     toast({
       title: "You submitted the following values:",
       description: (
@@ -91,6 +89,7 @@ export function SelectForm({ setOpen }: { setOpen: (open: boolean) => void }) {
 
   const services = data.find((item) => item.table_name === "services");
   const branch = data.find((item) => item.table_name === "branch");
+  const statuses = data.find((item) => item.table_name === "status");
 
   const patientAppointments = (appointmentsTable.row_data as Appointment[])
     .filter((item) => item.patient_id === patient)
@@ -112,6 +111,13 @@ export function SelectForm({ setOpen }: { setOpen: (open: boolean) => void }) {
             name={"branch"}
             label={"Branch"}
             data={branch.row_data}
+            num={true}
+          />
+          <Field
+            form={form}
+            name={"status"}
+            label={"Status"}
+            data={statuses.row_data}
             num={true}
           />
           <Field
