@@ -11,6 +11,7 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import useSWR, { mutate } from "swr";
 import AppointmentsMap from "@/components/appointmentsList";
+import { SelectForm } from "@/components/forms/new-appointment-form";
 
 const fetcher = (url: string): Promise<any[]> =>
   fetch(url).then((res) => res.json());
@@ -29,6 +30,7 @@ const timeSlots = [
 
 export default function Appointments() {
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const [open, setOpen] = React.useState(false);
 
   const { data, error } = useSWR("/api/data/", fetcher);
 
@@ -113,7 +115,13 @@ export default function Appointments() {
         <div className="flex justify-end">
           <CheckboxReactHookFormMultiple items={statuses} label="Status" />
           <BranchSelect />
-          <DrawerDialogDemo label={"New Appointment"} />
+          <DrawerDialogDemo
+            open={open}
+            setOpen={setOpen}
+            label={"New Appointment"}
+          >
+            <SelectForm setOpen={setOpen} />
+          </DrawerDialogDemo>
         </div>
         <div>
           {isLoading ? (

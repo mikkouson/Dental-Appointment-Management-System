@@ -52,7 +52,7 @@ interface SheetDemoProps {
 
 const FormSchema = z.object({
   id: z.number(),
-  patient: z.string(),
+  patient: z.string().optional(),
   service: z.number({
     required_error: "Please select an email to display.",
   }),

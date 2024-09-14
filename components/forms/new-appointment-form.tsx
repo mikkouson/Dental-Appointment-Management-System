@@ -28,7 +28,7 @@ type Appointment = {
 };
 
 const FormSchema = z.object({
-  patient: z.number(),
+  id: z.number(),
   service: z.number({
     required_error: "Please select an email to display.",
   }),
@@ -80,7 +80,7 @@ export function SelectForm({ setOpen }: { setOpen: (open: boolean) => void }) {
   if (!data) return <>Loading ...</>;
   const date = form.watch("date");
   const selectedBranch = form.watch("branch");
-  const patient = form.watch("patient");
+  const patient = form.watch("id");
 
   const patientsTable = data.find((item) => item.table_name === "patients");
   const appointmentsTable = data.find(
@@ -102,7 +102,7 @@ export function SelectForm({ setOpen }: { setOpen: (open: boolean) => void }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <Field
             form={form}
-            name={"patient"}
+            name={"id"}
             label={"patient"}
             data={patientsTable.row_data}
           />

@@ -1,5 +1,3 @@
-import * as React from "react";
-
 import { useMediaQuery } from "@/components/hooks/use-media-query";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,17 +19,27 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Plus } from "lucide-react";
-import { SelectForm } from "../forms/new-appointment-form";
 
-export function DrawerDialogDemo({ label }: { label: string }) {
-  const [open, setOpen] = React.useState(false);
+interface DrawerDialogDemoProps {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  label: string;
+  children: React.ReactNode;
+}
+
+export function DrawerDialogDemo({
+  open,
+  setOpen,
+  label,
+  children,
+}: DrawerDialogDemoProps) {
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button className="bg-primary ">
+          <Button className="bg-primary">
             <Plus size={20} className="mr-2" />
             {label}
           </Button>
@@ -43,7 +51,7 @@ export function DrawerDialogDemo({ label }: { label: string }) {
               Make changes to your profile here. Click save when youre done.
             </DialogDescription>
           </DialogHeader>
-          <SelectForm setOpen={setOpen} />
+          {children}
         </DialogContent>
       </Dialog>
     );
@@ -61,7 +69,7 @@ export function DrawerDialogDemo({ label }: { label: string }) {
             Make changes to your profile here. Click save when youre done.
           </DrawerDescription>
         </DrawerHeader>
-        <SelectForm setOpen={setOpen} />
+        {children}
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
             <Button variant="outline">Cancel</Button>

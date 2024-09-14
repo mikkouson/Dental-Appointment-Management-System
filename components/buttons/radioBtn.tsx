@@ -75,9 +75,6 @@ export function RadioBtn({
     item.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
   );
 
-  console.log("Search Query:", searchQuery);
-  console.log("Filtered Data:", filtered);
-
   const handleSetData = (id: string) => {
     field.onChange(id);
     setOpen(false);

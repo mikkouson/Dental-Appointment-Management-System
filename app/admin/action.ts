@@ -11,7 +11,6 @@ interface AppointmentActionProps {
 
 const schema = z.object({
   id: z.number().optional(),
-  patient: z.number(),
   service: z.number({
     required_error: "Please select an email to display.",
   }),
@@ -85,7 +84,7 @@ export async function newApp(data: Inputs) {
 
   const { error } = await supabase.from("appointments").insert([
     {
-      patient_id: data.patient,
+      patient_id: data.id,
       service: data.service,
       branch: data.branch,
       date: moment(data.date).format("MM/DD/YYYY"),
