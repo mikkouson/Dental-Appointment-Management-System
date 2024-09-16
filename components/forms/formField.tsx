@@ -1,13 +1,14 @@
 import { RadioBtn } from "../buttons/radioBtn";
 import { FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import { Input } from "../ui/input";
 
 interface FieldProps {
   form: any;
   name: string;
   label: string;
-  data: readonly any[];
-  erase?: boolean; // Mark erase as optional
-  defValue?: string | undefined;
+  data?: readonly any[]; // Mark data as optional
+  erase?: boolean;
+  defValue?: string;
   num?: boolean;
 }
 
@@ -15,7 +16,7 @@ export default function Field({
   form,
   name,
   label,
-  data,
+  data = [],
   erase = false,
   num = false,
 }: FieldProps) {
@@ -26,13 +27,17 @@ export default function Field({
       render={({ field }) => (
         <FormItem>
           <FormLabel>{label}</FormLabel>
-          <RadioBtn
-            field={field}
-            data={data}
-            form={form}
-            timeclear={erase}
-            num={num}
-          />
+          {data.length > 0 ? (
+            <RadioBtn
+              field={field}
+              data={data}
+              form={form}
+              timeclear={erase}
+              num={num}
+            />
+          ) : (
+            <Input type="text" placeholder={`Input ${name} here`} {...field} />
+          )}
           <FormMessage />
         </FormItem>
       )}
