@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import useSWR, { mutate } from "swr";
+import useSWR from "swr";
 import AppointmentsMap from "@/components/appointmentsList";
 import { SelectForm } from "@/components/forms/new-appointment-form";
 
@@ -32,8 +32,6 @@ export default function Appointments() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [open, setOpen] = React.useState(false);
 
-  const { data, error } = useSWR("/api/data/", fetcher);
-
   const { data: statuses, error: statusesError } = useSWR(
     "/api/status/",
     fetcher
@@ -55,6 +53,18 @@ export default function Appointments() {
     [statuses]
   );
 
+  const {
+    data: appointments = [],
+    error: appointmentsError,
+    isLoading,
+    mutate,
+  } = useSWR(
+    `/api/appointments?date=${formatDate}&branch=${
+      branches && branch !== 0 ? branch : branches ? branches[0]?.id : branch
+    }&status=${statusIds.length === 0 ? statusList.join(",") : statusIds}`,
+    fetcher
+  );
+
   const supabase = createClientComponentClient();
 
   useEffect(() => {
@@ -64,17 +74,7 @@ export default function Appointments() {
         "postgres_changes",
         { event: "*", schema: "public", table: "appointments" },
         () => {
-          mutate(
-            `/api/appointments?date=${formatDate}&branch=${
-              branches && branch !== 0
-                ? branch
-                : branches
-                ? branches[0]?.id
-                : branch
-            }&status=${
-              statusIds.length === 0 ? statusList.join(",") : statusIds
-            }`
-          );
+          mutate();
         }
       )
       .subscribe();
@@ -82,18 +82,7 @@ export default function Appointments() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [supabase, formatDate, branches, branch, statusIds, statusList]);
-
-  const {
-    data: appointments = [],
-    error: appointmentsError,
-    isLoading,
-  } = useSWR(
-    `/api/appointments?date=${formatDate}&branch=${
-      branches && branch !== 0 ? branch : branches ? branches[0]?.id : branch
-    }&status=${statusIds.length === 0 ? statusList.join(",") : statusIds}`,
-    fetcher
-  );
+  }, [supabase]);
 
   if (!statuses || !branches) return <>Loading ...</>;
   if (statusesError || branchesError) return <>Error loading data</>;
