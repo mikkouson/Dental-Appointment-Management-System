@@ -15,9 +15,16 @@ export async function GET(req: NextRequest) {
 
   const { data, error, count } = await supabase
     .from("patients")
-    .select("*", { count: "exact" })
+    .select(
+      `*,
+     address (
+      *
+    )`,
+      { count: "exact" }
+    )
     .ilike("name", `%${filterParam}%`) // Example filter for 'name' column
-    .range((page - 1) * pageSize, page * pageSize - 1);
+    .range((page - 1) * pageSize, page * pageSize - 1)
+    .is("deleteOn", null);
 
   if (error) {
     console.error("Supabase error:", error);

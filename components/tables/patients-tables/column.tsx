@@ -1,20 +1,10 @@
 "use client";
 
-import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import type { Patient } from "@/app/schema";
+import { ColumnDef } from "@tanstack/react-table";
+import { SquarePen } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
+import { DeleteModal } from "@/components/modal/deleteModal";
 export const columns: ColumnDef<Patient>[] = [
   {
     id: "select",
@@ -34,7 +24,8 @@ export const columns: ColumnDef<Patient>[] = [
     header: "EMAIL",
   },
   {
-    accessorKey: "address",
+    accessorFn: (row) => row.address?.address || "N/A",
+    id: "address",
     header: "ADDRESS",
   },
   {
@@ -51,22 +42,12 @@ export const columns: ColumnDef<Patient>[] = [
     enableHiding: false,
     header: "Actions",
     cell: ({ row }) => {
+      const id = row.original.id;
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex px-2">
+          <DeleteModal id={id} />
+          <SquarePen className="text-sm w-5 text-green-700 cursor-pointer" />
+        </div>
       );
     },
   },
