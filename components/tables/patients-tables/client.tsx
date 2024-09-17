@@ -13,9 +13,8 @@ import React from "react";
 import useSWR from "swr";
 import { DataTableDemo } from "../dataTable";
 import { columns } from "./column";
-// import { DialogDemo } from "@/components/modal/trymodal";
-import Maps from "@/components/gmaps";
-
+import { useEffect } from "react";
+import { createClient } from "@/utils/supabase/client";
 const fetcher = async (
   url: string
 ): Promise<{ data: Patient[]; count: number }> =>
@@ -30,6 +29,28 @@ export default function UserClient() {
   const { replace } = useRouter();
   const page = parseInt(searchParams.get("page") || "1", 10);
   const query = searchParams.get("query") || "";
+  const { data, error, isLoading, mutate } = useSWR<{
+    data: Patient[];
+    count: number;
+  }>(`/api/patients?page=${page}&query=${query}`, fetcher);
+  const supabase = createClient();
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("realtime patients")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "patients" },
+        () => {
+          mutate();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [supabase]);
 
   React.useEffect(() => {
     setSearchQuery(query);
@@ -52,11 +73,6 @@ export default function UserClient() {
     params.set("page", newPage.toString());
     replace(`${pathname}?${params.toString()}`);
   }
-
-  const { data, error, isLoading } = useSWR<{ data: Patient[]; count: number }>(
-    `/api/patients?page=${page}&query=${query}`,
-    fetcher
-  );
 
   const breadcrumbItems = [
     { title: "Dashboard", link: "/admin" },

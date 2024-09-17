@@ -1,22 +1,19 @@
-import { Input } from "@/components/ui/input";
+"use client";
+
+import React, { useRef } from "react";
 import {
+  useJsApiLoader,
   GoogleMap,
-  LoadScript,
   Marker,
   Autocomplete,
-  useJsApiLoader,
 } from "@react-google-maps/api";
-import React, { useRef } from "react";
+import { Input } from "@/components/ui/input";
 
-const Maps = () => {
-  const [formattedAddress, setFormattedAddress] = React.useState("");
-  const [center, setCenter] = React.useState<
-    google.maps.LatLng | google.maps.LatLngLiteral | undefined
-  >(undefined);
-  const [markerPosition, setMarkerPosition] = React.useState<
-    google.maps.LatLngLiteral | undefined
-  >(undefined);
+interface MapsProps {
+  field: any; // Adjust as needed based on your form library
+}
 
+const Maps = ({ field }: MapsProps) => {
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: process.env.NEXT_PUBLIC_MAPS_API as string,
@@ -26,16 +23,35 @@ const Maps = () => {
   const handlePlaceChanged = () => {
     if (autocompleteRef.current && isLoaded) {
       const place = autocompleteRef.current.getPlace();
-      if (place.formatted_address) {
-        setFormattedAddress(place.formatted_address);
-      }
-      if (place.geometry?.location) {
-        const latLng = {
-          lat: place.geometry.location.lat(),
-          lng: place.geometry.location.lng(),
-        };
-        setCenter(latLng);
-        setMarkerPosition(latLng);
+      if (
+        place.formatted_address &&
+        place.address_components &&
+        place.geometry?.location
+      ) {
+        // Check if the place is in the Philippines
+        const isInPhilippines = place.address_components.some(
+          (component) =>
+            component.short_name === "PH" && component.types.includes("country")
+        );
+
+        const addressWithoutPlusCode = place.formatted_address.replace(
+          /^[A-Z0-9]+[+\-][A-Z0-9]+\s*/,
+          ""
+        );
+
+        if (isInPhilippines) {
+          field.onChange({
+            address: addressWithoutPlusCode,
+            latitude: place.geometry.location.lat(),
+            longitude: place.geometry.location.lng(),
+          });
+        } else {
+          field.onChange({
+            address: "",
+            latitude: "",
+            longitude: "",
+          });
+        }
       }
     } else {
       console.error("No places found or API not loaded");
@@ -51,12 +67,14 @@ const Maps = () => {
 
       const snappedPosition = await snapToRoad(newPosition);
 
-      setMarkerPosition(snappedPosition);
-      setCenter(snappedPosition);
-
-      // Update address based on new marker position
       const newAddress = await reverseGeocode(snappedPosition);
-      setFormattedAddress(newAddress);
+      const isInPhilippines = newAddress !== "Address not available";
+
+      field.onChange({
+        address: isInPhilippines ? newAddress : "",
+        latitude: snappedPosition.lat,
+        longitude: snappedPosition.lng,
+      });
     }
   };
 
@@ -85,9 +103,15 @@ const Maps = () => {
     const response = await fetch(
       `https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.lat},${position.lng}&key=${apiKey}`
     );
-    const data = await response.json();
+    const data: {
+      results?: {
+        formatted_address?: string;
+        address_components?: google.maps.GeocoderAddressComponent[];
+      }[];
+    } = await response.json();
+
     if (data.results && data.results.length > 0) {
-      let formattedAddress = data.results[0].formatted_address;
+      let formattedAddress = data.results[0].formatted_address || "";
 
       // Remove Plus Codes from the address
       formattedAddress = formattedAddress
@@ -99,7 +123,13 @@ const Maps = () => {
         formattedAddress = formattedAddress.replace(/^\s*,\s*/, "").trim();
       }
 
-      return formattedAddress || "Address not available";
+      // Check if the address is in the Philippines
+      const isInPhilippines = data.results[0].address_components?.some(
+        (component) =>
+          component.short_name === "PH" && component.types.includes("country")
+      );
+
+      return isInPhilippines ? formattedAddress : "Address not available";
     }
     return "Address not available";
   };
@@ -117,47 +147,48 @@ const Maps = () => {
       >
         <Input
           placeholder="Enter your address"
-          value={formattedAddress}
-          onChange={(e) => setFormattedAddress(e.target.value)}
+          value={field.value?.address || ""}
+          onChange={(e) => {
+            const newAddress = e.target.value;
+            field.onChange({
+              address: newAddress,
+              latitude: "", // Clear latitude when typing
+              longitude: "", // Clear longitude when typing
+            });
+          }}
         />
       </Autocomplete>
-      {center && (
+      {field.value?.latitude && field.value?.longitude && (
         <div className="relative h-96">
           <GoogleMap
             mapContainerStyle={{ height: "100%", width: "100%" }}
-            center={markerPosition || center}
+            center={{
+              lat: field.value.latitude,
+              lng: field.value.longitude,
+            }}
             zoom={17}
             options={{
               streetViewControl: false,
               fullscreenControl: false,
             }}
           >
-            {markerPosition && (
-              <Marker
-                position={markerPosition}
-                draggable
-                onDragEnd={handleMarkerDragEnd}
-                options={{
-                  label: {
-                    text: "Your address is here",
-                    fontWeight: "bold",
-                    fontSize: "14px",
-                  },
-                  animation: google.maps.Animation.DROP,
-                }}
-              />
-            )}
+            <Marker
+              position={{
+                lat: field.value.latitude,
+                lng: field.value.longitude,
+              }}
+              draggable
+              onDragEnd={handleMarkerDragEnd}
+              options={{
+                label: {
+                  text: "Your address is here",
+                  fontWeight: "bold",
+                  fontSize: "14px",
+                },
+                animation: google.maps.Animation.DROP,
+              }}
+            />
           </GoogleMap>
-        </div>
-      )}
-      {markerPosition && (
-        <div className="mt-4">
-          <p>
-            <strong>Latitude:</strong> {markerPosition.lat}
-          </p>
-          <p>
-            <strong>Longitude:</strong> {markerPosition.lng}
-          </p>
         </div>
       )}
     </div>

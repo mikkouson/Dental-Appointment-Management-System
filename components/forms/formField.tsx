@@ -10,6 +10,7 @@ interface FieldProps {
   erase?: boolean;
   defValue?: string;
   num?: boolean;
+  age?: boolean;
 }
 
 export default function Field({
@@ -19,12 +20,13 @@ export default function Field({
   data = [],
   erase = false,
   num = false,
+  age = false,
 }: FieldProps) {
   return (
     <FormField
       control={form.control}
       name={name}
-      render={({ field }) => (
+      render={({ field, fieldState }) => (
         <FormItem>
           <FormLabel>{label}</FormLabel>
           {data.length > 0 ? (
@@ -36,9 +38,21 @@ export default function Field({
               num={num}
             />
           ) : (
-            <Input type="text" placeholder={`Input ${name} here`} {...field} />
+            <Input
+              type={!age ? "text" : "number"}
+              placeholder={`Input ${name} here`}
+              {...field}
+              value={age ? field.value : field.value} // Ensure age is treated as a number
+              onChange={(e) => {
+                if (age) {
+                  field.onChange(Number(e.target.value)); // Convert value to number
+                } else {
+                  field.onChange(e);
+                }
+              }}
+            />
           )}
-          <FormMessage />
+          <FormMessage>{fieldState.error?.message}</FormMessage>
         </FormItem>
       )}
     />
