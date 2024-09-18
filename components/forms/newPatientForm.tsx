@@ -64,7 +64,7 @@ export function SelectForm({ setOpen }: { setOpen: (open: boolean) => void }) {
       age: Number(data.age),
     };
 
-    // setOpen(false);
+    setOpen(false);
     newPatient(correctedData);
     toast({
       title: "You submitted the following values:",
