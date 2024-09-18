@@ -38,7 +38,6 @@ export function DrawerDialogDemo({
 }: DrawerDialogDemoProps) {
   const isDesktop = useMediaQuery("(min-width: 768px)");
   useEffect(() => {
-    // Disable Radix ui dialog pointer events lockout
     setTimeout(() => (document.body.style.pointerEvents = ""), 0);
   });
   if (isDesktop) {
@@ -70,7 +69,7 @@ export function DrawerDialogDemo({
           <DialogHeader>
             <DialogTitle>{label}</DialogTitle>
             <DialogDescription>
-              Make changes to your profile here. Click save when you're done.
+              Make changes to your profile here. Click save when youre done.
             </DialogDescription>
           </DialogHeader>
           {children}
@@ -103,7 +102,7 @@ export function DrawerDialogDemo({
         <DrawerHeader className="text-left">
           <DrawerTitle>Edit profile</DrawerTitle>
           <DrawerDescription>
-            Make changes to your profile here. Click save when you're done.
+            Make changes to your profile here. Click save when youre done.
           </DrawerDescription>
         </DrawerHeader>
         {children}

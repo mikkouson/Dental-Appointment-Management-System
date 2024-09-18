@@ -82,7 +82,7 @@ export default function Appointments() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [supabase]);
+  }, [supabase, mutate]);
 
   if (!statuses || !branches) return <>Loading ...</>;
   if (statusesError || branchesError) return <>Error loading data</>;
