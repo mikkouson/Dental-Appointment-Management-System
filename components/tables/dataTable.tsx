@@ -1,4 +1,3 @@
-"use client";
 import {
   Table,
   TableBody,
@@ -21,16 +20,17 @@ import {
 } from "@tanstack/react-table";
 import * as React from "react";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
+import type { PatientCol } from "@/app/schema";
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-}
+// Define Column type to match ColumnDef<Patient & { address?: Address }>
+type Column = ColumnDef<PatientCol>;
 
-export function DataTableDemo<TData, TValue>({
-  columns,
-  data,
-}: DataTableProps<TData, TValue>) {
+type DataTableProps = {
+  data: PatientCol[];
+  columns: Column[];
+};
+
+export function DataTableDemo({ columns, data }: DataTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []

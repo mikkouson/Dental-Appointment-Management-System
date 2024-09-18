@@ -1,11 +1,11 @@
-"use client";
-
-import type { Patient } from "@/app/schema";
+import type { PatientCol } from "@/app/schema";
 import { ColumnDef } from "@tanstack/react-table";
 import { SquarePen } from "lucide-react";
-
 import { DeleteModal } from "@/components/modal/deleteModal";
-export const columns: ColumnDef<Patient>[] = [
+
+type Column = ColumnDef<PatientCol>;
+
+export const columns: Column[] = [
   {
     id: "select",
     enableSorting: true,
@@ -36,7 +36,6 @@ export const columns: ColumnDef<Patient>[] = [
     accessorKey: "age",
     header: "Age",
   },
-
   {
     id: "actions",
     enableHiding: false,

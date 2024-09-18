@@ -1,5 +1,5 @@
 "use client";
-import type { Patient } from "@/app/schema";
+import type { Patient, Address } from "@/app/schema";
 import { Breadcrumbs } from "@/components/breadcrumb";
 import { SelectForm } from "@/components/forms/newPatientForm";
 import { Heading } from "@/components/heading";
@@ -17,8 +17,10 @@ import { useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 const fetcher = async (
   url: string
-): Promise<{ data: Patient[]; count: number }> =>
-  fetch(url).then((res) => res.json());
+): Promise<{
+  data: (Patient & { address?: Address | null })[];
+  count: number;
+}> => fetch(url).then((res) => res.json());
 
 export default function UserClient() {
   const [open, setOpen] = React.useState(false);
@@ -30,9 +32,10 @@ export default function UserClient() {
   const page = parseInt(searchParams.get("page") || "1", 10);
   const query = searchParams.get("query") || "";
   const { data, error, isLoading, mutate } = useSWR<{
-    data: Patient[];
+    data: (Patient & { address?: Address | null })[];
     count: number;
   }>(`/api/patients?page=${page}&query=${query}`, fetcher);
+
   const supabase = createClient();
 
   useEffect(() => {
@@ -50,7 +53,7 @@ export default function UserClient() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [supabase]);
+  }, [supabase, mutate]);
 
   React.useEffect(() => {
     setSearchQuery(query);
