@@ -3,9 +3,7 @@
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { FormControl } from "../ui/form";
-
 import { Check, ChevronsUpDown } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -22,6 +20,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { ScrollArea } from "../ui/scroll-area";
 
 type FieldProps = {
   value: string | number;
@@ -29,7 +28,7 @@ type FieldProps = {
 };
 
 type DataItem = {
-  id: string;
+  id: string | number; // Updated to support string or number id
   name: string;
 };
 
@@ -71,6 +70,7 @@ export function RadioBtn({
 }: RadioBtnProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [open, setOpen] = useState(false);
+
   const filtered = data.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
   );
@@ -78,13 +78,14 @@ export function RadioBtn({
   console.log("Search Query:", searchQuery);
   console.log("Filtered Data:", filtered);
 
-  const handleSetData = (id: string) => {
+  const handleSetData = (id: string | number) => {
     field.onChange(id);
     setOpen(false);
-    if (timeclear && id && form) {
+    if (timeclear && form) {
       form.setValue("time", 0);
     }
   };
+
   const handleOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
       setSearchQuery(""); // Clear search query when closing
@@ -119,22 +120,26 @@ export function RadioBtn({
           />
           <CommandList>
             <CommandEmpty>No option found.</CommandEmpty>
-            <CommandGroup>
-              {filtered.map((item) => (
-                <CommandItem
-                  key={item.id}
-                  onSelect={() => handleSetData(item.id)}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      item.id === field.value ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {item.name}
-                </CommandItem>
-              ))}
-            </CommandGroup>
+            <ScrollArea
+              className={"[&>[data-radix-scroll-area-viewport]]:max-h-[300px]"}
+            >
+              <CommandGroup>
+                {filtered.map((item) => (
+                  <CommandItem
+                    key={item.id}
+                    onSelect={() => handleSetData(item.id)}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        item.id === field.value ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    {item.name}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </ScrollArea>
           </CommandList>
         </Command>
       </PopoverContent>

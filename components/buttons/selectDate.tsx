@@ -46,14 +46,21 @@ export function CalendarForm({
   };
 
   const isDateDisabled = (date: Date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to midnight to ensure correct comparison
+    const thirtyDaysFromNow = new Date(today);
+    thirtyDaysFromNow.setDate(today.getDate() + 30);
+
     const dateStr = date.toDateString();
     const dontdisStr = dontdis?.toDateString();
+    const isWithinDateRange = date >= today && date <= thirtyDaysFromNow;
+
     return (
-      (patientAppointments.some(
+      !isWithinDateRange || // Disable dates outside the range
+      patientAppointments.some(
         (apptDate) => parseDate(apptDate).toDateString() === dateStr
       ) ||
-        date < new Date()) &&
-      dontdisStr !== dateStr
+      dontdisStr === dateStr // Disable specific date if `dontdis` matches
     );
   };
 

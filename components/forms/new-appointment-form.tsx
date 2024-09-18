@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { newApp } from "@/app/admin/action";
 import { toast } from "@/components/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,13 +17,9 @@ import {
 import { ChevronDownIcon } from "lucide-react";
 import useSWR from "swr";
 import { CalendarForm } from "../buttons/selectDate";
-import { RadioBtn } from "../buttons/radioBtn";
 import TimeSlot from "../buttons/selectTime";
 import Field from "./formField";
-type Patient = {
-  id: string;
-  // Add other patient properties as needed
-};
+import { newApp } from "@/app/admin/action";
 
 type Appointment = {
   id: string;
@@ -33,7 +28,7 @@ type Appointment = {
 };
 
 const FormSchema = z.object({
-  patient: z.number(),
+  id: z.number(),
   service: z.number({
     required_error: "Please select an email to display.",
   }),
@@ -48,6 +43,9 @@ const FormSchema = z.object({
   }),
   type: z.string({
     required_error: "A date of birth is required.",
+  }),
+  status: z.number({
+    required_error: "Please select an email to display.",
   }),
 });
 
@@ -67,8 +65,8 @@ export function SelectForm({ setOpen }: { setOpen: (open: boolean) => void }) {
   });
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    // newApp(data);
-    // setOpen(false);
+    newApp(data);
+    setOpen(false);
     toast({
       title: "You submitted the following values:",
       description: (
@@ -82,7 +80,7 @@ export function SelectForm({ setOpen }: { setOpen: (open: boolean) => void }) {
   if (!data) return <>Loading ...</>;
   const date = form.watch("date");
   const selectedBranch = form.watch("branch");
-  const patient = form.watch("patient");
+  const patient = form.watch("id");
 
   const patientsTable = data.find((item) => item.table_name === "patients");
   const appointmentsTable = data.find(
@@ -91,6 +89,7 @@ export function SelectForm({ setOpen }: { setOpen: (open: boolean) => void }) {
 
   const services = data.find((item) => item.table_name === "services");
   const branch = data.find((item) => item.table_name === "branch");
+  const statuses = data.find((item) => item.table_name === "status");
 
   const patientAppointments = (appointmentsTable.row_data as Appointment[])
     .filter((item) => item.patient_id === patient)
@@ -103,7 +102,7 @@ export function SelectForm({ setOpen }: { setOpen: (open: boolean) => void }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <Field
             form={form}
-            name={"patient"}
+            name={"id"}
             label={"patient"}
             data={patientsTable.row_data}
           />
@@ -112,6 +111,13 @@ export function SelectForm({ setOpen }: { setOpen: (open: boolean) => void }) {
             name={"branch"}
             label={"Branch"}
             data={branch.row_data}
+            num={true}
+          />
+          <Field
+            form={form}
+            name={"status"}
+            label={"Status"}
+            data={statuses.row_data}
             num={true}
           />
           <Field

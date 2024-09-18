@@ -10,8 +10,7 @@ interface AppointmentActionProps {
 }
 
 const schema = z.object({
-  id: z.number(),
-  patient: z.string(),
+  id: z.number().optional(),
   service: z.number({
     required_error: "Please select an email to display.",
   }),
@@ -32,22 +31,31 @@ const schema = z.object({
   }),
 });
 
-const schemas = z.object({
-  time: z.number({
-    invalid_type_error: "Invalid time",
+type Inputs = z.infer<typeof schema>;
+
+const FormSchema = z.object({
+  name: z.string().min(1, { message: "Name is required." }),
+  email: z.string().email().min(1, {
+    message: "Invalid email address.",
   }),
-  date: z
-    .date({
-      invalid_type_error: "Invalid time",
+  address: z
+    .object({
+      address: z.string({
+        required_error: "Address is required.",
+      }),
+      latitude: z.number().optional(),
+      longitude: z.number().optional(),
     })
-    .transform((date) => moment(date, "YYYY-MM-DD").toDate()),
-  id: z.number({
-    invalid_type_error: "Invalid time",
+    .refine((data) => data.address.trim().length > 0, {
+      message: "Address must be provided.",
+    }),
+  sex: z.string().min(1, { message: "Sex is required." }),
+  age: z.number().min(1, {
+    message: "Age is required.",
   }),
 });
 
-type Inputs = z.infer<typeof schema>;
-type Inputz = z.infer<typeof schemas>;
+type patientInput = z.infer<typeof FormSchema>;
 
 export async function cancelAppointment({ aptId }: AppointmentActionProps) {
   const supabase = createClient();
@@ -59,7 +67,7 @@ export async function cancelAppointment({ aptId }: AppointmentActionProps) {
 }
 
 export async function rescheduleAppointment(data: Inputs) {
-  const result = schemas.safeParse(data);
+  const result = schema.safeParse(data);
   if (!result.success) {
     console.log("Validation errors:", result.error.format());
     return;
@@ -100,12 +108,12 @@ export async function newApp(data: Inputs) {
 
   const { error } = await supabase.from("appointments").insert([
     {
-      patient_id: data.patient,
+      patient_id: data.id,
       service: data.service,
       branch: data.branch,
       date: moment(data.date).format("MM/DD/YYYY"),
       time: data.time,
-      status: "1",
+      status: data.status,
       type: data.type,
     },
   ]);
@@ -114,5 +122,66 @@ export async function newApp(data: Inputs) {
     console.error("Error inserting data:", error.message);
   } else {
     console.log("Data inserted successfully");
+  }
+}
+
+export async function newPatient(data: patientInput) {
+  const result = FormSchema.safeParse(data);
+
+  if (!result.success) {
+    console.log("Validation errors:", result.error.format());
+    return;
+  }
+
+  const supabase = createClient();
+
+  // Step 1: Insert address and get the ID
+  const { data: addressData, error: addressError } = await supabase
+    .from("addresses")
+    .insert([
+      {
+        address: data.address.address,
+        latitude: data.address.latitude,
+        longitude: data.address.longitude,
+      },
+    ])
+    .select("id") // Select the id of the newly inserted address
+    .single();
+
+  if (addressError || !addressData) {
+    console.error("Error inserting address:", addressError?.message);
+    return;
+  }
+
+  const addressId = addressData.id;
+
+  // Step 2: Insert patient with the address ID
+  const { error: patientError } = await supabase.from("patients").insert([
+    {
+      name: data.name,
+      email: data.email,
+      sex: data.sex,
+      age: data.age,
+      address: addressId, // Use the address ID from the previous step
+    },
+  ]);
+
+  if (patientError) {
+    console.error("Error inserting patient:", patientError.message);
+  } else {
+    console.log("Patient data inserted successfully");
+  }
+}
+
+export async function deletePatient(id: number) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("patients")
+    .update({
+      deleteOn: new Date().toISOString(),
+    })
+    .eq("id", id);
+  if (error) {
+    console.log("Error deleting patient", error.message);
   }
 }

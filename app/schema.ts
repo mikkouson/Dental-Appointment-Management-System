@@ -10,9 +10,35 @@ export type Appointment = Database["public"]["Tables"]["appointments"]["Row"];
 export type Service = Database["public"]["Tables"]["services"]["Row"];
 export type Status = Database["public"]["Tables"]["status"]["Row"];
 export type Patient = Database["public"]["Tables"]["patients"]["Row"];
+export type Address = Database["public"]["Tables"]["addresses"]["Row"];
+export type PatientCol = Tables<"patients"> & {
+  address: Tables<"addresses"> | null;
+};
+
 export type Database = {
   public: {
     Tables: {
+      addresses: {
+        Row: {
+          address: string;
+          id: number;
+          latitude: number;
+          longitude: number;
+        };
+        Insert: {
+          address: string;
+          id?: number;
+          latitude: number;
+          longitude: number;
+        };
+        Update: {
+          address?: string;
+          id?: number;
+          latitude?: number;
+          longitude?: number;
+        };
+        Relationships: [];
+      };
       appointments: {
         Row: {
           appointment_ticket: string | null;
@@ -144,30 +170,41 @@ export type Database = {
       };
       patients: {
         Row: {
-          address: string | null;
+          address: number | null;
           age: number | null;
+          deleteOn: string | null;
           email: string | null;
           id: number;
           name: string | null;
           sex: string | null;
         };
         Insert: {
-          address?: string | null;
+          address?: number | null;
           age?: number | null;
+          deleteOn?: string | null;
           email?: string | null;
           id?: number;
           name?: string | null;
           sex?: string | null;
         };
         Update: {
-          address?: string | null;
+          address?: number | null;
           age?: number | null;
+          deleteOn?: string | null;
           email?: string | null;
           id?: number;
           name?: string | null;
           sex?: string | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "patients_address_fkey";
+            columns: ["address"];
+            isOneToOne: false;
+            referencedRelation: "addresses";
+            referencedColumns: ["id"];
+          }
+        ];
       };
       services: {
         Row: {
