@@ -4,7 +4,6 @@ import { Breadcrumbs } from "@/components/breadcrumb";
 import { SelectForm } from "@/components/forms/newPatientForm";
 import { Heading } from "@/components/heading";
 import PageContainer from "@/components/layout/page-container";
-import { DrawerDialogDemo } from "@/components/modal/newPatientModal";
 import { PaginationDemo } from "@/components/pagitnation";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -15,6 +14,7 @@ import { DataTableDemo } from "../dataTable";
 import { columns } from "./column";
 import { useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
+import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
 const fetcher = async (
   url: string
 ): Promise<{

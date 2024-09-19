@@ -10,8 +10,8 @@ import {
 } from "@/components/ui/form";
 import * as React from "react";
 import { z } from "zod";
-import { CalendarForm } from "../buttons/selectDate";
-import TimeSlot from "../buttons/selectTime";
+import { CalendarForm } from "../../buttons/selectDate";
+import TimeSlot from "../../buttons/selectTime";
 
 const fetcher = (url: string): Promise<any[]> =>
   fetch(url).then((res) => res.json());
@@ -29,9 +29,9 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import useSWR from "swr";
-import Field from "./formField";
-import { toast } from "../hooks/use-toast";
-import { Input } from "../ui/input";
+import Field from "../../forms/formField";
+import { toast } from "../../hooks/use-toast";
+import { Input } from "../../ui/input";
 
 interface Appointment {
   branch: number;
