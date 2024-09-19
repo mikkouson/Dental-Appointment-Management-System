@@ -34,12 +34,14 @@ const schema = z.object({
 type Inputs = z.infer<typeof schema>;
 
 const FormSchema = z.object({
+  id: z.number().optional(),
   name: z.string().min(1, { message: "Name is required." }),
   email: z.string().email().min(1, {
     message: "Invalid email address.",
   }),
   address: z
     .object({
+      id: z.number().optional(),
       address: z.string({
         required_error: "Address is required.",
       }),
@@ -183,5 +185,53 @@ export async function deletePatient(id: number) {
     .eq("id", id);
   if (error) {
     console.log("Error deleting patient", error.message);
+  }
+}
+export async function updatePatient(data: patientInput) {
+  const result = FormSchema.safeParse(data);
+
+  if (!result.success) {
+    console.log("Validation errors:", result.error.format());
+    return;
+  }
+
+  const supabase = createClient();
+
+  // Check if address ID is provided
+  if (!data.address.id) {
+    console.error("Address ID is missing or undefined.");
+    return;
+  }
+
+  // Update address
+  const { error: addressError } = await supabase
+    .from("addresses")
+    .update({
+      address: data.address.address,
+      latitude: data.address.latitude,
+      longitude: data.address.longitude,
+    })
+    .eq("id", data.address.id);
+
+  if (addressError) {
+    console.error("Error updating address:", addressError.message);
+    return;
+  }
+
+  // Update patient
+  const { error: patientError } = await supabase
+    .from("patients")
+    .update({
+      name: data.name,
+      email: data.email,
+      sex: data.sex,
+      age: data.age,
+    })
+    .eq("id", data.id);
+
+  if (patientError) {
+    console.error("Error updating patient:", patientError.message);
+  } else {
+    console.log("Patient data updated successfully");
   }
 }

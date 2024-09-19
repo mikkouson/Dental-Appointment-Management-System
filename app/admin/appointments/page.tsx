@@ -3,7 +3,6 @@
 import { useGetDate } from "@/app/store";
 import BranchSelect from "@/components/buttons/selectbranch-btn";
 import { CheckboxReactHookFormMultiple } from "@/components/buttons/comboBoxSelect";
-import { DrawerDialogDemo } from "@/components/modal/newPatientModal";
 import { Calendar } from "@/components/ui/calendar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
@@ -11,7 +10,8 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import useSWR from "swr";
 import AppointmentsMap from "@/components/appointmentsList";
-import { SelectForm } from "@/components/forms/new-appointment-form";
+import { NewAppointmentForm } from "@/components/forms/new-appointment-form";
+import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
 
 const fetcher = (url: string): Promise<any[]> =>
   fetch(url).then((res) => res.json());
@@ -109,7 +109,7 @@ export default function Appointments() {
             setOpen={setOpen}
             label={"New Appointment"}
           >
-            <SelectForm setOpen={setOpen} />
+            <NewAppointmentForm setOpen={setOpen} />
           </DrawerDialogDemo>
         </div>
         <div>

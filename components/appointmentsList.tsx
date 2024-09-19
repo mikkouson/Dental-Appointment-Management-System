@@ -6,7 +6,7 @@ import type {
   Status,
   TimeSlot,
 } from "@/app/schema";
-import { SheetDemo } from "./forms/appointment-form";
+import { SheetDemo } from "./modal/appointments/editAppointment";
 import SubmitButton from "./buttons/submitBtn";
 
 interface AppointmentsMapProps {

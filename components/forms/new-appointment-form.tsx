@@ -57,7 +57,11 @@ const type = [
   { name: "Phone Call", id: "phone call" },
 ] as const;
 
-export function SelectForm({ setOpen }: { setOpen: (open: boolean) => void }) {
+export function NewAppointmentForm({
+  setOpen,
+}: {
+  setOpen: (open: boolean) => void;
+}) {
   const { data, error } = useSWR("/api/data/", fetcher);
 
   const form = useForm<z.infer<typeof FormSchema>>({

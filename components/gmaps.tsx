@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Autocomplete,
@@ -12,22 +12,17 @@ type MapsProps = {
     name: string;
     onChange: (value: any) => void;
     onBlur: () => void;
-    value: any;
+    value: {
+      address?: string;
+      latitude?: number;
+      longitude?: number;
+      id?: number;
+    };
   };
 };
 
 const Maps = ({ field }: MapsProps) => {
-  const [formattedAddress, setFormattedAddress] = useState("");
-  const [center, setCenter] = useState<google.maps.LatLngLiteral | undefined>(
-    undefined
-  );
-  const [markerPosition, setMarkerPosition] = useState<
-    google.maps.LatLngLiteral | undefined
-  >(undefined);
-  const [initialCountry, setInitialCountry] = useState<string>("PH"); // Default to 'PH'
-
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
-  const geocoderRef = useRef<google.maps.Geocoder | null>(null);
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: process.env.NEXT_PUBLIC_MAPS_API as string,
     libraries: ["places"],
@@ -40,31 +35,13 @@ const Maps = ({ field }: MapsProps) => {
     geocoder.geocode({ location: latLngObj }, (results, status) => {
       if (status === "OK" && results && results.length > 0) {
         const address = results[0].formatted_address || "";
-        setFormattedAddress(address);
-        const country =
-          results[0].address_components.find((component) =>
-            component.types.includes("country")
-          )?.short_name || "";
 
-        if (country !== initialCountry) {
-          // Clear the input and coordinates if the country has changed
-          setFormattedAddress("");
-          setMarkerPosition(undefined);
-          setCenter(undefined);
-          field.onChange({
-            address: "",
-            latitude: undefined,
-            longitude: undefined,
-          });
-        } else {
-          setMarkerPosition(latLng);
-          setCenter(latLng);
-          field.onChange({
-            address: formattedAddress,
-            latitude: latLng.lat,
-            longitude: latLng.lng,
-          });
-        }
+        field.onChange({
+          address: address,
+          latitude: latLng.lat,
+          longitude: latLng.lng,
+          id: field.value?.id, // Preserve the ID if it exists
+        });
       }
     });
   };
@@ -73,9 +50,11 @@ const Maps = ({ field }: MapsProps) => {
     if (autocompleteRef.current) {
       const place = autocompleteRef.current.getPlace();
       if (place) {
-        if (place.formatted_address) {
-          setFormattedAddress(place.formatted_address);
-        }
+        const address = place.formatted_address || "";
+        field.onChange({
+          ...field.value,
+          address: address,
+        });
         if (place.geometry?.location) {
           const latLng = {
             lat: place.geometry.location.lat(),
@@ -103,6 +82,8 @@ const Maps = ({ field }: MapsProps) => {
     return <div>Loading...</div>;
   }
 
+  const { address = "", latitude, longitude } = field.value || {};
+
   return (
     <div className="mb-4">
       <Autocomplete
@@ -112,44 +93,44 @@ const Maps = ({ field }: MapsProps) => {
       >
         <Input
           placeholder="Enter your address"
-          value={formattedAddress}
-          onChange={(e) => setFormattedAddress(e.target.value)}
+          value={address}
+          onChange={(e) =>
+            field.onChange({ ...field.value, address: e.target.value })
+          }
         />
       </Autocomplete>
-      {center && (
+      {latitude && longitude && (
         <div className="relative h-96">
           <GoogleMap
             mapContainerStyle={{ height: "100%", width: "100%" }}
-            center={markerPosition || center}
+            center={{ lat: latitude, lng: longitude }}
             zoom={17}
             options={{ streetViewControl: false, fullscreenControl: false }}
           >
-            {markerPosition && (
-              <Marker
-                position={markerPosition}
-                draggable
-                onDragEnd={handleMarkerDragEnd}
-                title="Your address is here"
-                options={{
-                  label: {
-                    text: "Your address is here",
-                    fontWeight: "bold",
-                    fontSize: "14px",
-                  },
-                  animation: google.maps.Animation.DROP,
-                }}
-              />
-            )}
+            <Marker
+              position={{ lat: latitude, lng: longitude }}
+              draggable
+              onDragEnd={handleMarkerDragEnd}
+              title="Your address is here"
+              options={{
+                label: {
+                  text: "Your address is here",
+                  fontWeight: "bold",
+                  fontSize: "14px",
+                },
+                animation: google.maps.Animation.DROP,
+              }}
+            />
           </GoogleMap>
         </div>
       )}
-      {markerPosition && (
+      {latitude && longitude && (
         <div className="mt-4">
           <p>
-            <strong>Latitude:</strong> {markerPosition.lat}
+            <strong>Latitude:</strong> {latitude}
           </p>
           <p>
-            <strong>Longitude:</strong> {markerPosition.lng}
+            <strong>Longitude:</strong> {longitude}
           </p>
         </div>
       )}
