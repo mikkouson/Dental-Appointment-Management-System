@@ -10,7 +10,7 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import useSWR from "swr";
 import AppointmentsMap from "@/components/appointmentsList";
-import { SelectForm } from "@/components/forms/new-appointment-form";
+import { NewAppointmentForm } from "@/components/forms/new-appointment-form";
 import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
 
 const fetcher = (url: string): Promise<any[]> =>
@@ -109,7 +109,7 @@ export default function Appointments() {
             setOpen={setOpen}
             label={"New Appointment"}
           >
-            <SelectForm setOpen={setOpen} />
+            <NewAppointmentForm setOpen={setOpen} />
           </DrawerDialogDemo>
         </div>
         <div>
