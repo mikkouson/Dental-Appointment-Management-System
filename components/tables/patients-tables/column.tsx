@@ -2,6 +2,7 @@ import type { PatientCol } from "@/app/schema";
 import { ColumnDef } from "@tanstack/react-table";
 import { SquarePen } from "lucide-react";
 import { DeleteModal } from "@/components/modal/deleteModal";
+import { EditPatient } from "@/components/modal/patients/editPatient";
 
 type Column = ColumnDef<PatientCol>;
 
@@ -42,10 +43,12 @@ export const columns: Column[] = [
     header: "Actions",
     cell: ({ row }) => {
       const id = row.original.id;
+      const patient = row.original;
       return (
         <div className="flex px-2">
           <DeleteModal id={id} />
-          <SquarePen className="text-sm w-5 text-green-700 cursor-pointer" />
+
+          <EditPatient patient={patient} />
         </div>
       );
     },
