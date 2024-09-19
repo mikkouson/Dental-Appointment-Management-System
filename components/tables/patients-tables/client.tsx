@@ -1,7 +1,7 @@
 "use client";
 import type { Patient, Address } from "@/app/schema";
 import { Breadcrumbs } from "@/components/breadcrumb";
-import { SelectForm } from "@/components/forms/newPatientForm";
+import { NewPatientForm } from "@/components/forms/newPatientForm";
 import { Heading } from "@/components/heading";
 import PageContainer from "@/components/layout/page-container";
 import { PaginationDemo } from "@/components/pagitnation";
@@ -104,7 +104,7 @@ export default function UserClient() {
           />
 
           <DrawerDialogDemo open={open} setOpen={setOpen} label={"New Patient"}>
-            <SelectForm setOpen={setOpen} />
+            <NewPatientForm setOpen={setOpen} />
           </DrawerDialogDemo>
         </div>
         <Separator />
