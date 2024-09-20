@@ -23,6 +23,10 @@ import { useEffect, useState } from "react";
 export function EditPatient({ patient }: { patient: PatientCol }) {
   const [open, setOpen] = useState(false);
 
+  useEffect(() => {
+    setTimeout(() => (document.body.style.pointerEvents = ""), 0);
+  });
+
   // Use z.infer to derive the type from PatientSchema
   const form = useForm<z.infer<typeof PatientSchema>>({
     resolver: zodResolver(PatientSchema),
