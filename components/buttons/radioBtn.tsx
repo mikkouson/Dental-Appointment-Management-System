@@ -75,9 +75,6 @@ export function RadioBtn({
     item.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
   );
 
-  console.log("Search Query:", searchQuery);
-  console.log("Filtered Data:", filtered);
-
   const handleSetData = (id: string | number) => {
     field.onChange(id);
     setOpen(false);
@@ -94,7 +91,7 @@ export function RadioBtn({
   };
 
   return (
-    <Popover open={open} onOpenChange={handleOpenChange}>
+    <Popover open={open} onOpenChange={handleOpenChange} modal={true}>
       <PopoverTrigger asChild>
         <FormControl>
           <Button
