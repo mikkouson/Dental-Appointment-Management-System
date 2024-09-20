@@ -87,6 +87,9 @@ export function NewAppointmentForm({
   const patient = form.watch("id");
 
   const patientsTable = data.find((item) => item.table_name === "patients");
+  const patients = patientsTable?.row_data?.filter(
+    (item: { deleteOn: null | Date }) => item.deleteOn === null
+  );
   const appointmentsTable = data.find(
     (item) => item.table_name === "appointments"
   );
@@ -99,7 +102,7 @@ export function NewAppointmentForm({
     .filter((item) => item.patient_id === patient)
     .map((item) => item.date);
 
-  console.log(patientAppointments);
+  console.log(patients);
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
@@ -108,7 +111,8 @@ export function NewAppointmentForm({
             form={form}
             name={"id"}
             label={"patient"}
-            data={patientsTable.row_data}
+            data={patients}
+            num={true}
           />
           <Field
             form={form}
