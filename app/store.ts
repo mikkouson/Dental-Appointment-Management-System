@@ -29,3 +29,16 @@ export const useGetDate = create<State & Actions>((set) => ({
   setBranch: (branch) => set({ branch }),
   setStatus: (status) => set({ status }),
 }));
+
+type ActiveState = {
+  selectedPatient: Number;
+};
+
+type ActiveActions = {
+  setActive: (selectedPatient: Number) => void;
+};
+
+export const useSetActive = create<ActiveState & ActiveActions>((set) => ({
+  selectedPatient: 0,
+  setActive: (selectedPatient) => set({ selectedPatient }),
+}));

@@ -44,10 +44,10 @@ export const columns: Column[] = [
     cell: ({ row }) => {
       const id = row.original.id;
       const patient = row.original;
+
       return (
         <div className="flex px-2">
           <DeleteModal id={id} />
-
           <EditPatient patient={patient} />
         </div>
       );

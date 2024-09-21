@@ -1,11 +1,7 @@
 import React, { useRef } from "react";
 import { Input } from "@/components/ui/input";
-import {
-  Autocomplete,
-  GoogleMap,
-  Marker,
-  useJsApiLoader,
-} from "@react-google-maps/api";
+import { Autocomplete, GoogleMap, Marker } from "@react-google-maps/api";
+import useGoogleMapsLoader from "./hooks/useGoogleMapsLoader";
 
 type MapsProps = {
   field: {
@@ -23,10 +19,7 @@ type MapsProps = {
 
 const Maps = ({ field }: MapsProps) => {
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_MAPS_API as string,
-    libraries: ["places"],
-  });
+  const { isLoaded } = useGoogleMapsLoader();
 
   const updateAddress = (latLng: google.maps.LatLngLiteral) => {
     const geocoder = new google.maps.Geocoder();
@@ -40,7 +33,7 @@ const Maps = ({ field }: MapsProps) => {
           address: address,
           latitude: latLng.lat,
           longitude: latLng.lng,
-          id: field.value?.id, // Preserve the ID if it exists
+          id: field.value?.id,
         });
       }
     });
