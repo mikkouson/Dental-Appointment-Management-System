@@ -9,6 +9,7 @@ import {
 import {
   ColumnDef,
   ColumnFiltersState,
+  Row,
   SortingState,
   VisibilityState,
   flexRender,
@@ -21,23 +22,36 @@ import {
 import * as React from "react";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import type { PatientCol } from "@/app/schema";
+import { useSetActive } from "@/app/store";
+import { cn } from "@/lib/utils";
 
-// Define Column type to match ColumnDef<Patient & { address?: Address }>
 type Column = ColumnDef<PatientCol>;
 
 type DataTableProps = {
   data: PatientCol[];
   columns: Column[];
+  activePatient: Number;
 };
 
-export function DataTableDemo({ columns, data }: DataTableProps) {
+// In your DataTableDemo component
+export function DataTableDemo({
+  columns,
+  data,
+  activePatient,
+}: DataTableProps) {
+  const setActive = useSetActive((state) => state.setActive);
+
+  console.log(activePatient);
+
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
+  const [rowSelection, setRowSelection] = React.useState<
+    Record<string, boolean>
+  >({});
 
   const table = useReactTable({
     data,
@@ -57,6 +71,10 @@ export function DataTableDemo({ columns, data }: DataTableProps) {
       rowSelection,
     },
   });
+
+  const handleClick = (row: Row<PatientCol>) => {
+    setActive(row.original.id); // Set the clicked row as active
+  };
 
   return (
     <ScrollArea className="h-[calc(80vh-220px)] rounded-md border md:h-[calc(80dvh-200px)]">
@@ -82,7 +100,11 @@ export function DataTableDemo({ columns, data }: DataTableProps) {
             table.getRowModel().rows.map((row) => (
               <TableRow
                 key={row.id}
-                data-state={row.getIsSelected() ? "selected" : undefined}
+                className={cn(
+                  "cursor-pointer",
+                  activePatient === row.original.id && "bg-muted"
+                )}
+                onClick={() => handleClick(row)}
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
