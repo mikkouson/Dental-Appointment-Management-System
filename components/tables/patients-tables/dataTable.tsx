@@ -20,7 +20,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import * as React from "react";
-import { ScrollArea, ScrollBar } from "../ui/scroll-area";
+import { ScrollArea, ScrollBar } from "../../ui/scroll-area";
 import type { PatientCol } from "@/app/schema";
 import { useSetActive } from "@/app/store";
 import { cn } from "@/lib/utils";
@@ -40,8 +40,6 @@ export function DataTableDemo({
   activePatient,
 }: DataTableProps) {
   const setActive = useSetActive((state) => state.setActive);
-
-  console.log(activePatient);
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
