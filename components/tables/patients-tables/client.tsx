@@ -12,7 +12,7 @@ import { createClient } from "@/utils/supabase/client";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect } from "react";
 import useSWR from "swr";
-import { DataTableDemo } from "../dataTable";
+import { DataTableDemo } from "./dataTable";
 import { columns } from "./column";
 import PatientCard from "@/components/cards/patientCard";
 import { useSetActive } from "@/app/store";
@@ -92,7 +92,6 @@ export default function UserClient() {
     setSearchQuery(value);
     handleSearch(value);
   };
-
   return (
     <PageContainer>
       <div className="space-y-4">

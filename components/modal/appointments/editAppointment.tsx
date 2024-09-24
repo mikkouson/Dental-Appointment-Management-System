@@ -133,7 +133,7 @@ export function SheetDemo({ date, pid, time, aptId, apt }: SheetDemoProps) {
       <SheetTrigger asChild>
         <Button onClick={() => set()}>Edit</Button>
       </SheetTrigger>
-      <SheetContent>
+      <SheetContent className="w-[800px]">
         <SheetHeader>
           <SheetTitle>Edit Appointment</SheetTitle>
           <SheetDescription>

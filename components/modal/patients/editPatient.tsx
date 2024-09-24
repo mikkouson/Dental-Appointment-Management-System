@@ -35,7 +35,9 @@ export function EditPatient({ patient }: { patient: PatientCol }) {
       name: patient.name || "",
       email: patient.email || "",
       sex: patient.sex || "",
-      age: patient.age || 0,
+      status: patient.status || "",
+      dob: patient.dob ? new Date(patient.dob) : undefined,
+      phoneNumber: patient.phone_number || 0,
       address: {
         id: patient.address?.id || 0,
         address: patient.address?.address || "",
@@ -46,20 +48,13 @@ export function EditPatient({ patient }: { patient: PatientCol }) {
   });
 
   function onSubmit(data: z.infer<typeof PatientSchema>) {
-    const correctedData = {
-      ...data,
-      age: Number(data.age),
-    };
-
     setOpen(false);
-    updatePatient(correctedData);
+    updatePatient(data);
     toast({
       title: "You submitted the following values:",
       description: (
         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">
-            {JSON.stringify(correctedData, null, 2)}
-          </code>
+          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
         </pre>
       ),
     });
@@ -75,6 +70,7 @@ export function EditPatient({ patient }: { patient: PatientCol }) {
         <SquarePen className="text-sm w-5 text-green-700 cursor-pointer" />
       </SheetTrigger>
       <SheetContent
+        className="w-[800px]"
         onInteractOutside={(e) => {
           const hasPacContainer = e.composedPath().some((el: EventTarget) => {
             if ("classList" in el) {
