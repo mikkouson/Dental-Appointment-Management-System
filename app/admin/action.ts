@@ -5,6 +5,7 @@ import moment from "moment";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { PatientSchema } from "@/app/types";
 interface AppointmentActionProps {
   aptId: number;
 }
@@ -33,31 +34,7 @@ const schema = z.object({
 
 type Inputs = z.infer<typeof schema>;
 
-const FormSchema = z.object({
-  id: z.number().optional(),
-  name: z.string().min(1, { message: "Name is required." }),
-  email: z.string().email().min(1, {
-    message: "Invalid email address.",
-  }),
-  address: z
-    .object({
-      id: z.number().optional(),
-      address: z.string({
-        required_error: "Address is required.",
-      }),
-      latitude: z.number().optional(),
-      longitude: z.number().optional(),
-    })
-    .refine((data) => data.address.trim().length > 0, {
-      message: "Address must be provided.",
-    }),
-  sex: z.string().min(1, { message: "Sex is required." }),
-  age: z.number().min(1, {
-    message: "Age is required.",
-  }),
-});
-
-type patientInput = z.infer<typeof FormSchema>;
+type patientInput = z.infer<typeof PatientSchema>;
 
 export async function cancelAppointment({ aptId }: AppointmentActionProps) {
   const supabase = createClient();
@@ -128,7 +105,7 @@ export async function newApp(data: Inputs) {
 }
 
 export async function newPatient(data: patientInput) {
-  const result = FormSchema.safeParse(data);
+  const result = PatientSchema.safeParse(data);
 
   if (!result.success) {
     console.log("Validation errors:", result.error.format());
@@ -163,8 +140,10 @@ export async function newPatient(data: patientInput) {
       name: data.name,
       email: data.email,
       sex: data.sex,
-      age: data.age,
-      address: addressId, // Use the address ID from the previous step
+      address: addressId,
+      phone_number: data.phoneNumber,
+      dob: data.dob,
+      status: data.status,
     },
   ]);
 
@@ -188,7 +167,7 @@ export async function deletePatient(id: number) {
   }
 }
 export async function updatePatient(data: patientInput) {
-  const result = FormSchema.safeParse(data);
+  const result = PatientSchema.safeParse(data);
 
   if (!result.success) {
     console.log("Validation errors:", result.error.format());
@@ -225,7 +204,9 @@ export async function updatePatient(data: patientInput) {
       name: data.name,
       email: data.email,
       sex: data.sex,
-      age: data.age,
+      phone_number: data.phoneNumber,
+      dob: data.dob,
+      status: data.status,
     })
     .eq("id", data.id);
 
