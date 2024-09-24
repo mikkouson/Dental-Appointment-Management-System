@@ -33,12 +33,25 @@ export const useGetDate = create<State & Actions>((set) => ({
 type ActiveState = {
   selectedPatient: Number;
 };
-
+type ActiveAppointment = {
+  selectedAppointment: Number;
+};
 type ActiveActions = {
   setActive: (selectedPatient: Number) => void;
+};
+
+type ActiveAppointmentActions = {
+  setActiveState: (selectedAppointment: Number) => void;
 };
 
 export const useSetActive = create<ActiveState & ActiveActions>((set) => ({
   selectedPatient: 0,
   setActive: (selectedPatient) => set({ selectedPatient }),
+}));
+
+export const useSetActiveAppointments = create<
+  ActiveAppointment & ActiveAppointmentActions
+>((set) => ({
+  selectedAppointment: 0,
+  setActiveState: (selectedAppointment) => set({ selectedAppointment }),
 }));
