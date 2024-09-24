@@ -14,6 +14,13 @@ export type Address = Database["public"]["Tables"]["addresses"]["Row"];
 export type PatientCol = Tables<"patients"> & {
   address: Tables<"addresses"> | null;
 };
+export type AppointmentsCol = Tables<"appointments"> & {
+  branch: Tables<"branch"> | null; // Example: Relationship to branch table
+  patients: Tables<"patients"> | null; // Example: Relationship to patients table
+  services: Tables<"services"> | null; // Example: Relationship to services table
+  status: Tables<"status"> | null; // Example: Relationship to status table
+  time_slots: Tables<"time_slots"> | null; // Example: Relationship to time_slots table
+};
 
 export type Database = {
   public: {
@@ -172,29 +179,41 @@ export type Database = {
         Row: {
           address: number | null;
           age: number | null;
+          created_at: string | null;
           deleteOn: string | null;
+          dob: string | null;
           email: string | null;
           id: number;
           name: string | null;
+          phone_number: number | null;
           sex: string | null;
+          status: string | null;
         };
         Insert: {
           address?: number | null;
           age?: number | null;
+          created_at?: string | null;
           deleteOn?: string | null;
+          dob?: string | null;
           email?: string | null;
           id?: number;
           name?: string | null;
+          phone_number?: number | null;
           sex?: string | null;
+          status?: string | null;
         };
         Update: {
           address?: number | null;
           age?: number | null;
+          created_at?: string | null;
           deleteOn?: string | null;
+          dob?: string | null;
           email?: string | null;
           id?: number;
           name?: string | null;
+          phone_number?: number | null;
           sex?: string | null;
+          status?: string | null;
         };
         Relationships: [
           {
@@ -326,6 +345,29 @@ export type Database = {
           date_param: string;
         };
         Returns: Json;
+      };
+      get_patient_appointments: {
+        Args: {
+          patient_id: number;
+        };
+        Returns: {
+          id: number;
+          name: string;
+          appointments: Json;
+        }[];
+      };
+      get_patient_with_appointments: {
+        Args: {
+          p_id: number;
+        };
+        Returns: {
+          id: number;
+          name: string;
+          email: string;
+          age: number;
+          address: Json;
+          appointments: Json;
+        }[];
       };
       get_specific_tables_data: {
         Args: Record<PropertyKey, never>;
