@@ -10,13 +10,21 @@ import {
 } from "@/components/ui/form";
 import Maps from "@/components/gmaps";
 import { Button } from "@/components/ui/button";
+import { UseFormReturn } from "react-hook-form";
+import { PatientFormValues } from "@/app/types";
+import { Input } from "@/components/ui/input";
+import { CalendarForm } from "@/components/calendarInput";
+
 const sex = [
   { name: "Male", id: "male" },
   { name: "Female", id: "female" },
   { name: "Prefer not to say", id: "prefer_not_to_say" },
 ] as const;
-import { UseFormReturn } from "react-hook-form";
-import { PatientFormValues } from "@/app/types";
+
+const status = [
+  { name: "Active", id: "Active" },
+  { name: "Inactive", id: "Inactive" },
+] as const;
 
 interface PatientFieldsProps {
   form: UseFormReturn<PatientFormValues>;
@@ -31,7 +39,31 @@ const PatientFields = ({ form, onSubmit }: PatientFieldsProps) => {
           <Field form={form} name={"name"} label={"Name"} />
           <Field form={form} name={"email"} label={"Email"} />
           <Field form={form} data={sex} name={"sex"} label={"Sex"} />
-          <Field form={form} name={"age"} label={"Age"} age={true} />
+          <Field form={form} name={"status"} label={"Status"} data={status} />
+          <FormField
+            control={form.control}
+            name="phoneNumber"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Phone Number</FormLabel>
+                <FormControl>
+                  <div className="relative ml-auto flex-1 md:grow-0">
+                    <p className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground text-sm">
+                      (+639)
+                    </p>
+                    <Input
+                      type="number"
+                      className="w-full rounded-lg bg-background pl-16 "
+                      {...field}
+                      value={field.value}
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <CalendarForm form={form} />
           <FormField
             control={form.control}
             name="address"

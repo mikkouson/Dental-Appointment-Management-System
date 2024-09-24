@@ -21,25 +21,17 @@ export function NewPatientForm({
       name: "",
       email: "",
       sex: "",
-      age: 0,
     },
   });
 
   function onSubmit(data: z.infer<typeof PatientSchema>) {
-    const correctedData = {
-      ...data,
-      age: Number(data.age),
-    };
-
     setOpen(false);
-    newPatient(correctedData);
+    newPatient(data);
     toast({
       title: "You submitted the following values:",
       description: (
         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">
-            {JSON.stringify(correctedData, null, 2)}
-          </code>
+          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
         </pre>
       ),
     });

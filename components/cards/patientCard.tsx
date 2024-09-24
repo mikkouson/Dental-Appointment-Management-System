@@ -20,6 +20,7 @@ import { CalendarFold, Copy, MoreVertical } from "lucide-react";
 import useSWR from "swr";
 import StaticMaps from "../staticMap";
 import { ScrollArea } from "../ui/scroll-area";
+import Link from "next/link";
 
 const fetcher = async (url: string): Promise<any> => {
   const res = await fetch(url);
@@ -99,10 +100,12 @@ const PatientCard = ({ activePatient }: { activePatient: Number }) => {
               <address className="grid gap-0.5 not-italic text-muted-foreground">
                 <span>{data?.address?.address}</span>
               </address>
-              <StaticMaps
-                latitude={data.address?.latitude}
-                longitude={data.address?.longitude}
-              />
+              {!isLoading && (
+                <StaticMaps
+                  latitude={data?.address?.latitude}
+                  longitude={data?.address?.longitude}
+                />
+              )}
             </div>
           </div>
           <Separator className="my-4" />
@@ -124,12 +127,14 @@ const PatientCard = ({ activePatient }: { activePatient: Number }) => {
                   <dd>{data?.appointments[0].services.name}</dd>
                 </div>
               </dl>
-              <Button size="sm" variant="outline" className="h-8 gap-1">
-                <CalendarFold className="h-3.5 w-3.5" />
-                <span className="lg:sr-only xl:not-sr-only xl:whitespace-nowrap">
-                  View All Appointments
-                </span>
-              </Button>
+              <Link href={`/admin/patients/${data.id}`}>
+                <Button variant="outline" className="h-8 w-full gap-1">
+                  <CalendarFold className="h-3.5 w-3.5" />
+                  <span className="lg:sr-only xl:not-sr-only xl:whitespace-nowrap">
+                    Link View All Appointments
+                  </span>
+                </Button>
+              </Link>
             </div>
           ) : (
             <>no appointments</>
