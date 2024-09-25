@@ -8,6 +8,7 @@ import type {
 } from "@/app/schema";
 import { SheetDemo } from "./modal/appointments/editAppointment";
 import SubmitButton from "./buttons/submitBtn";
+import { Separator } from "./ui/separator";
 
 interface AppointmentsMapProps {
   timeSlots: TimeSlot[];
@@ -30,8 +31,14 @@ export default function AppointmentsMap({
         );
 
         return (
-          <div key={time.id}>
-            <h3 className="text-lg font-semibold mb-2">{time.time}</h3>
+          <div key={time.id} className="mb-4">
+            <div className="flex items-center max-w-[1000px]">
+              <h3 className="text-lg font-semibold mr-2 whitespace-nowrap">
+                {time.time}
+              </h3>
+              {timeSlots.length && <Separator className="my-2 " />}
+            </div>
+
             {filteredAppointments.length > 0 ? (
               <div>
                 {filteredAppointments.map((apt: any) => (
