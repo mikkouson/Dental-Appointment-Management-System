@@ -16,7 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
-import { CalendarFold, Copy, MoreVertical } from "lucide-react";
+import { Expand, Copy, MoreVertical } from "lucide-react";
 import useSWR from "swr";
 import StaticMaps from "../staticMap";
 import { ScrollArea } from "../ui/scroll-area";
@@ -127,18 +127,18 @@ const PatientCard = ({ activePatient }: { activePatient: Number }) => {
                   <dd>{data?.appointments[0].services.name}</dd>
                 </div>
               </dl>
-              <Link href={`/admin/patients/${data.id}`}>
-                <Button variant="outline" className="h-8 w-full gap-1">
-                  <CalendarFold className="h-3.5 w-3.5" />
-                  <span className="lg:sr-only xl:not-sr-only xl:whitespace-nowrap">
-                    Link View All Appointments
-                  </span>
-                </Button>
-              </Link>
             </div>
           ) : (
             <>no appointments</>
           )}
+          <Link href={`/admin/patients/${data.id}`}>
+            <Button variant="outline" className="h-8 w-full gap-1 mt-2 flex">
+              <Expand className="h-3.5 w-3.5 mr-2" />
+              <span className="lg:sr-only xl:not-sr-only xl:whitespace-nowrap">
+                Expand Details
+              </span>
+            </Button>
+          </Link>
         </CardContent>
       </ScrollArea>
       <CardFooter className="flex flex-row items-center border-t bg-muted/50 px-6 py-3">
