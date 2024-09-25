@@ -1,5 +1,4 @@
 "use client";
-
 import { useGetDate } from "@/app/store";
 import BranchSelect from "@/components/buttons/selectbranch-btn";
 import { CheckboxReactHookFormMultiple } from "@/components/buttons/comboBoxSelect";
@@ -12,6 +11,7 @@ import useSWR from "swr";
 import AppointmentsMap from "@/components/appointmentsList";
 import { NewAppointmentForm } from "@/components/forms/new-appointment-form";
 import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
+import { Separator } from "@/components/ui/separator";
 
 const fetcher = (url: string): Promise<any[]> =>
   fetch(url).then((res) => res.json());
@@ -90,18 +90,22 @@ export default function Appointments() {
   if (appointmentsError) return <div>Error loading appointments</div>;
 
   return (
-    <div className="flex  justify-between mx-10 ">
-      <div>
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={setDate}
-          className="rounded-md border"
-        />
+    <div className="mx-auto grid grid-cols-4 gap-4 w-full max-w-[93rem] p-5">
+      {/* Left Column for Calendar */}
+      <div className="col-span-1 mr-10">
+        <>
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={setDate}
+            className="rounded-md border mb-4 flex items-center justify-center"
+          />
+        </>
       </div>
 
-      <div className="w-full pl-10 flex-col">
-        <div className="flex justify-end">
+      {/* Right Column */}
+      <div className="col-span-3 flex flex-col">
+        <div className="flex justify-end mb-4 space-x-4">
           <CheckboxReactHookFormMultiple items={statuses} label="Status" />
           <BranchSelect />
           <DrawerDialogDemo
@@ -112,27 +116,22 @@ export default function Appointments() {
             <NewAppointmentForm setOpen={setOpen} />
           </DrawerDialogDemo>
         </div>
-        <div>
-          {isLoading ? (
-            <div>
-              {timeSlots.map((time) => (
-                <div className="mb-2" key={time.id}>
-                  <h2 className="text-lg font-semibold mb-2">{time.time}</h2>
-                  <div className="flex flex-col border p-2">
-                    <Skeleton className="h-2 w-3/4 mb-2" />
-                    <Skeleton className="h-2 w-2/5 mb-2" />
-                    <Skeleton className="h-2 w-1/4" />
-                  </div>
+        {isLoading ? (
+          <div>
+            {timeSlots.map((time) => (
+              <div className="mb-4" key={time.id}>
+                <h2 className="text-lg font-semibold mb-2">{time.time}</h2>
+                <div className="flex flex-col border p-2">
+                  <Skeleton className="h-2 w-3/4 mb-2" />
+                  <Skeleton className="h-2 w-2/5 mb-2" />
+                  <Skeleton className="h-2 w-1/4" />
                 </div>
-              ))}
-            </div>
-          ) : (
-            <AppointmentsMap
-              timeSlots={timeSlots}
-              appointments={appointments}
-            />
-          )}
-        </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <AppointmentsMap timeSlots={timeSlots} appointments={appointments} />
+        )}
       </div>
     </div>
   );

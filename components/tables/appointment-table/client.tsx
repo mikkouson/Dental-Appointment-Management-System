@@ -17,6 +17,7 @@ import { columns } from "./column";
 import PatientCard from "@/components/cards/patientCard";
 import { useSetActiveAppointments } from "@/app/store";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Search } from "lucide-react";
 
 const fetcher = async (
   url: string
@@ -107,19 +108,34 @@ export default function UserClient() {
             description="Manage employees (Server side table functionalities.)"
           />
 
-          <DrawerDialogDemo open={open} setOpen={setOpen} label={"New Patient"}>
-            <NewPatientForm setOpen={setOpen} />
-          </DrawerDialogDemo>
+          <div className="flex">
+            <div className="mr-2 relative">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search Patient Name ..."
+                className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px]"
+                onChange={handleInputChange}
+              />
+            </div>
+            <DrawerDialogDemo
+              open={open}
+              setOpen={setOpen}
+              label={"New Patient"}
+            >
+              <NewPatientForm setOpen={setOpen} />
+            </DrawerDialogDemo>
+          </div>
         </div>
         <Separator />
         <div className="flex">
           <div className="flex-1">
-            <Input
+            {/* <Input
               className="block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500 md:max-w-sm"
               placeholder="Search Patient Name"
               value={searchQuery}
               onChange={handleInputChange}
-            />
+            /> */}
             {isLoading ? (
               <p>Loading...</p>
             ) : data && data.data ? (
