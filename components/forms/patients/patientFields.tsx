@@ -55,7 +55,6 @@ const PatientFields = ({ form, onSubmit }: PatientFieldsProps) => {
                       type="number"
                       className="w-full rounded-lg bg-background pl-16 "
                       {...field}
-                      value={field.value}
                     />
                   </div>
                 </FormControl>
@@ -63,7 +62,30 @@ const PatientFields = ({ form, onSubmit }: PatientFieldsProps) => {
               </FormItem>
             )}
           />
-          <CalendarForm form={form} />
+          <FormField
+            control={form.control}
+            name="dob"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Date of Birth</FormLabel>
+                <FormControl>
+                  <Input
+                    type="date"
+                    value={
+                      field.value instanceof Date
+                        ? field.value.toISOString().split("T")[0]
+                        : ""
+                    }
+                    onChange={(e) => {
+                      const selectedDate = new Date(e.target.value);
+                      field.onChange(selectedDate);
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="address"

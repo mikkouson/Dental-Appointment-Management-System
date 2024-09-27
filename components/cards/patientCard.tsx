@@ -21,6 +21,7 @@ import useSWR from "swr";
 import StaticMaps from "../staticMap";
 import { ScrollArea } from "../ui/scroll-area";
 import Link from "next/link";
+import moment from "moment";
 
 const fetcher = async (url: string): Promise<any> => {
   const res = await fetch(url);
@@ -53,7 +54,9 @@ const PatientCard = ({ activePatient }: { activePatient: Number }) => {
               <span className="sr-only">Copy Order ID</span>
             </Button>
           </CardTitle>
-          <CardDescription>Date: November 23, 2023</CardDescription>
+          <CardDescription>
+            Date of Birth: {moment(data?.dob).format("MMMM DD, YYYY")}
+          </CardDescription>
         </div>
         <div className="ml-auto flex items-center gap-1">
           <DropdownMenu>
