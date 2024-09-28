@@ -5,7 +5,7 @@ import moment from "moment";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { PatientSchema } from "@/app/types";
+import { PatientSchema, ServiceFormValues, ServiceSchema } from "@/app/types";
 interface AppointmentActionProps {
   aptId: number;
 }
@@ -214,5 +214,32 @@ export async function updatePatient(data: patientInput) {
     console.error("Error updating patient:", patientError.message);
   } else {
     console.log("Patient data updated successfully");
+  }
+}
+
+// Patient Actions
+
+export async function newService(data: ServiceFormValues) {
+  const result = ServiceSchema.safeParse(data);
+
+  if (!result.success) {
+    console.log("Validation errors:", result.error.format());
+    return;
+  }
+
+  const supabase = createClient();
+
+  const { error } = await supabase.from("services").insert([
+    {
+      name: data.name,
+      description: data.description,
+      price: data.price,
+    },
+  ]);
+
+  if (error) {
+    console.error("Error inserting patient:", error.message);
+  } else {
+    console.log("Patient data inserted successfully");
   }
 }
