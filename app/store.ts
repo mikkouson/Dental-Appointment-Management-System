@@ -30,18 +30,21 @@ export const useGetDate = create<State & Actions>((set) => ({
   setStatus: (status) => set({ status }),
 }));
 
+//active patients
 type ActiveState = {
   selectedPatient: Number;
 };
-type ActiveAppointment = {
-  selectedAppointment: Number;
-};
+
 type ActiveActions = {
   setActive: (selectedPatient: Number) => void;
 };
 
+//active appointments
 type ActiveAppointmentActions = {
   setActiveState: (selectedAppointment: Number) => void;
+};
+type ActiveAppointment = {
+  selectedAppointment: Number;
 };
 
 export const useSetActive = create<ActiveState & ActiveActions>((set) => ({

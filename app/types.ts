@@ -37,3 +37,12 @@ export const PatientSchema = z.object({
 });
 
 export type PatientFormValues = z.infer<typeof PatientSchema>;
+
+export const ServiceSchema = z.object({
+  id: z.number().optional(),
+  description: z.string().min(1, { message: "Description is required." }),
+  name: z.string().min(1, { message: "Name is required." }),
+  price: z.number().min(1, { message: "Price is required." }),
+});
+
+export type ServiceFormValues = z.infer<typeof ServiceSchema>;
