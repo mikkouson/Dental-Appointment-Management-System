@@ -1,7 +1,8 @@
 "use client";
-import type { Address, Patient } from "@/app/schema";
+import type { Address, Patient, PatientCol } from "@/app/schema";
+import { useSetActive } from "@/app/store";
 import { Breadcrumbs } from "@/components/breadcrumb";
-import { NewPatientForm } from "@/components/forms/newPatientForm";
+import PatientCard from "@/components/cards/patientCard";
 import { Heading } from "@/components/heading";
 import PageContainer from "@/components/layout/page-container";
 import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
@@ -9,15 +10,13 @@ import { PaginationDemo } from "@/components/pagitnation";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/utils/supabase/client";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect } from "react";
-import useSWR from "swr";
-import { DataTableDemo } from "./dataTable";
-import { columns } from "./column";
-import PatientCard from "@/components/cards/patientCard";
-import { useSetActive } from "@/app/store";
 import { Search } from "lucide-react";
-
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import React, { useEffect, useOptimistic } from "react";
+import useSWR, { preload } from "swr";
+import { columns } from "./column";
+import { DataTableDemo } from "./dataTable";
+import { NewPatientForm } from "@/components/forms/newPatientForm";
 const fetcher = async (
   url: string
 ): Promise<{
@@ -25,6 +24,7 @@ const fetcher = async (
   count: number;
 }> => fetch(url).then((res) => res.json());
 
+preload(`/api/patients`, fetcher);
 export default function UserClient() {
   const [open, setOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState<string>("");
@@ -93,6 +93,7 @@ export default function UserClient() {
     setSearchQuery(value);
     handleSearch(value);
   };
+
   return (
     <PageContainer>
       <div className="space-y-4">
@@ -128,14 +129,17 @@ export default function UserClient() {
           <div className="flex-1">
             {isLoading ? (
               <p>Loading...</p>
-            ) : data && data.data ? (
+            ) : data && data.data && data.data.length > 0 ? (
               <>
                 <DataTableDemo
                   columns={columns}
                   data={data.data}
                   activePatient={
-                    activePatient == 0 ? data.data[0].id : activePatient
+                    activePatient === 0
+                      ? data.data[0].id
+                      : activePatient || undefined
                   }
+                  mutate={mutate}
                 />
                 <PaginationDemo
                   currentPage={page}
@@ -148,7 +152,7 @@ export default function UserClient() {
             )}
           </div>
           <div className="w-1/5 ml-5">
-            {data && (
+            {data && data.data && data.data.length > 0 && (
               <PatientCard
                 activePatient={
                   activePatient == 0 ? data.data[0].id : activePatient

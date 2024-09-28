@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import useSWR from "swr";
+import useSWR, { preload } from "swr";
 import AppointmentsMap from "@/components/appointmentsList";
 import { NewAppointmentForm } from "@/components/forms/new-appointment-form";
 import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
@@ -28,6 +28,9 @@ const timeSlots = [
   { id: 9, time: "4:00 PM" },
 ];
 
+preload(`/api/appointments`, fetcher);
+preload(`/api/status`, fetcher);
+preload(`/api/branch`, fetcher);
 export default function Appointments() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [open, setOpen] = React.useState(false);

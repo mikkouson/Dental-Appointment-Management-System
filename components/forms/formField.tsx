@@ -1,6 +1,7 @@
 import { RadioBtn } from "../buttons/radioBtn";
 import { FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea"; // Import the Textarea component
 
 interface FieldProps {
   form: any;
@@ -11,6 +12,7 @@ interface FieldProps {
   defValue?: string;
   num?: boolean;
   age?: boolean;
+  textarea?: boolean; // Add a textarea prop
 }
 
 export default function Field({
@@ -20,7 +22,7 @@ export default function Field({
   data = [],
   erase = false,
   num = false,
-  age = false,
+  textarea = false, // Default to false if not provided
 }: FieldProps) {
   return (
     <FormField
@@ -37,14 +39,20 @@ export default function Field({
               timeclear={erase}
               num={num}
             />
+          ) : textarea ? ( // Render Textarea if textarea prop is true
+            <Textarea
+              placeholder={`Tell us a little bit about ${name}`}
+              className="resize-none"
+              {...field}
+            />
           ) : (
             <Input
-              type={!age ? "text" : "number"}
+              type={!num ? "text" : "number"}
               placeholder={`Input ${name} here`}
               {...field}
-              value={age ? field.value : field.value} // Ensure age is treated as a number
+              value={num ? field.value : field.value} // Ensure num is treated as a number
               onChange={(e) => {
-                if (age) {
+                if (num) {
                   field.onChange(Number(e.target.value)); // Convert value to number
                 } else {
                   field.onChange(e);

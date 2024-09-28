@@ -1,3 +1,10 @@
+"use client";
+import { deletePatient } from "@/app/admin/action";
+import type { PatientCol } from "@/app/schema";
+import { useSetActive } from "@/app/store";
+import { toast } from "@/components/hooks/use-toast";
+import { DeleteModal } from "@/components/modal/deleteModal";
+import { EditPatient } from "@/components/modal/patients/editPatient";
 import {
   Table,
   TableBody,
@@ -6,6 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -20,24 +28,25 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import * as React from "react";
+import { startTransition } from "react";
 import { ScrollArea, ScrollBar } from "../../ui/scroll-area";
-import type { PatientCol } from "@/app/schema";
-import { useSetActive } from "@/app/store";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { ToastAction } from "@/components/ui/toast";
 
 type Column = ColumnDef<PatientCol>;
 
 type DataTableProps = {
   data: PatientCol[];
   columns: Column[];
-  activePatient: Number;
+  activePatient: Number | undefined;
+  mutate: any;
 };
 
-// In your DataTableDemo component
 export function DataTableDemo({
   columns,
   data,
   activePatient,
+  mutate,
 }: DataTableProps) {
   const setActive = useSetActive((state) => state.setActive);
 
@@ -72,6 +81,30 @@ export function DataTableDemo({
 
   const handleClick = (row: Row<PatientCol>) => {
     setActive(row.original.id); // Set the clicked row as active
+  };
+  const handleDelete = (id?: number) => {
+    try {
+      if (!id) return;
+
+      // Optimistically update the UI
+      const filteredPatients = data.filter((patient) => patient.id !== id);
+      mutate({ data: filteredPatients }, false);
+      deletePatient(id);
+      toast({
+        className: cn(
+          "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
+        ),
+        variant: "success",
+        description: "Patient deleted successfully.",
+      });
+    } catch (error: any) {
+      toast({
+        className: cn(
+          "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
+        ),
+        description: `Failed to delete the patient: ${error.message}`,
+      });
+    }
   };
 
   return (
@@ -109,6 +142,14 @@ export function DataTableDemo({
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
+                <TableCell>
+                  <div className="flex px-2">
+                    <DeleteModal
+                      formAction={() => handleDelete(row.original.id)}
+                    />
+                    <EditPatient patient={row.original} />
+                  </div>
+                </TableCell>
               </TableRow>
             ))
           ) : (
