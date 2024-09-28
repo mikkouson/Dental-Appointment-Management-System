@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { deletePatient } from "@/app/admin/action";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -11,42 +13,51 @@ import {
 } from "@/components/ui/dialog";
 import { Trash2 } from "lucide-react";
 import SubmitButton from "../buttons/submitBtn";
+type DeleteModalProps = {
+  formAction: () => void;
+};
+export function DeleteModal({ formAction }: DeleteModalProps) {
+  const [isOpen, setIsOpen] = useState(false);
 
-export function DeleteModal({ id }: { id: Number }) {
   const handleDelete = () => {
-    deletePatient(Number(id));
+    formAction();
+    setIsOpen(false);
   };
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Trash2 className="text-sm w-5 text-red-500 mr-2 cursor-pointer" />
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Confirm Deletion</DialogTitle>
-          <DialogDescription>
-            Are you sure you want to delete this patient?
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogTrigger asChild>
+          <Trash2
+            className="text-sm w-5 text-red-500 mr-2 cursor-pointer"
+            onClick={() => setIsOpen(true)}
+          />
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this patient?
+            </DialogDescription>
+          </DialogHeader>
 
-        <DialogFooter>
-          <form>
-            <SubmitButton
-              className="bg-red-500 text-white"
-              formAction={handleDelete}
-              pendingText="Deleting"
+          <DialogFooter>
+            <form
+              onSubmit={(event) => {
+                event.preventDefault(); // Prevents default form submission
+                handleDelete(); // Call deletion handler
+              }}
             >
-              Delete
-            </SubmitButton>
-          </form>
-          <DialogTrigger asChild>
-            <Button type="button" className="ml-2">
-              Cancel
-            </Button>
-          </DialogTrigger>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+              <Button type="submit"> Delete</Button>
+            </form>
+            <DialogClose asChild>
+              <Button type="button" variant="secondary">
+                Close
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

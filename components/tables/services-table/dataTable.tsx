@@ -30,7 +30,7 @@ type Column = ColumnDef<Service>;
 type DataTableProps = {
   data: Service[] | [];
   columns: Column[];
-  activePatient: Number;
+  activePatient?: number; // Making activePatient optional
 };
 
 // In your DataTableDemo component

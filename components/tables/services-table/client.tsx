@@ -1,17 +1,21 @@
 "use client";
-import { useSetActiveAppointments } from "@/app/store";
+import { Service } from "@/app/schema";
 import { Breadcrumbs } from "@/components/breadcrumb";
+import { NewServiceForm } from "@/components/forms/services/newServicesForm";
 import { Heading } from "@/components/heading";
 import PageContainer from "@/components/layout/page-container";
+import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
+import { PaginationDemo } from "@/components/pagitnation";
+import { Input } from "@/components/ui/input";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/utils/supabase/client";
+import { Search } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect } from "react";
 import useSWR from "swr";
 import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
-import { Service } from "@/app/schema";
 
 const fetcher = async (
   url: string
@@ -23,9 +27,6 @@ const fetcher = async (
 export default function UserClient() {
   const [open, setOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState<string>("");
-  const activePatient = useSetActiveAppointments(
-    (state) => state.selectedAppointment
-  );
 
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -35,16 +36,16 @@ export default function UserClient() {
   const { data, error, isLoading, mutate } = useSWR<{
     data: Service[] | [];
     count: number;
-  }>(`/api/service`, fetcher);
+  }>(`/api/service?page=${page}&query=${query}`, fetcher);
 
   const supabase = createClient();
 
   useEffect(() => {
     const channel = supabase
-      .channel("realtime appointments")
+      .channel("realtime services")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "patients" },
+        { event: "*", schema: "public", table: "services" },
         () => {
           mutate();
         }
@@ -101,7 +102,7 @@ export default function UserClient() {
             description="Manage services (Server side table functionalities.)"
           />
 
-          {/* <div className="flex">
+          <div className="flex">
             <div className="mr-2 relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -114,55 +115,34 @@ export default function UserClient() {
             <DrawerDialogDemo
               open={open}
               setOpen={setOpen}
-              label={"New Patient"}
+              label={"New Service"}
             >
-              <NewPatientForm setOpen={setOpen} />
+              <NewServiceForm setOpen={setOpen} />
             </DrawerDialogDemo>
-          </div> */}
+          </div>
         </div>
         <Separator />
         <div className="flex">
           <div className="flex-1">
-            {/* <Input
-              className="block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500 md:max-w-sm"
-              placeholder="Search Patient Name"
-              value={searchQuery}
-              onChange={handleInputChange}
-            /> */}
             {isLoading ? (
               <p>Loading...</p>
             ) : data && data.data ? (
               <>
                 <ScrollArea className="h-[calc(80vh-220px)] rounded-md border md:h-[calc(80dvh-200px)]">
-                  <DataTableDemo
-                    columns={columns}
-                    data={data.data}
-                    activePatient={
-                      activePatient == 0 ? data.data[0].id : activePatient
-                    }
-                  />
+                  <DataTableDemo columns={columns} data={data.data} />
                   <ScrollBar orientation="horizontal" />
                 </ScrollArea>
-                {/* 
+
                 <PaginationDemo
                   currentPage={page}
                   totalPages={totalPages}
                   onPageChange={handlePageChange}
-                /> */}
+                />
               </>
             ) : (
               <p>No data available</p>
             )}
           </div>
-          {/* <div className="w-1/5 ml-5">
-            {data && (
-              <PatientCard
-                activePatient={
-                  activePatient == 0 ? data.data[0].id : activePatient
-                }
-              />
-            )}
-          </div> */}
         </div>
       </div>
     </PageContainer>
