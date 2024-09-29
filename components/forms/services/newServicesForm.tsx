@@ -7,6 +7,8 @@ import { z } from "zod";
 import { newPatient, newService } from "@/app/admin/action";
 import { ServiceSchema } from "@/app/types";
 import ServicesFields from "./servicesField";
+import { toast } from "@/components/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 export function NewServiceForm({
   setOpen,
@@ -24,14 +26,13 @@ export function NewServiceForm({
   function onSubmit(data: z.infer<typeof ServiceSchema>) {
     setOpen(false);
     newService(data);
-    // toast({
-    //   title: "You submitted the following values:",
-    //   description: (
-    //     <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-    //       <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-    //     </pre>
-    //   ),
-    // });
+    toast({
+      className: cn(
+        "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
+      ),
+      variant: "success",
+      description: "Service added successfully.",
+    });
   }
 
   return <ServicesFields form={form} onSubmit={onSubmit} />;

@@ -16,7 +16,7 @@ import React, { useEffect, useOptimistic, useState } from "react";
 import useSWR, { preload } from "swr";
 import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
-import { NewPatientForm } from "@/components/forms/newPatientForm";
+import { NewPatientForm } from "@/components/forms/patients/newPatientForm";
 const fetcher = async (
   url: string
 ): Promise<{

@@ -9,6 +9,7 @@ import { toast } from "@/components/hooks/use-toast";
 import { newPatient } from "@/app/admin/action";
 import { PatientSchema } from "@/app/types";
 import PatientFields from "./patientFields";
+import { cn } from "@/lib/utils";
 
 export function NewPatientForm({
   setOpen,
@@ -27,14 +28,13 @@ export function NewPatientForm({
   function onSubmit(data: z.infer<typeof PatientSchema>) {
     setOpen(false);
     newPatient(data);
-    // toast({
-    //   title: "You submitted the following values:",
-    //   description: (
-    //     <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-    //       <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-    //     </pre>
-    //   ),
-    // });
+    toast({
+      className: cn(
+        "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
+      ),
+      variant: "success",
+      description: "Patient added successfully.",
+    });
   }
 
   return <PatientFields form={form} onSubmit={onSubmit} />;
