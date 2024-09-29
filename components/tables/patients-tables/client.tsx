@@ -12,7 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/utils/supabase/client";
 import { Search } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect, useOptimistic } from "react";
+import React, { useEffect, useOptimistic, useState } from "react";
 import useSWR, { preload } from "swr";
 import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
@@ -27,7 +27,9 @@ const fetcher = async (
 preload(`/api/patients`, fetcher);
 export default function UserClient() {
   const [open, setOpen] = React.useState(false);
-  const [searchQuery, setSearchQuery] = React.useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>(
+    useSearchParams().get("query") || ""
+  );
   const activePatient = useSetActive((state) => state.selectedPatient);
 
   const searchParams = useSearchParams();
@@ -113,6 +115,7 @@ export default function UserClient() {
                 placeholder="Search Patient Name ..."
                 className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px]"
                 onChange={handleInputChange}
+                value={searchQuery}
               />
             </div>
             <DrawerDialogDemo

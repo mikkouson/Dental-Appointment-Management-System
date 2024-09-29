@@ -217,7 +217,7 @@ export async function updatePatient(data: patientInput) {
   }
 }
 
-// Patient Actions
+// Service Actions
 
 export async function newService(data: ServiceFormValues) {
   const result = ServiceSchema.safeParse(data);
@@ -241,5 +241,45 @@ export async function newService(data: ServiceFormValues) {
     console.error("Error inserting patient:", error.message);
   } else {
     console.log("Patient data inserted successfully");
+  }
+}
+
+export async function deleteService(id: number) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("services")
+    .update({
+      deleteOn: new Date().toISOString(),
+    })
+    .eq("id", id);
+  if (error) {
+    console.log("Error deleting patient", error.message);
+  }
+}
+
+export async function updateService(data: ServiceFormValues) {
+  const result = ServiceSchema.safeParse(data);
+
+  if (!result.success) {
+    console.log("Validation errors:", result.error.format());
+    return;
+  }
+
+  const supabase = createClient();
+
+  // Update patient
+  const { error } = await supabase
+    .from("services")
+    .update({
+      name: data.name,
+      price: data.price,
+      description: data.description,
+    })
+    .eq("id", data.id);
+
+  if (error) {
+    console.error("Error updating patient:", error.message);
+  } else {
+    console.log("Patient data updated successfully");
   }
 }

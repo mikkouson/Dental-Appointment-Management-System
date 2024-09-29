@@ -5,17 +5,17 @@ import { NewServiceForm } from "@/components/forms/services/newServicesForm";
 import { Heading } from "@/components/heading";
 import PageContainer from "@/components/layout/page-container";
 import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
-import { PaginationDemo } from "@/components/pagitnation";
 import { Input } from "@/components/ui/input";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/utils/supabase/client";
 import { Search } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import useSWR from "swr";
 import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
+import { PaginationDemo } from "@/components/pagitnation";
 
 const fetcher = async (
   url: string
@@ -25,8 +25,10 @@ const fetcher = async (
 }> => fetch(url).then((res) => res.json());
 
 export default function UserClient() {
-  const [open, setOpen] = React.useState(false);
-  const [searchQuery, setSearchQuery] = React.useState<string>("");
+  const [open, setOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState<string>(
+    useSearchParams().get("query") || ""
+  );
 
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -40,7 +42,8 @@ export default function UserClient() {
 
   const supabase = createClient();
 
-  useEffect(() => {
+  // Subscribe to realtime updates
+  React.useEffect(() => {
     const channel = supabase
       .channel("realtime services")
       .on(
@@ -57,11 +60,15 @@ export default function UserClient() {
     };
   }, [supabase, mutate]);
 
-  useEffect(() => {
-    setSearchQuery(query);
-  }, [query]);
+  // Handle search input change
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    handleSearch(value);
+  };
 
-  function handleSearch(term: string) {
+  // Handle search and update URL query parameters
+  const handleSearch = (term: string) => {
     const params = new URLSearchParams(searchParams);
     if (term) {
       params.set("query", term);
@@ -71,26 +78,23 @@ export default function UserClient() {
       params.delete("page");
     }
     replace(`${pathname}?${params.toString()}`);
-  }
+  };
 
-  function handlePageChange(newPage: number) {
+  // Handle page change and update URL page parameter
+  const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams);
     params.set("page", newPage.toString());
     replace(`${pathname}?${params.toString()}`);
-  }
+  };
 
+  // Breadcrumb items
   const breadcrumbItems = [
     { title: "Dashboard", link: "/admin" },
-    { title: "Services", link: "/admin/serives" },
+    { title: "Services", link: "/admin/services" },
   ];
 
+  // Calculate total pages for pagination
   const totalPages = data ? Math.ceil(data.count / 10) : 1;
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchQuery(value);
-    handleSearch(value);
-  };
 
   return (
     <PageContainer>
@@ -109,6 +113,7 @@ export default function UserClient() {
                 type="search"
                 placeholder="Search Patient Name ..."
                 className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px]"
+                value={searchQuery}
                 onChange={handleInputChange}
               />
             </div>
@@ -129,7 +134,11 @@ export default function UserClient() {
             ) : data && data.data ? (
               <>
                 <ScrollArea className="h-[calc(80vh-220px)] rounded-md border md:h-[calc(80dvh-200px)]">
-                  <DataTableDemo columns={columns} data={data.data} />
+                  <DataTableDemo
+                    columns={columns}
+                    data={data.data}
+                    mutate={mutate}
+                  />
                   <ScrollBar orientation="horizontal" />
                 </ScrollArea>
 

@@ -28,33 +28,4 @@ export const columns: Column[] = [
     accessorKey: "price",
     header: "PRICE",
   },
-  // {
-  //   accessorFn: (row) => row.address?.address || "N/A",
-  //   id: "address",
-  //   header: "ADDRESS",
-  // },
-  // {
-  //   accessorKey: "sex",
-  //   header: "SEX",
-  // },
-  // {
-  //   accessorKey: "age",
-  //   header: "Age",
-  // },
-  {
-    id: "actions",
-    enableHiding: false,
-    header: "Actions",
-    cell: ({ row }) => {
-      const id = row.original.id;
-      const patient = row.original;
-
-      return (
-        <div className="flex px-2">
-          <DeleteModal id={id} />
-          {/* <EditPatient patient={patient} /> */}
-        </div>
-      );
-    },
-  },
 ];
