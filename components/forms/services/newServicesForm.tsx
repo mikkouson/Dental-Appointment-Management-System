@@ -9,12 +9,21 @@ import { ServiceSchema } from "@/app/types";
 import ServicesFields from "./servicesField";
 import { toast } from "@/components/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import useSWR from "swr";
+import { Service } from "@/app/schema";
 
+const fetcher = (url: string): Promise<any> =>
+  fetch(url).then((res) => res.json());
 export function NewServiceForm({
   setOpen,
 }: {
   setOpen: (open: boolean) => void;
 }) {
+  const { data: responseData, error } = useSWR("/api/service/", fetcher);
+
+  // Extract the array of service from the response data
+  const service = responseData?.data || [];
+
   const form = useForm<z.infer<typeof ServiceSchema>>({
     resolver: zodResolver(ServiceSchema),
     defaultValues: {
@@ -23,7 +32,24 @@ export function NewServiceForm({
     },
   });
 
-  function onSubmit(data: z.infer<typeof ServiceSchema>) {
+  const validateName = async (name: string): Promise<boolean> => {
+    const trimmedName = name.trim(); // Trim whitespace from the input email
+    return service.some(
+      (service: Service | null) => service?.name?.trim() === trimmedName
+    );
+  };
+
+  async function onSubmit(data: z.infer<typeof ServiceSchema>) {
+    const nameExists = await validateName(data.name);
+
+    if (nameExists) {
+      form.setError("name", {
+        type: "manual",
+        message: "Service already exists",
+      });
+      return;
+    }
+
     setOpen(false);
     newService(data);
     toast({

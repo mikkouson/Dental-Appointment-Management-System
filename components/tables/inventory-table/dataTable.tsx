@@ -29,7 +29,7 @@ import {
 import * as React from "react";
 import { ScrollArea, ScrollBar } from "../../ui/scroll-area";
 import { EditService } from "@/components/modal/services/editService";
-import { EditInventory } from "@/components/modal/inventory/editService";
+import { EditInventory } from "@/components/modal/inventory/editInvetory";
 
 type Column = ColumnDef<Inventory>;
 
@@ -123,6 +123,7 @@ export function DataTableDemo({
                       )}
                 </TableHead>
               ))}
+              <TableHead>Actions</TableHead>
             </TableRow>
           ))}
         </TableHeader>

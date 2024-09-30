@@ -1,7 +1,6 @@
 "use client";
 import type { Address, AppointmentsCol, Patient } from "@/app/schema";
 import { Breadcrumbs } from "@/components/breadcrumb";
-import { NewPatientForm } from "@/components/forms/newPatientForm";
 import { Heading } from "@/components/heading";
 import PageContainer from "@/components/layout/page-container";
 import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
@@ -18,6 +17,7 @@ import PatientCard from "@/components/cards/patientCard";
 import { useSetActiveAppointments } from "@/app/store";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Search } from "lucide-react";
+import { NewPatientForm } from "@/components/forms/patients/newPatientForm";
 
 const fetcher = async (
   url: string

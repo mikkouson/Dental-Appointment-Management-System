@@ -18,8 +18,17 @@ import {
 import { SquarePen } from "lucide-react";
 import { useEffect, useState } from "react";
 import { updateService } from "@/app/admin/action";
+import useSWR from "swr";
+
+const fetcher = (url: string): Promise<any> =>
+  fetch(url).then((res) => res.json());
 
 export function EditService({ data }: { data: Service }) {
+  const { data: responseData, error } = useSWR("/api/service/", fetcher);
+
+  // Extract the array of service from the response data
+  const service = responseData?.data || [];
+
   const [open, setOpen] = useState(false);
   console.log(data);
   useEffect(() => {
@@ -36,10 +45,26 @@ export function EditService({ data }: { data: Service }) {
       price: data.price || 0,
     },
   });
+  const validateName = async (name: string): Promise<boolean> => {
+    const trimmedName = name.trim(); // Trim whitespace from the input email
+    return service.some(
+      (service: Service | null) => service?.name?.trim() === trimmedName
+    );
+  };
 
-  function onSubmit(data: z.infer<typeof ServiceSchema>) {
-    setOpen(false);
-    updateService(data);
+  async function onSubmit(data: z.infer<typeof ServiceSchema>) {
+    const nameExists = await validateName(data.name);
+
+    if (nameExists) {
+      form.setError("name", {
+        type: "manual",
+        message: "Service already exists",
+      });
+      return;
+    }
+
+    // setOpen(false);
+    // updateService(data);
     // toast({
     //   title: "You submitted the following values:",
     //   description: (
@@ -57,7 +82,10 @@ export function EditService({ data }: { data: Service }) {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <SquarePen className="text-sm w-5 text-green-700 cursor-pointer" />
+        <SquarePen
+          className="text-sm w-5 text-green-700 cursor-pointer"
+          onClick={() => form.reset()}
+        />
       </SheetTrigger>
       <SheetContent
         className="w-[800px]"

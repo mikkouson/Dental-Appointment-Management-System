@@ -123,6 +123,7 @@ export function DataTableDemo({
                       )}
                 </TableHead>
               ))}
+              <TableHead>Actions</TableHead>
             </TableRow>
           ))}
         </TableHeader>

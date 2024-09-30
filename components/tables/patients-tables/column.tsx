@@ -35,10 +35,6 @@ export const columns: Column[] = [
     accessorKey: "sex",
     header: "SEX",
   },
-  {
-    accessorKey: "age",
-    header: "Age",
-  },
   // {
   //   id: "actions",
   //   enableHiding: false,

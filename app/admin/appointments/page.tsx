@@ -12,7 +12,7 @@ import AppointmentsMap from "@/components/appointmentsList";
 import { NewAppointmentForm } from "@/components/forms/new-appointment-form";
 import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
 import { Separator } from "@/components/ui/separator";
-
+import { createClient } from "@/utils/supabase/client";
 const fetcher = (url: string): Promise<any[]> =>
   fetch(url).then((res) => res.json());
 
@@ -68,7 +68,7 @@ export default function Appointments() {
     fetcher
   );
 
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   useEffect(() => {
     const channel = supabase

@@ -19,9 +19,18 @@ import {
 } from "@/components/ui/sheet";
 import { SquarePen } from "lucide-react";
 import { useEffect, useState } from "react";
+import useSWR from "swr";
+
+const fetcher = (url: string): Promise<any> =>
+  fetch(url).then((res) => res.json());
 
 export function EditPatient({ patient }: { patient: PatientCol }) {
   const [open, setOpen] = useState(false);
+  // Fetch patient data
+  const { data: responseData, error } = useSWR("/api/patients/", fetcher);
+
+  // Extract the array of patients from the response data
+  const patients = responseData?.data || [];
 
   useEffect(() => {
     setTimeout(() => (document.body.style.pointerEvents = ""), 0);
@@ -46,8 +55,19 @@ export function EditPatient({ patient }: { patient: PatientCol }) {
       },
     },
   });
+  const checkEmailExists = async (email: string): Promise<boolean> => {
+    return patients.some((patient: PatientCol) => patient.email === email);
+  };
+  async function onSubmit(data: z.infer<typeof PatientSchema>) {
+    const emailExists = await checkEmailExists(data.email);
 
-  function onSubmit(data: z.infer<typeof PatientSchema>) {
+    if (emailExists) {
+      form.setError("email", {
+        type: "manual",
+        message: "Email already exists",
+      });
+      return;
+    }
     setOpen(false);
     updatePatient(data);
     // toast({
@@ -67,7 +87,10 @@ export function EditPatient({ patient }: { patient: PatientCol }) {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <SquarePen className="text-sm w-5 text-green-700 cursor-pointer" />
+        <SquarePen
+          className="text-sm w-5 text-green-700 cursor-pointer"
+          onClick={() => form.reset()}
+        />
       </SheetTrigger>
       <SheetContent
         className="w-[800px]"
