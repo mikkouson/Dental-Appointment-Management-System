@@ -31,19 +31,11 @@ export const columns: Column[] = [
     header: "TIME",
   },
   {
-    accessorFn: (row) => row.branch?.name || "N/A",
-    id: "branch",
-    header: "BRANCH",
-  },
-  {
     accessorFn: (row) => row.services?.name || "N/A",
     id: "services",
     header: "SERVICE",
   },
-  {
-    accessorKey: "type",
-    header: "TYPE",
-  },
+
   {
     accessorFn: (row) => row.status?.name || "N/A",
     id: "status",

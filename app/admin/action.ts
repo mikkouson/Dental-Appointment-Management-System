@@ -51,6 +51,19 @@ export async function cancelAppointment({ aptId }: AppointmentActionProps) {
   redirect("/admin/appointments");
 }
 
+export async function deleteAppointment(id: number) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("appointments")
+    .update({
+      deleteOn: new Date().toISOString(),
+    })
+    .eq("id", id);
+  if (error) {
+    console.log("Error deleting appointment", error.message);
+  }
+}
+
 export async function rescheduleAppointment(data: Inputs) {
   const result = schema.safeParse(data);
   if (!result.success) {
@@ -58,7 +71,6 @@ export async function rescheduleAppointment(data: Inputs) {
     return;
   }
   const supabase = createClient();
-  const formattedDate = moment(data.date).format("YYYY-MM-DD");
 
   const { error } = await supabase
     .from("appointments")

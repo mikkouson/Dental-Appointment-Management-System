@@ -1,5 +1,27 @@
 import { z } from "zod";
-
+export const AppointmentSchema = z.object({
+  id: z.number(),
+  patient: z.string().optional(),
+  service: z.number({
+    required_error: "Please select an email to display.",
+  }),
+  branch: z.number({
+    required_error: "Please select an email to display.",
+  }),
+  date: z.date({
+    required_error: "A date of birth is required.",
+  }),
+  time: z.number({
+    required_error: "A date of birth is required.",
+  }),
+  type: z.string({
+    required_error: "A date of birth is required.",
+  }),
+  status: z.number({
+    required_error: "A date of birth is required.",
+  }),
+});
+export type AppointmentSchemaType = z.infer<typeof AppointmentSchema>;
 export const PatientSchema = z.object({
   id: z.number().optional(),
   name: z.string().min(1, { message: "Name is required." }),

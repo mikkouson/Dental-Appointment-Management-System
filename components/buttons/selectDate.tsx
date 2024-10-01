@@ -11,7 +11,8 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import React from "react";
-
+import { UseFormReturn } from "react-hook-form";
+import { AppointmentSchemaType } from "@/app/types";
 type FieldProps = {
   value: Date | null;
   onChange: (date: Date) => void;
@@ -24,7 +25,7 @@ export function CalendarForm({
   dontdis,
 }: {
   field: FieldProps;
-  form: any; // Add appropriate type for form here
+  form: UseFormReturn<AppointmentSchemaType>; // Replace AppointmentSchemaType with your actual form data type
   patientAppointments: (Date | string)[]; // Adjust type if needed
   dontdis?: Date; // Optional date that should not be disabled
 }) {
@@ -37,7 +38,7 @@ export function CalendarForm({
       field.onChange(date);
       getDate(date);
       setIsCalendarOpen(false);
-      form.setValue("time", null);
+      form.setValue("time", 0);
     }
   };
 

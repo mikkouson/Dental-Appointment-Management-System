@@ -61,7 +61,7 @@ import {
 import { Input } from "postcss";
 import { Label } from "recharts";
 import { TextareaForm } from "@/components/patientNote";
-const fetcher = async (url: string): Promise<any> => {
+const fetcher = async (url: any): Promise<any> => {
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error("Failed to fetch data");
@@ -75,7 +75,7 @@ interface PageProps {
   };
 }
 export default function Page({ params }: PageProps) {
-  const { data, error, isLoading } = useSWR(
+  const { data, error, isLoading, mutate } = useSWR(
     `/api/patientdetails?id=${params.id}`,
     fetcher
   );
@@ -289,6 +289,7 @@ export default function Page({ params }: PageProps) {
                       columns={columns}
                       data={data.appointments}
                       activePatient={active}
+                      mutate={mutate}
                     />
                   </CardContent>
                 </Card>

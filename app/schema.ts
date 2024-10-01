@@ -50,6 +50,7 @@ export type Database = {
       };
       appointments: {
         Row: {
+          patients: any;
           appointment_ticket: string | null;
           branch: number | null;
           date: string | null;
