@@ -3,8 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   const supabase = createClient();
-
   const pageParam = req.nextUrl.searchParams.get("page");
+  const statusParam = req.nextUrl.searchParams.get("status");
+  const branch = req.nextUrl.searchParams.get("status");
+
   const pageSize = 10; // Example page size
 
   // Default to page 1 if no page parameter is provided
@@ -13,7 +15,7 @@ export async function GET(req: NextRequest) {
   // Get the filter parameter from the query
   const filterParam = req.nextUrl.searchParams.get("query") || "";
 
-  const { data, error, count } = await supabase
+  let query = supabase
     .from("appointments")
     .select(
       `
@@ -27,19 +29,28 @@ export async function GET(req: NextRequest) {
       time_slots (
         *
       ),
-       status (
+      status (
         *
       ),
-         branch (
+      branch (
         *
       )
-    `,
+      `,
       { count: "exact" }
     )
 
     .ilike("patients.name", `%${filterParam}%`) // Example filter for 'name' column
-    .range((page - 1) * pageSize, page * pageSize - 1)
     .is("deleteOn", null);
+
+  // Optional status filter
+  if (statusParam) {
+    const statusList = statusParam.split(",");
+    query = query.in("status", statusList);
+  }
+
+  query = query.range((page - 1) * pageSize, page * pageSize - 1);
+
+  const { data, error, count } = await query;
 
   if (error) {
     console.error("Supabase error:", error);
