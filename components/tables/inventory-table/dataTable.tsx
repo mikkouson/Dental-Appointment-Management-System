@@ -108,7 +108,7 @@ export function DataTableDemo({
   };
 
   return (
-    <ScrollArea className="h-[calc(80vh-220px)] rounded-md border md:h-[calc(80dvh-200px)]">
+    <ScrollArea className="h-[calc(80vh-220px)] overflow-y-auto rounded-md border md:h-[calc(80dvh-200px)]">
       <Table className="relative">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -130,39 +130,21 @@ export function DataTableDemo({
         <TableBody>
           {table.getRowModel().rows.length ? (
             table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                className={cn(
-                  "cursor-pointer",
-                  activePatient === row.original.id && "bg-muted"
-                )}
-                onClick={() => handleClick(row)}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-                <TableCell>
-                  <div className="flex px-2">
-                    <DeleteModal
-                      formAction={() => handleDelete(row.original.id)}
-                    />
-                    <EditInventory data={row.original} />
-                  </div>
-                </TableCell>
+              <TableRow key={row.id} className={cn("cursor-pointer")}>
+                {/* Render row cells here */}
               </TableRow>
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+              <TableCell
+                colSpan={table.getHeaderGroups()[0].headers.length + 1}
+              >
+                No data available
               </TableCell>
             </TableRow>
           )}
         </TableBody>
       </Table>
-      <ScrollBar orientation="horizontal" />
     </ScrollArea>
   );
 }

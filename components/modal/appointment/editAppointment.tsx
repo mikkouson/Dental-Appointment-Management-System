@@ -29,6 +29,7 @@ export function EditAppointment({
 }: {
   appointment: AppointmentsCol;
 }) {
+  console.log(appointment);
   const [open, setOpen] = useState(false);
   // Fetch patient data
   const { data: responseData, error } = useSWR("/api/apt/", fetcher);
@@ -39,7 +40,6 @@ export function EditAppointment({
   useEffect(() => {
     setTimeout(() => (document.body.style.pointerEvents = ""), 0);
   });
-  console.log(appointment);
   // Use z.infer to derive the type from AppointmentSchema
   const form = useForm<z.infer<typeof AppointmentSchema>>({
     resolver: zodResolver(AppointmentSchema),
@@ -50,7 +50,10 @@ export function EditAppointment({
     }
     form.setValue("id", appointment.id);
     form.setValue("time", appointment?.time || 0);
-    form.setValue("branch", appointment?.branch?.id || 0);
+    form.setValue(
+      "branch",
+      appointment?.branch?.id || appointment?.branch || 0
+    );
     form.setValue("status", appointment?.status?.id || 0);
     form.setValue("service", appointment?.service || 0);
     form.setValue("type", appointment?.type || "");
@@ -91,12 +94,12 @@ export function EditAppointment({
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <SquarePen
-          className="text-sm w-5 text-green-700 cursor-pointer"
+          className="text-sm w-5 text-[#fde68a] cursor-pointer"
           onClick={() => set()}
         />
       </SheetTrigger>
       <SheetContent
-        className="w-[800px]"
+        className="w-full md:w-[800px] overflow-auto"
         onInteractOutside={(e) => {
           const hasPacContainer = e.composedPath().some((el: EventTarget) => {
             if ("classList" in el) {

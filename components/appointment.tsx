@@ -13,6 +13,7 @@ import { NewAppointmentForm } from "@/components/forms/new-appointment-form";
 import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/utils/supabase/client";
+import PageContainer from "./layout/page-container";
 const fetcher = (url: string): Promise<any[]> =>
   fetch(url).then((res) => res.json());
 
@@ -93,49 +94,52 @@ export default function AppointmentCalendar() {
   if (appointmentsError) return <div>Error loading appointments</div>;
 
   return (
-    <div className="mx-auto grid grid-cols-4 gap-4 w-full max-w-[93rem] p-5">
-      {/* Left Column for Calendar */}
-      <div className="col-span-1 mr-10">
-        <>
+    <PageContainer>
+      <div className=" flex flex-col lg:flex-row gap-4 ">
+        {/* Left Column for Calendar */}
+        <div className="mb-4 xl:mr-10">
           <Calendar
             mode="single"
             selected={date}
             onSelect={setDate}
-            className="rounded-md border mb-4 flex items-center justify-center"
+            className="rounded-md border mb-4 flex items-center justify-center "
           />
-        </>
-      </div>
-
-      {/* Right Column */}
-      <div className="col-span-3 flex flex-col">
-        <div className="flex justify-end mb-4 space-x-4">
-          <CheckboxReactHookFormMultiple items={statuses} label="Status" />
-          <BranchSelect />
-          <DrawerDialogDemo
-            open={open}
-            setOpen={setOpen}
-            label={"New Appointment"}
-          >
-            <NewAppointmentForm setOpen={setOpen} />
-          </DrawerDialogDemo>
         </div>
-        {isLoading ? (
-          <div>
-            {timeSlots.map((time) => (
-              <div className="mb-4" key={time.id}>
-                <h2 className="text-lg font-semibold mb-2">{time.time}</h2>
-                <div className="flex flex-col border p-2">
-                  <Skeleton className="h-2 w-3/4 mb-2" />
-                  <Skeleton className="h-2 w-2/5 mb-2" />
-                  <Skeleton className="h-2 w-1/4" />
-                </div>
-              </div>
-            ))}
+
+        {/* Right Column */}
+        <div className="flex flex-col flex-1">
+          <div className="flex justify-end mb-4 ">
+            <CheckboxReactHookFormMultiple items={statuses} label="Status" />
+            <BranchSelect />
+            <DrawerDialogDemo
+              open={open}
+              setOpen={setOpen}
+              label={"New Appointment"}
+            >
+              <NewAppointmentForm setOpen={setOpen} />
+            </DrawerDialogDemo>
           </div>
-        ) : (
-          <AppointmentsMap timeSlots={timeSlots} appointments={appointments} />
-        )}
+          {isLoading ? (
+            <div className="flex flex-col">
+              {timeSlots.map((time) => (
+                <div className="mb-4" key={time.id}>
+                  <h2 className="text-lg font-semibold mb-2">{time.time}</h2>
+                  <div className="flex flex-col border p-2">
+                    <Skeleton className="h-2 w-3/4 mb-2" />
+                    <Skeleton className="h-2 w-2/5 mb-2" />
+                    <Skeleton className="h-2 w-1/4" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <AppointmentsMap
+              timeSlots={timeSlots}
+              appointments={appointments}
+            />
+          )}
+        </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

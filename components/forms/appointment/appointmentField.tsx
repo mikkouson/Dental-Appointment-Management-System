@@ -72,8 +72,6 @@ export function AppointmentField({
               </FormItem>
             )}
           />
-          <Input disabled defaultValue={appointment.id} />
-          <Field form={form} name={"branch"} label={"Branch"} />
           <Field
             form={form}
             name={"branch"}

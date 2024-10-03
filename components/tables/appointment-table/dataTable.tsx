@@ -52,9 +52,7 @@ export function DataTableDemo({
   const setActive = useSetActiveAppointments((state) => state.setActiveState);
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
+
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState<
@@ -65,7 +63,6 @@ export function DataTableDemo({
     data,
     columns,
     onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -74,7 +71,6 @@ export function DataTableDemo({
     onRowSelectionChange: setRowSelection,
     state: {
       sorting,
-      columnFilters,
       columnVisibility,
       rowSelection,
     },
@@ -112,7 +108,7 @@ export function DataTableDemo({
   };
 
   return (
-    <ScrollArea className="h-[calc(80vh-220px)] rounded-md border md:h-[calc(80dvh-200px)]">
+    <ScrollArea className=" md:h-[calc(80vh-220px)] rounded-md border ">
       <Table className="relative">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -152,7 +148,7 @@ export function DataTableDemo({
                     <DeleteModal
                       formAction={() => handleDelete(row.original.id)}
                     />
-                    {/* <EditAppointment appointment={row.original} /> */}
+                    <EditAppointment appointment={row.original} />
                   </div>
                 </TableCell>
               </TableRow>
