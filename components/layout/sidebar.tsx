@@ -24,7 +24,7 @@ export default function Sidebar({ className }: SidebarProps) {
   return (
     <aside
       className={cn(
-        `relative hidden h-screen flex-none border-r bg-card transition-[width] duration-500 md:block`,
+        `relative hidden h-screen flex-none border-r bg-card transition-[width] duration-500 lg:block`,
         !isMinimized ? "w-72" : "w-[72px]",
         className
       )}
@@ -34,7 +34,7 @@ export default function Sidebar({ className }: SidebarProps) {
           <div className="flex items-center">
             <Image height={50} width={50} src={Logo} alt="Logo" />
             {!isMinimized && (
-              <h3 className="scroll-m-20 text-lg font-semibold tracking-tight xl:block">
+              <h3 className="scroll-m-20 text-lg font-semibold tracking-tight lg:block">
                 Lobodent Dental Clinic
               </h3>
             )}
