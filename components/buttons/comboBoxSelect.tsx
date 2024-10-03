@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { ChevronDownIcon } from "lucide-react";
+import { Status } from "@/app/schema";
 
 const FormSchema = z.object({
   items: z
@@ -28,13 +29,8 @@ const FormSchema = z.object({
     }),
 });
 
-type StatusItem = {
-  id: number;
-  name: string;
-};
-
 type CheckboxReactHookFormMultipleProps = {
-  items: StatusItem[];
+  items: Status[];
   label: string;
 };
 
@@ -54,7 +50,12 @@ export function CheckboxReactHookFormMultiple({
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues,
+    defaultValues: {
+      items: defaultValues.items.map((item) => ({
+        ...item,
+        name: item.name ?? "", // Provide a default empty string if name is null
+      })),
+    },
   });
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
@@ -81,7 +82,7 @@ export function CheckboxReactHookFormMultiple({
             <FormItem>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild className="mr-2">
-                  <Button variant="outline">
+                  <Button variant="outline" className="">
                     {label} <ChevronDownIcon className="ml-2 h-4 w-4" />{" "}
                     <FormMessage />
                   </Button>
