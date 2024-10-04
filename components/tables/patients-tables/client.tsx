@@ -101,19 +101,19 @@ export default function UserClient() {
       <div className="space-y-4">
         <Breadcrumbs items={breadcrumbItems} />
 
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col 2xl:flex-row lg:items-start lg:justify-between">
           <Heading
             title={`Total Patients (${data ? data.count : "loading"})`}
             description="Manage patients (Server side table functionalities.)"
           />
 
-          <div className="flex">
+          <div className="flex justify-end  max-w-full  w-full mt-2 sm:ml-0 ">
             <div className="mr-2 relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
                 placeholder="Search Patient Name ..."
-                className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px]"
+                className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px] "
                 onChange={handleInputChange}
                 value={searchQuery}
               />
@@ -128,7 +128,7 @@ export default function UserClient() {
           </div>
         </div>
         <Separator />
-        <div className="flex">
+        <div className="flex flex-col  xl:flex-row">
           <div className="flex-1">
             {isLoading ? (
               <p>Loading...</p>
@@ -154,7 +154,7 @@ export default function UserClient() {
               <p>No data available</p>
             )}
           </div>
-          <div className="w-1/5 ml-5">
+          <div className="w-full mt-5 xl:w-1/5 xl:ml-5 xl:mt-0">
             {data && data.data && data.data.length > 0 && (
               <PatientCard
                 activePatient={

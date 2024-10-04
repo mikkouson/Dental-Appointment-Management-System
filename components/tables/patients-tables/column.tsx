@@ -14,10 +14,7 @@ export const columns: Column[] = [
     enableSorting: true,
     enableHiding: false,
   },
-  {
-    accessorKey: "id",
-    header: "Id",
-  },
+
   {
     accessorKey: "name",
     header: "NAME",
