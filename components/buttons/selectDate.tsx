@@ -32,7 +32,6 @@ export function CalendarForm({
   const [isCalendarOpen, setIsCalendarOpen] = React.useState(false);
   const getDate = useGetDate((state) => state.getDate);
 
-  console.log(patientAppointments);
   const handleSetDate = (date: Date | undefined) => {
     if (date) {
       field.onChange(date);

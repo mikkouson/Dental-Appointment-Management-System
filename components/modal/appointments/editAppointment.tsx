@@ -122,8 +122,6 @@ export function SheetDemo({ date, pid, time, aptId, apt }: SheetDemoProps) {
     // });
   };
 
-  const b = form.watch("type");
-
   if (!data) return <>Loading ...</>;
   const services = data.find((item) => item.table_name === "services");
   const statuses = data.find((item) => item.table_name === "status");

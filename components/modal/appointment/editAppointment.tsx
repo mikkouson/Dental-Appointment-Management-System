@@ -29,7 +29,6 @@ export function EditAppointment({
 }: {
   appointment: AppointmentsCol;
 }) {
-  console.log(appointment);
   const [open, setOpen] = useState(false);
   // Fetch patient data
   const { data: responseData, error } = useSWR("/api/apt/", fetcher);
@@ -44,6 +43,7 @@ export function EditAppointment({
   const form = useForm<z.infer<typeof AppointmentSchema>>({
     resolver: zodResolver(AppointmentSchema),
   });
+
   const set = () => {
     if (appointment.date) {
       form.setValue("date", new Date(appointment.date));
@@ -60,6 +60,8 @@ export function EditAppointment({
     form.setValue("patient", appointment?.patients?.name || "");
   };
 
+  const date = form.watch("date");
+  console.log(date);
   //   const checkEmailExists = async (email: string): Promise<boolean> => {
   //     return patients.some((patient: PatientCol) => patient.email === email);
   //   };
