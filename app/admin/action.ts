@@ -71,7 +71,7 @@ export async function rescheduleAppointment(data: Inputs) {
     return;
   }
   const supabase = createClient();
-  const formattedDate = moment(data.date).format("YYYY-MM-DD");
+  const formattedDate = moment(data.date).format("MM-DD-YYYY");
 
   const { error } = await supabase
     .from("appointments")
