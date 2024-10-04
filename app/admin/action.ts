@@ -71,13 +71,14 @@ export async function rescheduleAppointment(data: Inputs) {
     return;
   }
   const supabase = createClient();
+  const formattedDate = moment(data.date).format("YYYY-MM-DD");
 
   const { error } = await supabase
     .from("appointments")
     .update({
       service: data.service,
       branch: data.branch,
-      date: moment(data.date).format("MM/DD/YYYY"),
+      date: formattedDate,
       time: data.time,
       status: data.status,
       type: data.type,
