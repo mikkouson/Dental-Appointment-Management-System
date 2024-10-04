@@ -8,8 +8,9 @@ type Column = ColumnDef<Inventory>;
 
 export const columns: Column[] = [
   {
-    accessorKey: "id",
-    header: "ID",
+    id: "select",
+    enableSorting: true,
+    enableHiding: false,
   },
   {
     accessorKey: "name",

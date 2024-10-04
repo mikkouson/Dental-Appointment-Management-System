@@ -1,7 +1,6 @@
 "use client";
 import { Inventory } from "@/app/schema";
 import { Breadcrumbs } from "@/components/breadcrumb";
-import { NewServiceForm } from "@/components/forms/services/newServicesForm";
 import { Heading } from "@/components/heading";
 import PageContainer from "@/components/layout/page-container";
 import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
@@ -101,13 +100,13 @@ export default function UserClient() {
     <PageContainer>
       <div className="space-y-4">
         <Breadcrumbs items={breadcrumbItems} />
-        <div className="flex items-start justify-between">
+
+        <div className="flex flex-col 2xl:flex-row lg:items-start lg:justify-between">
           <Heading
             title={`Total Inventory (${data ? data.count : "loading"})`}
             description="Manage Inventory (Server side table functionalities.)"
           />
-
-          <div className="flex">
+          <div className="flex justify-end  max-w-full  w-full mt-2 sm:ml-0 ">
             <div className="mr-2 relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -139,6 +138,7 @@ export default function UserClient() {
                     columns={columns}
                     data={data.data}
                     mutate={mutate}
+                    activePatient={undefined}
                   />
                   <ScrollBar orientation="horizontal" />
                 </ScrollArea>

@@ -1,6 +1,7 @@
-import { deleteService } from "@/app/admin/action";
+"use client";
+import { deletePatient } from "@/app/admin/action";
 import type { Inventory } from "@/app/schema";
-import { useSetActiveAppointments } from "@/app/store";
+import { useSetActive } from "@/app/store";
 import { toast } from "@/components/hooks/use-toast";
 import { DeleteModal } from "@/components/modal/deleteModal";
 import { EditPatient } from "@/components/modal/patients/editPatient";
@@ -28,26 +29,24 @@ import {
 } from "@tanstack/react-table";
 import * as React from "react";
 import { ScrollArea, ScrollBar } from "../../ui/scroll-area";
-import { EditService } from "@/components/modal/services/editService";
 import { EditInventory } from "@/components/modal/inventory/editInvetory";
 
 type Column = ColumnDef<Inventory>;
 
 type DataTableProps = {
-  data: Inventory[] | [];
+  data: Inventory[];
   columns: Column[];
-  activePatient?: number;
+  activePatient: Number | undefined;
   mutate: any;
 };
 
-// In your DataTableDemo component
 export function DataTableDemo({
   columns,
   data,
   activePatient,
   mutate,
 }: DataTableProps) {
-  const setActive = useSetActiveAppointments((state) => state.setActiveState);
+  const setActive = useSetActive((state) => state.setActive);
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -81,7 +80,6 @@ export function DataTableDemo({
   const handleClick = (row: Row<Inventory>) => {
     setActive(row.original.id); // Set the clicked row as active
   };
-
   const handleDelete = (id?: number) => {
     try {
       if (!id) return;
@@ -89,7 +87,7 @@ export function DataTableDemo({
       // Optimistically update the UI
       const filteredPatients = data.filter((patient) => patient.id !== id);
       mutate({ data: filteredPatients }, false);
-      deleteService(id);
+      deletePatient(id);
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
@@ -108,7 +106,7 @@ export function DataTableDemo({
   };
 
   return (
-    <ScrollArea className="h-[calc(80vh-220px)] overflow-y-auto rounded-md border md:h-[calc(80dvh-200px)]">
+    <ScrollArea className="h-[calc(80vh-220px)] rounded-md border md:h-[calc(80dvh-200px)]">
       <Table className="relative">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -130,21 +128,39 @@ export function DataTableDemo({
         <TableBody>
           {table.getRowModel().rows.length ? (
             table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} className={cn("cursor-pointer")}>
-                {/* Render row cells here */}
+              <TableRow
+                key={row.id}
+                className={cn(
+                  "cursor-pointer",
+                  activePatient === row.original.id && "bg-muted"
+                )}
+                onClick={() => handleClick(row)}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+                <TableCell>
+                  <div className="flex px-2">
+                    <DeleteModal
+                      formAction={() => handleDelete(row.original.id)}
+                    />
+                    <EditInventory data={row.original} />
+                  </div>
+                </TableCell>
               </TableRow>
             ))
           ) : (
             <TableRow>
-              <TableCell
-                colSpan={table.getHeaderGroups()[0].headers.length + 1}
-              >
-                No data available
+              <TableCell colSpan={columns.length} className="h-24 text-center">
+                No results.
               </TableCell>
             </TableRow>
           )}
         </TableBody>
       </Table>
+      <ScrollBar orientation="horizontal" />
     </ScrollArea>
   );
 }
