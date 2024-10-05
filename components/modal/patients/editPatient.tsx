@@ -39,25 +39,32 @@ export function EditPatient({ patient }: { patient: PatientCol }) {
   // Use z.infer to derive the type from PatientSchema
   const form = useForm<z.infer<typeof PatientSchema>>({
     resolver: zodResolver(PatientSchema),
-    defaultValues: {
-      id: patient.id || 0,
-      name: patient.name || "",
-      email: patient.email || "",
-      sex: patient.sex || "",
-      status: patient.status || "",
-      dob: patient.dob ? new Date(patient.dob) : undefined,
-      phoneNumber: patient.phone_number || 0,
-      address: {
-        id: patient.address?.id || 0,
-        address: patient.address?.address || "",
-        latitude: patient.address?.latitude ?? 0,
-        longitude: patient.address?.longitude ?? 0,
-      },
-    },
   });
-  const checkEmailExists = async (email: string): Promise<boolean> => {
-    return patients.some((patient: PatientCol) => patient.email === email);
+
+  const set = () => {
+    form.setValue("id", patient.id || 0);
+    form.setValue("name", patient.name || "");
+    form.setValue("email", patient.email || "");
+    form.setValue("sex", patient.sex || "");
+    form.setValue("status", patient.status || "");
+    form.setValue(
+      "dob",
+      patient.dob ? new Date(patient.dob) : patients.Row.dob
+    );
+    form.setValue("phoneNumber", patient.phone_number || 0);
+    form.setValue("address.id", patient.address?.id || 0);
+    form.setValue("address.address", patient.address?.address || "");
+    form.setValue("address.latitude", patient.address?.latitude ?? 0);
+    form.setValue("address.longitude", patient.address?.longitude ?? 0);
   };
+
+  async function checkEmailExists(email: string): Promise<boolean> {
+    // Filter out the current patient from patients array
+    const filteredPatients = patients.filter(
+      (p: PatientCol) => p.id !== patient.id
+    );
+    return filteredPatients.some((p: PatientCol) => p.email === email);
+  }
   async function onSubmit(data: z.infer<typeof PatientSchema>) {
     const emailExists = await checkEmailExists(data.email);
 
@@ -70,6 +77,7 @@ export function EditPatient({ patient }: { patient: PatientCol }) {
     }
     setOpen(false);
     updatePatient(data);
+    // Optional: Display toast message
     // toast({
     //   title: "You submitted the following values:",
     //   description: (
@@ -89,11 +97,11 @@ export function EditPatient({ patient }: { patient: PatientCol }) {
       <SheetTrigger asChild>
         <SquarePen
           className="text-sm w-5 text-green-700 cursor-pointer"
-          onClick={() => form.reset()}
+          onClick={() => set()}
         />
       </SheetTrigger>
       <SheetContent
-        className="w-[800px]"
+        className="w-full md:w-[800px] overflow-auto"
         onInteractOutside={(e) => {
           const hasPacContainer = e.composedPath().some((el: EventTarget) => {
             if ("classList" in el) {
