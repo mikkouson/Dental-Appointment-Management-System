@@ -106,7 +106,7 @@ export default function UserClient() {
             title={`Total Inventory (${data ? data.count : "loading"})`}
             description="Manage Inventory (Server side table functionalities.)"
           />
-          <div className="flex justify-end  max-w-full  w-full mt-2 sm:ml-0 ">
+          <div className="flex justify-end  max-w-full  w-full mt-2 sm:ml-0  sm:max-w-full 2xl:max-w-[730px] ">
             <div className="mr-2 relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input

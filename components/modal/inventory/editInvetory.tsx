@@ -40,11 +40,24 @@ export function EditInventory({ data }: { data: Inventory }) {
     },
   });
 
-  const validateName = async (name: string): Promise<boolean> => {
-    return inventory.some((inventory: Inventory) => inventory.name === name);
+  const set = () => {
+    form.setValue("id", data.id || 0);
+    form.setValue("name", data.name || "");
+    form.setValue("description", data.description || "");
+    form.setValue("quantity", data.quantity || 0);
   };
 
-  const onSubmit = async (formData: z.infer<typeof InventorySchema>) => {
+  async function validateName(name: string): Promise<boolean> {
+    // Filter out the current item being edited
+    const filteredInventory = inventory.filter(
+      (i: Inventory) => i.id !== data.id
+    );
+
+    // Check if any remaining item has the same name
+    return filteredInventory.some((i: Inventory) => i.name === name);
+  }
+
+  async function onSubmit(formData: z.infer<typeof InventorySchema>) {
     const nameExists = await validateName(formData.name);
 
     if (nameExists) {
@@ -55,28 +68,25 @@ export function EditInventory({ data }: { data: Inventory }) {
       return;
     }
 
-    // Uncomment to update inventory
-    // updateInventory(formData);
-
-    // Optionally close the sheet after submission
-    // setOpen(false);
+    updateInventory(formData);
+    setOpen(false);
 
     // Optionally show a toast or notification
     // toast({
     //   title: "Inventory Updated",
     //   description: "Changes saved successfully.",
     // });
-  };
+  }
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <SquarePen
           className="text-sm w-5 text-green-700 cursor-pointer"
-          onClick={() => form.reset()}
+          onClick={() => set()}
         />
       </SheetTrigger>
-      <SheetContent className="w-[800px]">
+      <SheetContent className="w-full md:w-[800px] overflow-auto">
         <SheetHeader>
           <SheetTitle>Edit Inventory</SheetTitle>
           <SheetDescription>
