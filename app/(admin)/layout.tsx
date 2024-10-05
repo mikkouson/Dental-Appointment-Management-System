@@ -4,10 +4,6 @@ import { SidebarDemo } from "@/components/sidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Metadata } from "next";
 import NextTopLoader from "nextjs-toploader";
-export const metadata: Metadata = {
-  title: "Next Shadcn Dashboard Starter",
-  description: "Basic dashboard with Next.js and Shadcn",
-};
 
 export default function DashboardLayout({
   children,

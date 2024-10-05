@@ -1,7 +1,10 @@
 "use client";
 import useSWR from "swr";
 
+import { useSetActiveAppointments } from "@/app/store";
+import { TextareaForm } from "@/components/patientNote";
 import StaticMaps from "@/components/staticMap";
+import { columns } from "@/components/tables/appointment-table/column";
 import { DataTableDemo } from "@/components/tables/appointment-table/dataTable";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -25,42 +28,15 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-} from "@/components/ui/pagination";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Copy,
-  CreditCard,
-  File,
-  ListFilter,
-  MoreVertical,
-  Truck,
-} from "lucide-react";
+import { File, ListFilter } from "lucide-react";
 import moment from "moment";
 import Link from "next/link";
-import { columns } from "@/components/tables/appointment-table/column";
-import { useSetActive, useSetActiveAppointments } from "@/app/store";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@radix-ui/react-select";
-import { Input } from "postcss";
-import { Label } from "recharts";
-import { TextareaForm } from "@/components/patientNote";
 const fetcher = async (url: any): Promise<any> => {
   const res = await fetch(url);
   if (!res.ok) {

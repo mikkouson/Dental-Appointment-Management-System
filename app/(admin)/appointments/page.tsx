@@ -3,11 +3,16 @@ import React, { Suspense } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AppointmentCalendar from "@/components/appointment";
 import { Breadcrumbs } from "@/components/breadcrumb";
+import { Metadata } from "next";
+export const metadata: Metadata = {
+  title: "Lobodent Dental Clinic - Appointments",
+};
 // Breadcrumb items
 const breadcrumbItems = [
   { title: "Dashboard", link: "/" },
   { title: "Appointments", link: "/appointments" },
 ];
+
 export default function Page() {
   return (
     <Suspense fallback={<div>Loading...</div>}>

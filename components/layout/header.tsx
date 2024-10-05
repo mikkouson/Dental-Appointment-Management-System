@@ -42,7 +42,7 @@ export default function Header() {
 
                   <div className="mt-8 flex flex-col gap-2">
                     {links.map((link, idx) => (
-                      <SidebarLink key={idx} link={link} />
+                      <SidebarLink setOpen={setOpen} key={idx} link={link} />
                     ))}
                   </div>
                 </div>

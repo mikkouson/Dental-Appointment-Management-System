@@ -7,6 +7,8 @@ import PageContainer from "@/components/layout/page-container";
 import { RecentSales } from "@/components/recent-sales";
 import { SidebarDemo } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
+import type { Metadata } from "next";
+
 import {
   Card,
   CardContent,
@@ -15,6 +17,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+export const metadata: Metadata = {
+  title: "Lobodent Dental Clinic - Dashboard",
+  description:
+    "Lobodent Dental Clinic is now an Orthero certified provider offering comfortable and invisible Orthero Clear Aligners. Visit us at 2nd Floor, R Building, President Jose P. Laurel Highway, Brgy 1, Marawoy, Lipa City. We are open Monday - Saturday, 10am - 5pm, and Sunday, 10am - 3pm. Parking spaces available.",
+};
 
 export default function page() {
   return (
