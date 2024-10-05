@@ -19,7 +19,7 @@ export default function BranchSelect() {
   if (!data)
     return (
       <Button variant="outline" disabled>
-        Branch : Loading ...
+        Branch: Loading ...
         <ChevronDownIcon className="ml-2 h-4 w-4" />
       </Button>
     );

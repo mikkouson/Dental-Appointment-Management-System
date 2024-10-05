@@ -5,7 +5,7 @@ export async function GET(req: NextRequest) {
   const supabase = createClient();
   const pageParam = req.nextUrl.searchParams.get("page");
   const statusParam = req.nextUrl.searchParams.get("status");
-  const branch = req.nextUrl.searchParams.get("status");
+  const branch = req.nextUrl.searchParams.get("branch"); // Fixed incorrect variable name
 
   const pageSize = 10; // Example page size
 
@@ -38,7 +38,6 @@ export async function GET(req: NextRequest) {
       `,
       { count: "exact" }
     )
-
     .ilike("patients.name", `%${filterParam}%`) // Example filter for 'name' column
     .is("deleteOn", null);
 
@@ -47,8 +46,14 @@ export async function GET(req: NextRequest) {
     const statusList = statusParam.split(",");
     query = query.in("status", statusList);
   }
+  if (branch) {
+    query = query.eq("branch", branch);
+  }
 
-  query = query.range((page - 1) * pageSize, page * pageSize - 1);
+  // Apply range only if pageParam is provided
+  if (pageParam) {
+    query = query.range((page - 1) * pageSize, page * pageSize - 1);
+  }
 
   const { data, error, count } = await query;
 

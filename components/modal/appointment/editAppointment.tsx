@@ -60,7 +60,7 @@ export function EditAppointment({
   };
 
   const date = form.watch("date");
-  console.log(date);
+
   //   const checkEmailExists = async (email: string): Promise<boolean> => {
   //     return patients.some((patient: PatientCol) => patient.email === email);
   //   };

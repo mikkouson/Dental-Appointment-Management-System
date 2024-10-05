@@ -35,7 +35,7 @@ export default function RadioComboBox<T extends DropdownItem>({
   if (!data)
     return (
       <Button variant="outline">
-        Branch : Loading ...
+        Branch: Loading ...
         <ChevronDownIcon className="ml-2 h-4 w-4" />
       </Button>
     );
@@ -48,8 +48,8 @@ export default function RadioComboBox<T extends DropdownItem>({
             variant="outline"
             className=" text-xs sm:text-sm px-2 sm:px-4"
           >
-            {label} : <span></span>
-            <span className="hidden sm:inline ">
+            {label} <span className="hidden sm:inline">:</span>
+            <span className="ml-2 hidden sm:inline ">
               {selectedItem
                 ? selectedItem.name
                 : data.length > 0

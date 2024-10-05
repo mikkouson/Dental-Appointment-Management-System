@@ -1,46 +1,34 @@
 "use client";
 import { AppointmentsCol } from "@/app/schema";
-import { Breadcrumbs } from "@/components/breadcrumb";
+import { useGetDate } from "@/app/store";
+import { CheckboxReactHookFormMultiple } from "@/components/buttons/comboBoxSelect";
+import BranchSelect from "@/components/buttons/selectbranch-btn";
+import { NewAppointmentForm } from "@/components/forms/new-appointment-form";
 import { Heading } from "@/components/heading";
 import PageContainer from "@/components/layout/page-container";
 import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
+import { PaginationDemo } from "@/components/pagitnation";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/utils/supabase/client";
-import { ListFilter, Search } from "lucide-react";
+import { File, Search } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 import useSWR from "swr";
 import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
-import { PaginationDemo } from "@/components/pagitnation";
-import { NewInventoryForm } from "@/components/forms/inventory/newInventoryForm";
-import { NewAppointmentForm } from "@/components/forms/new-appointment-form";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { DropdownMenuCheckboxes } from "@/components/buttons/filterAppointment";
-import StatusSelect from "@/components/buttons/statusSelect";
-import { useGetDate } from "@/app/store";
-import { CheckboxReactHookFormMultiple } from "@/components/buttons/comboBoxSelect";
-import BranchSelect from "@/components/buttons/selectbranch-btn";
+import { CSVLink } from "react-csv";
 
-const fetcher = async (
-  url: string
-): Promise<{
-  data: AppointmentsCol[] | [];
-  count: number;
-}> => fetch(url).then((res) => res.json());
+const fetcher = async (url: string) => {
+  const res = await fetch(url);
+  return res.json();
+};
 
-const fetche = (url: string): Promise<any[]> =>
-  fetch(url).then((res) => res.json());
+const fetche = async (url: string) => {
+  const res = await fetch(url);
+  return res.json();
+};
 
 export default function UserClient() {
   const [open, setOpen] = useState(false);
@@ -52,7 +40,7 @@ export default function UserClient() {
     fetche
   );
   const statusList = React.useMemo(
-    () => statuses?.map((s) => s.id) || [],
+    () => statuses?.map((s: { id: number }) => s.id) || [],
     [statuses]
   );
 
@@ -81,6 +69,17 @@ export default function UserClient() {
     fetcher
   );
 
+  const { data: exportData, isLoading: exportLoading } = useSWR<{
+    data: AppointmentsCol[] | [];
+    count: number;
+  }>(
+    `/api/apt?&query=${query}&branch=${
+      branches && branch !== 0 ? branch : branches ? branches[0]?.id : branch
+    }&status=${statusIds.length === 0 ? statusList.join(",") : statusIds}`,
+    fetcher
+  );
+
+  const exported = exportData?.data;
   const supabase = createClient();
 
   // Subscribe to realtime updates
@@ -130,7 +129,9 @@ export default function UserClient() {
 
   // Calculate total pages for pagination
   const totalPages = data ? Math.ceil(data.count / 10) : 1;
-  if (isLoading || statusLoading || branchLoading) return <>loading</>;
+
+  if (isLoading || statusLoading || branchLoading || exportLoading)
+    return <>loading</>;
 
   return (
     <PageContainer>
@@ -141,7 +142,7 @@ export default function UserClient() {
             description="Manage Inventory (Server side table functionalities.)"
           />
 
-          <div className="flex justify-end  max-w-full flex-col sm:flex-row w-full sm:max-w-full 2xl:max-w-[730px]">
+          <div className="flex justify-end  max-w-full flex-col md:flex-row w-full sm:max-w-full 2xl:max-w-[830px]">
             <div className="mr-0 mt-2 sm:mr-2 sm:mt-0 relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -153,6 +154,28 @@ export default function UserClient() {
               />
             </div>
             <div className="flex justify-end mt-2 sm:mt-0">
+              <CSVLink
+                data={(exported || []).map((apt: AppointmentsCol) => ({
+                  patient_name: apt.patients.name || "null", // Assuming 'name' is the field to export
+                  appointment_ticket: apt.appointment_ticket || "null", // Assuming 'name' is the field to export
+                  branch: apt?.branch?.name || "null",
+                  status: apt?.status?.name || "null",
+                  services: apt?.services?.name || "null",
+                  time_slots: apt.time_slots?.time || "null",
+                  type: apt.type || "null", // Assuming 'name' is the field to export
+                  deleteOn: apt.deleteOn || "null",
+                }))}
+                filename={"appointments.csv"}
+              >
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className=" gap-2 h-10 text-sm mr-2"
+                >
+                  <File className="h-5 w-5" />
+                  <span className="sr-only sm:not-sr-only">Export</span>
+                </Button>
+              </CSVLink>
               {statuses && (
                 <CheckboxReactHookFormMultiple
                   items={statuses}
