@@ -38,20 +38,20 @@ export function EditService({ data }: { data: Service }) {
   // Use z.infer to derive the type from ServiceSchema
   const form = useForm<z.infer<typeof ServiceSchema>>({
     resolver: zodResolver(ServiceSchema),
-    defaultValues: {
-      id: data.id || 0,
-      description: data.description || "",
-      name: data.name || "",
-      price: data.price || 0,
-    },
   });
-  const validateName = async (name: string): Promise<boolean> => {
-    const trimmedName = name.trim(); // Trim whitespace from the input email
-    return service.some(
-      (service: Service | null) => service?.name?.trim() === trimmedName
-    );
+
+  const set = () => {
+    form.setValue("id", data.id || 0);
+    form.setValue("name", data.name || "");
+    form.setValue("description", data.description || "");
+    form.setValue("price", data.price || 0);
   };
 
+  async function validateName(name: string): Promise<boolean> {
+    const filteredService = service.filter((i: Service) => i.id !== data.id);
+
+    return filteredService.some((i: Service) => i.name === name);
+  }
   async function onSubmit(data: z.infer<typeof ServiceSchema>) {
     const nameExists = await validateName(data.name);
 
@@ -63,8 +63,8 @@ export function EditService({ data }: { data: Service }) {
       return;
     }
 
-    // setOpen(false);
-    // updateService(data);
+    setOpen(false);
+    updateService(data);
     // toast({
     //   title: "You submitted the following values:",
     //   description: (
@@ -84,11 +84,11 @@ export function EditService({ data }: { data: Service }) {
       <SheetTrigger asChild>
         <SquarePen
           className="text-sm w-5 text-green-700 cursor-pointer"
-          onClick={() => form.reset()}
+          onClick={() => set()}
         />
       </SheetTrigger>
       <SheetContent
-        className="w-[800px]"
+        className="w-full md:w-[800px] overflow-auto"
         onInteractOutside={(e) => {
           const hasPacContainer = e.composedPath().some((el: EventTarget) => {
             if ("classList" in el) {

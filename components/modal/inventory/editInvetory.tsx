@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { updateInventory } from "@/app/admin/action";
 import { InventorySchema } from "@/app/types";
@@ -32,12 +32,6 @@ export function EditInventory({ data }: { data: Inventory }) {
 
   const form = useForm<z.infer<typeof InventorySchema>>({
     resolver: zodResolver(InventorySchema),
-    defaultValues: {
-      id: data.id || 0,
-      description: data.description || "",
-      name: data.name || "",
-      quantity: data.quantity || 0,
-    },
   });
 
   const set = () => {
@@ -48,12 +42,10 @@ export function EditInventory({ data }: { data: Inventory }) {
   };
 
   async function validateName(name: string): Promise<boolean> {
-    // Filter out the current item being edited
     const filteredInventory = inventory.filter(
       (i: Inventory) => i.id !== data.id
     );
 
-    // Check if any remaining item has the same name
     return filteredInventory.some((i: Inventory) => i.name === name);
   }
 
@@ -77,7 +69,9 @@ export function EditInventory({ data }: { data: Inventory }) {
     //   description: "Changes saved successfully.",
     // });
   }
-
+  useEffect(() => {
+    setTimeout(() => (document.body.style.pointerEvents = ""), 0);
+  }, []);
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
@@ -86,7 +80,23 @@ export function EditInventory({ data }: { data: Inventory }) {
           onClick={() => set()}
         />
       </SheetTrigger>
-      <SheetContent className="w-full md:w-[800px] overflow-auto">
+      <SheetContent
+        className="w-full md:w-[800px] overflow-auto"
+        onInteractOutside={(e) => {
+          const hasPacContainer = e.composedPath().some((el: EventTarget) => {
+            if ("classList" in el) {
+              return Array.from((el as Element).classList).includes(
+                "pac-container"
+              );
+            }
+            return false;
+          });
+
+          if (hasPacContainer) {
+            e.preventDefault();
+          }
+        }}
+      >
         <SheetHeader>
           <SheetTitle>Edit Inventory</SheetTitle>
           <SheetDescription>

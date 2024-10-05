@@ -44,10 +44,10 @@ export default function UserClient() {
   // Subscribe to realtime updates
   React.useEffect(() => {
     const channel = supabase
-      .channel("realtime inventory")
+      .channel("realtime service")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "inventory" },
+        { event: "*", schema: "public", table: "services" },
         () => {
           mutate();
         }

@@ -12,7 +12,7 @@ interface PatientFieldsProps {
 const ServicesFields = ({ form, onSubmit }: PatientFieldsProps) => {
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full p-2">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <Field form={form} name={"name"} label={"Name"} />
 
