@@ -88,7 +88,11 @@ export function SidebarDemo({ children, ...props }: Props) {
       {/* Sidebar component */}
       <Sidebar open={open} setOpen={setOpen}>
         <SidebarBody className="justify-between gap-10 md:relative">
-          <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden items-center">
+          <div
+            className={cn(
+              "flex flex-col flex-1 overflow-y-auto overflow-x-hidden "
+            )}
+          >
             {open ? (
               <Logos /> // Replace with your open state content
             ) : (
@@ -100,7 +104,7 @@ export function SidebarDemo({ children, ...props }: Props) {
                   className={cn(
                     "px-2 rounded-lg ",
                     path === link.href
-                      ? "bg-[#1c1c21] border border-neutral-700 "
+                      ? "dark:bg-[#1c1c21] border dark:border-neutral-700 bg-white border-input "
                       : "transparent",
                     "opacity-80"
                   )}
