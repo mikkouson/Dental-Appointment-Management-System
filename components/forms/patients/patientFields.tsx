@@ -10,13 +10,21 @@ import {
 } from "@/components/ui/form";
 import Maps from "@/components/gmaps";
 import { Button } from "@/components/ui/button";
+import { UseFormReturn } from "react-hook-form";
+import { PatientFormValues } from "@/app/types";
+import { Input } from "@/components/ui/input";
+import { CalendarForm } from "@/components/calendarInput";
+
 const sex = [
   { name: "Male", id: "male" },
   { name: "Female", id: "female" },
   { name: "Prefer not to say", id: "prefer_not_to_say" },
 ] as const;
-import { UseFormReturn } from "react-hook-form";
-import { PatientFormValues } from "@/app/types";
+
+const status = [
+  { name: "Active", id: "Active" },
+  { name: "Inactive", id: "Inactive" },
+] as const;
 
 interface PatientFieldsProps {
   form: UseFormReturn<PatientFormValues>;
@@ -24,14 +32,63 @@ interface PatientFieldsProps {
 }
 
 const PatientFields = ({ form, onSubmit }: PatientFieldsProps) => {
+  console.log(form);
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full p-2">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <Field form={form} name={"id"} label={"id"} />
+
           <Field form={form} name={"name"} label={"Name"} />
           <Field form={form} name={"email"} label={"Email"} />
           <Field form={form} data={sex} name={"sex"} label={"Sex"} />
-          <Field form={form} name={"age"} label={"Age"} age={true} />
+          <Field form={form} name={"status"} label={"Status"} data={status} />
+          <FormField
+            control={form.control}
+            name="phoneNumber"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Phone Number</FormLabel>
+                <FormControl>
+                  <div className="relative ml-auto flex-1 md:grow-0">
+                    <p className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground text-sm">
+                      (+639)
+                    </p>
+                    <Input
+                      type="number"
+                      className="w-full rounded-lg bg-background pl-16 "
+                      {...field}
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="dob"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Date of Birth</FormLabel>
+                <FormControl>
+                  <Input
+                    type="date"
+                    value={
+                      field.value instanceof Date
+                        ? field.value.toISOString().split("T")[0]
+                        : ""
+                    }
+                    onChange={(e) => {
+                      const selectedDate = new Date(e.target.value);
+                      field.onChange(selectedDate);
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="address"

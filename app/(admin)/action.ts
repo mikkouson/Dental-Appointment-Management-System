@@ -5,6 +5,13 @@ import moment from "moment";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import {
+  InventoryFormValues,
+  InventorySchema,
+  PatientSchema,
+  ServiceFormValues,
+  ServiceSchema,
+} from "@/app/types";
 interface AppointmentActionProps {
   aptId: number;
 }
@@ -33,31 +40,7 @@ const schema = z.object({
 
 type Inputs = z.infer<typeof schema>;
 
-const FormSchema = z.object({
-  id: z.number().optional(),
-  name: z.string().min(1, { message: "Name is required." }),
-  email: z.string().email().min(1, {
-    message: "Invalid email address.",
-  }),
-  address: z
-    .object({
-      id: z.number().optional(),
-      address: z.string({
-        required_error: "Address is required.",
-      }),
-      latitude: z.number().optional(),
-      longitude: z.number().optional(),
-    })
-    .refine((data) => data.address.trim().length > 0, {
-      message: "Address must be provided.",
-    }),
-  sex: z.string().min(1, { message: "Sex is required." }),
-  age: z.number().min(1, {
-    message: "Age is required.",
-  }),
-});
-
-type patientInput = z.infer<typeof FormSchema>;
+type patientInput = z.infer<typeof PatientSchema>;
 
 export async function cancelAppointment({ aptId }: AppointmentActionProps) {
   const supabase = createClient();
@@ -65,7 +48,20 @@ export async function cancelAppointment({ aptId }: AppointmentActionProps) {
   await supabase.from("appointments").update({ status: 3 }).eq("id", aptId);
 
   revalidatePath("/");
-  redirect("/admin/appointments");
+  redirect("/appointments");
+}
+
+export async function deleteAppointment(id: number) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("appointments")
+    .update({
+      deleteOn: new Date().toISOString(),
+    })
+    .eq("id", id);
+  if (error) {
+    console.log("Error deleting appointment", error.message);
+  }
 }
 
 export async function rescheduleAppointment(data: Inputs) {
@@ -75,14 +71,17 @@ export async function rescheduleAppointment(data: Inputs) {
     return;
   }
   const supabase = createClient();
-  const formattedDate = moment(data.date).format("YYYY-MM-DD");
+  const formattedDate = moment
+    .utc(data.date)
+    .add(8, "hours")
+    .format("MM-DD-YYYY");
 
   const { error } = await supabase
     .from("appointments")
     .update({
       service: data.service,
       branch: data.branch,
-      date: moment(data.date).format("MM/DD/YYYY"),
+      date: formattedDate,
       time: data.time,
       status: data.status,
       type: data.type,
@@ -95,7 +94,7 @@ export async function rescheduleAppointment(data: Inputs) {
   }
 
   revalidatePath("/");
-  redirect("/admin/appointments");
+  redirect("/appointments");
 }
 
 export async function newApp(data: Inputs) {
@@ -128,7 +127,7 @@ export async function newApp(data: Inputs) {
 }
 
 export async function newPatient(data: patientInput) {
-  const result = FormSchema.safeParse(data);
+  const result = PatientSchema.safeParse(data);
 
   if (!result.success) {
     console.log("Validation errors:", result.error.format());
@@ -163,8 +162,10 @@ export async function newPatient(data: patientInput) {
       name: data.name,
       email: data.email,
       sex: data.sex,
-      age: data.age,
-      address: addressId, // Use the address ID from the previous step
+      address: addressId,
+      phone_number: data.phoneNumber,
+      dob: data.dob,
+      status: data.status,
     },
   ]);
 
@@ -188,7 +189,7 @@ export async function deletePatient(id: number) {
   }
 }
 export async function updatePatient(data: patientInput) {
-  const result = FormSchema.safeParse(data);
+  const result = PatientSchema.safeParse(data);
 
   if (!result.success) {
     console.log("Validation errors:", result.error.format());
@@ -225,12 +226,135 @@ export async function updatePatient(data: patientInput) {
       name: data.name,
       email: data.email,
       sex: data.sex,
-      age: data.age,
+      phone_number: data.phoneNumber,
+      dob: data.dob,
+      status: data.status,
     })
     .eq("id", data.id);
 
   if (patientError) {
     console.error("Error updating patient:", patientError.message);
+  } else {
+    console.log("Patient data updated successfully");
+  }
+}
+
+// Service Actions
+
+export async function newService(data: ServiceFormValues) {
+  const result = ServiceSchema.safeParse(data);
+
+  if (!result.success) {
+    console.log("Validation errors:", result.error.format());
+    return;
+  }
+
+  const supabase = createClient();
+
+  const { error } = await supabase.from("services").insert([
+    {
+      name: data.name,
+      description: data.description,
+      price: data.price,
+    },
+  ]);
+
+  if (error) {
+    console.error("Error inserting patient:", error.message);
+  } else {
+    console.log("Patient data inserted successfully");
+  }
+}
+
+export async function deleteService(id: number) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("services")
+    .update({
+      deleteOn: new Date().toISOString(),
+    })
+    .eq("id", id);
+  if (error) {
+    console.log("Error deleting patient", error.message);
+  }
+}
+
+export async function updateService(data: ServiceFormValues) {
+  const result = ServiceSchema.safeParse(data);
+
+  if (!result.success) {
+    console.log("Validation errors:", result.error.format());
+    return;
+  }
+
+  const supabase = createClient();
+
+  // Update patient
+  const { error } = await supabase
+    .from("services")
+    .update({
+      name: data.name,
+      price: data.price,
+      description: data.description,
+    })
+    .eq("id", data.id);
+
+  if (error) {
+    console.error("Error updating patient:", error.message);
+  } else {
+    console.log("Patient data updated successfully");
+  }
+}
+
+// Inventory Actions
+
+export async function newInventory(data: InventoryFormValues) {
+  const result = InventorySchema.safeParse(data);
+
+  if (!result.success) {
+    console.log("Validation errors:", result.error.format());
+    return;
+  }
+
+  const supabase = createClient();
+
+  const { error } = await supabase.from("inventory").insert([
+    {
+      name: data.name,
+      description: data.description,
+      quantity: data.quantity,
+    },
+  ]);
+
+  if (error) {
+    console.error("Error inserting patient:", error.message);
+  } else {
+    console.log("Patient data inserted successfully");
+  }
+}
+
+export async function updateInventory(data: InventoryFormValues) {
+  const result = InventorySchema.safeParse(data);
+
+  if (!result.success) {
+    console.log("Validation errors:", result.error.format());
+    return;
+  }
+
+  const supabase = createClient();
+
+  // Update patient
+  const { error } = await supabase
+    .from("inventory")
+    .update({
+      name: data.name,
+      quantity: data.quantity,
+      description: data.description,
+    })
+    .eq("id", data.id);
+
+  if (error) {
+    console.error("Error updating patient:", error.message);
   } else {
     console.log("Patient data updated successfully");
   }

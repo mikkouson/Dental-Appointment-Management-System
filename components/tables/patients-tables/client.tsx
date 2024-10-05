@@ -1,7 +1,8 @@
 "use client";
-import type { Address, Patient } from "@/app/schema";
+import type { Address, Patient, PatientCol } from "@/app/schema";
+import { useSetActive } from "@/app/store";
 import { Breadcrumbs } from "@/components/breadcrumb";
-import { NewPatientForm } from "@/components/forms/newPatientForm";
+import PatientCard from "@/components/cards/patientCard";
 import { Heading } from "@/components/heading";
 import PageContainer from "@/components/layout/page-container";
 import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
@@ -9,14 +10,13 @@ import { PaginationDemo } from "@/components/pagitnation";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/utils/supabase/client";
+import { Search } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect } from "react";
-import useSWR from "swr";
-import { DataTableDemo } from "../dataTable";
+import React, { useEffect, useOptimistic, useState } from "react";
+import useSWR, { preload } from "swr";
 import { columns } from "./column";
-import PatientCard from "@/components/cards/patientCard";
-import { useSetActive } from "@/app/store";
-
+import { DataTableDemo } from "./dataTable";
+import { NewPatientForm } from "@/components/forms/patients/newPatientForm";
 const fetcher = async (
   url: string
 ): Promise<{
@@ -24,9 +24,12 @@ const fetcher = async (
   count: number;
 }> => fetch(url).then((res) => res.json());
 
+preload(`/api/patients`, fetcher);
 export default function UserClient() {
   const [open, setOpen] = React.useState(false);
-  const [searchQuery, setSearchQuery] = React.useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>(
+    useSearchParams().get("query") || ""
+  );
   const activePatient = useSetActive((state) => state.selectedPatient);
 
   const searchParams = useSearchParams();
@@ -81,8 +84,8 @@ export default function UserClient() {
   }
 
   const breadcrumbItems = [
-    { title: "Dashboard", link: "/admin" },
-    { title: "Patients", link: "/admin/patients" },
+    { title: "Dashboard", link: "/" },
+    { title: "Patients", link: "/patients" },
   ];
 
   const totalPages = data ? Math.ceil(data.count / 10) : 1;
@@ -98,35 +101,48 @@ export default function UserClient() {
       <div className="space-y-4">
         <Breadcrumbs items={breadcrumbItems} />
 
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col 2xl:flex-row lg:items-start lg:justify-between">
           <Heading
             title={`Total Patients (${data ? data.count : "loading"})`}
-            description="Manage employees (Server side table functionalities.)"
+            description="Manage patients (Server side table functionalities.)"
           />
 
-          <DrawerDialogDemo open={open} setOpen={setOpen} label={"New Patient"}>
-            <NewPatientForm setOpen={setOpen} />
-          </DrawerDialogDemo>
+          <div className="flex justify-end  max-w-full  w-full mt-2 sm:ml-0  sm:max-w-full 2xl:max-w-[730px] ">
+            <div className="mr-2 relative">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search Patient Name ..."
+                className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px] "
+                onChange={handleInputChange}
+                value={searchQuery}
+              />
+            </div>
+            <DrawerDialogDemo
+              open={open}
+              setOpen={setOpen}
+              label={"New Patient"}
+            >
+              <NewPatientForm setOpen={setOpen} />
+            </DrawerDialogDemo>
+          </div>
         </div>
         <Separator />
-        <div className="flex">
+        <div className="flex flex-col  xl:flex-row">
           <div className="flex-1">
-            <Input
-              className="block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500 md:max-w-sm"
-              placeholder="Search Patient Name"
-              value={searchQuery}
-              onChange={handleInputChange}
-            />
             {isLoading ? (
               <p>Loading...</p>
-            ) : data && data.data ? (
+            ) : data && data.data && data.data.length > 0 ? (
               <>
                 <DataTableDemo
                   columns={columns}
                   data={data.data}
                   activePatient={
-                    activePatient == 0 ? data.data[0].id : activePatient
+                    activePatient === 0
+                      ? data.data[0].id
+                      : activePatient || undefined
                   }
+                  mutate={mutate}
                 />
                 <PaginationDemo
                   currentPage={page}
@@ -138,8 +154,8 @@ export default function UserClient() {
               <p>No data available</p>
             )}
           </div>
-          <div className="w-1/5 ml-5">
-            {data && (
+          <div className="w-full mt-5 xl:w-1/5 xl:ml-5 xl:mt-0">
+            {data && data.data && data.data.length > 0 && (
               <PatientCard
                 activePatient={
                   activePatient == 0 ? data.data[0].id : activePatient

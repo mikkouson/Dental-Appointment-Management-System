@@ -16,7 +16,7 @@ import TimeSlot from "../../buttons/selectTime";
 const fetcher = (url: string): Promise<any[]> =>
   fetch(url).then((res) => res.json());
 
-import { rescheduleAppointment } from "@/app/admin/action";
+import { rescheduleAppointment } from "@/app/(admin)/action";
 import { useGetDate } from "@/app/store";
 import {
   Sheet,
@@ -112,18 +112,15 @@ export function SheetDemo({ date, pid, time, aptId, apt }: SheetDemoProps) {
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
     rescheduleAppointment(data);
     setOpen(false);
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+    // toast({
+    //   title: "You submitted the following values:",
+    //   description: (
+    //     <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+    //       <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+    //     </pre>
+    //   ),
+    // });
   };
-
-  const b = form.watch("type");
-  console.log(typeof b);
 
   if (!data) return <>Loading ...</>;
   const services = data.find((item) => item.table_name === "services");
@@ -133,7 +130,7 @@ export function SheetDemo({ date, pid, time, aptId, apt }: SheetDemoProps) {
       <SheetTrigger asChild>
         <Button onClick={() => set()}>Edit</Button>
       </SheetTrigger>
-      <SheetContent>
+      <SheetContent className="w-[800px]">
         <SheetHeader>
           <SheetTitle>Edit Appointment</SheetTitle>
           <SheetDescription>

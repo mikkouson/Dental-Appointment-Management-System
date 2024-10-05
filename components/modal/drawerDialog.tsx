@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/drawer";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
+import { ScrollArea } from "../ui/scroll-area";
 
 interface DrawerDialogDemoProps {
   open: boolean;
@@ -44,12 +45,12 @@ export function DrawerDialogDemo({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button className="bg-primary">
-            <Plus size={20} className="mr-2" />
+            <Plus size={20} className="mr-2 " />
             {label}
           </Button>
         </DialogTrigger>
         <DialogContent
-          className="sm:max-w-[1000px]"
+          className={"lg:max-w-screen-lg overflow-y-auto max-h-screen"}
           onInteractOutside={(e) => {
             const hasPacContainer = e.composedPath().some((el: EventTarget) => {
               if ("classList" in el) {
@@ -80,8 +81,9 @@ export function DrawerDialogDemo({
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button variant="outline">Edit Profile</Button>
+        <Button className="bg-primary text-xs p-0 px-2">{label}</Button>
       </DrawerTrigger>
+
       <DrawerContent
         onInteractOutside={(e) => {
           const hasPacContainer = e.composedPath().some((el: EventTarget) => {
@@ -104,7 +106,8 @@ export function DrawerDialogDemo({
             Make changes to your profile here. Click save when youre done.
           </DrawerDescription>
         </DrawerHeader>
-        {children}
+        <ScrollArea className="h-[50vh] w-full ">{children}</ScrollArea>
+
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
             <Button variant="outline">Cancel</Button>

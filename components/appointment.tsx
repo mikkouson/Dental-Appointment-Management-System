@@ -1,5 +1,4 @@
 "use client";
-
 import { useGetDate } from "@/app/store";
 import BranchSelect from "@/components/buttons/selectbranch-btn";
 import { CheckboxReactHookFormMultiple } from "@/components/buttons/comboBoxSelect";
@@ -8,11 +7,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import useSWR from "swr";
+import useSWR, { preload } from "swr";
 import AppointmentsMap from "@/components/appointmentsList";
 import { NewAppointmentForm } from "@/components/forms/new-appointment-form";
 import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
-
+import { Separator } from "@/components/ui/separator";
+import { createClient } from "@/utils/supabase/client";
+import PageContainer from "./layout/page-container";
 const fetcher = (url: string): Promise<any[]> =>
   fetch(url).then((res) => res.json());
 
@@ -28,7 +29,10 @@ const timeSlots = [
   { id: 9, time: "4:00 PM" },
 ];
 
-export default function Appointments() {
+preload(`/api/appointments`, fetcher);
+preload(`/api/status`, fetcher);
+preload(`/api/branch`, fetcher);
+export default function AppointmentCalendar() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [open, setOpen] = React.useState(false);
 
@@ -65,7 +69,7 @@ export default function Appointments() {
     fetcher
   );
 
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   useEffect(() => {
     const channel = supabase
@@ -90,33 +94,35 @@ export default function Appointments() {
   if (appointmentsError) return <div>Error loading appointments</div>;
 
   return (
-    <div className="flex  justify-between mx-10 ">
-      <div>
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={setDate}
-          className="rounded-md border"
-        />
-      </div>
-
-      <div className="w-full pl-10 flex-col">
-        <div className="flex justify-end">
-          <CheckboxReactHookFormMultiple items={statuses} label="Status" />
-          <BranchSelect />
-          <DrawerDialogDemo
-            open={open}
-            setOpen={setOpen}
-            label={"New Appointment"}
-          >
-            <NewAppointmentForm setOpen={setOpen} />
-          </DrawerDialogDemo>
+    <PageContainer>
+      <div className=" flex flex-col lg:flex-row gap-4 ">
+        {/* Left Column for Calendar */}
+        <div className="mb-4 xl:mr-10">
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={setDate}
+            className="rounded-md border mb-4 flex items-center justify-center "
+          />
         </div>
-        <div>
+
+        {/* Right Column */}
+        <div className="flex flex-col flex-1">
+          <div className="flex justify-end mb-4 ">
+            <CheckboxReactHookFormMultiple items={statuses} label="Status" />
+            <BranchSelect />
+            <DrawerDialogDemo
+              open={open}
+              setOpen={setOpen}
+              label={"New Appointment"}
+            >
+              <NewAppointmentForm setOpen={setOpen} />
+            </DrawerDialogDemo>
+          </div>
           {isLoading ? (
-            <div>
+            <div className="flex flex-col">
               {timeSlots.map((time) => (
-                <div className="mb-2" key={time.id}>
+                <div className="mb-4" key={time.id}>
                   <h2 className="text-lg font-semibold mb-2">{time.time}</h2>
                   <div className="flex flex-col border p-2">
                     <Skeleton className="h-2 w-3/4 mb-2" />
@@ -134,6 +140,6 @@ export default function Appointments() {
           )}
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

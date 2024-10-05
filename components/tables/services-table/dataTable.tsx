@@ -1,3 +1,9 @@
+import { deleteService } from "@/app/(admin)/action";
+import type { Service } from "@/app/schema";
+import { useSetActiveAppointments } from "@/app/store";
+import { toast } from "@/components/hooks/use-toast";
+import { DeleteModal } from "@/components/modal/deleteModal";
+import { EditPatient } from "@/components/modal/patients/editPatient";
 import {
   Table,
   TableBody,
@@ -6,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -20,17 +27,16 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import * as React from "react";
-import { ScrollArea, ScrollBar } from "../ui/scroll-area";
-import type { PatientCol } from "@/app/schema";
-import { useSetActive } from "@/app/store";
-import { cn } from "@/lib/utils";
+import { ScrollArea, ScrollBar } from "../../ui/scroll-area";
+import { EditService } from "@/components/modal/services/editService";
 
-type Column = ColumnDef<PatientCol>;
+type Column = ColumnDef<Service>;
 
 type DataTableProps = {
-  data: PatientCol[];
+  data: Service[] | [];
   columns: Column[];
-  activePatient: Number;
+  activePatient?: number;
+  mutate: any;
 };
 
 // In your DataTableDemo component
@@ -38,10 +44,9 @@ export function DataTableDemo({
   columns,
   data,
   activePatient,
+  mutate,
 }: DataTableProps) {
-  const setActive = useSetActive((state) => state.setActive);
-
-  console.log(activePatient);
+  const setActive = useSetActiveAppointments((state) => state.setActiveState);
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -72,8 +77,33 @@ export function DataTableDemo({
     },
   });
 
-  const handleClick = (row: Row<PatientCol>) => {
+  const handleClick = (row: Row<Service>) => {
     setActive(row.original.id); // Set the clicked row as active
+  };
+
+  const handleDelete = (id?: number) => {
+    try {
+      if (!id) return;
+
+      // Optimistically update the UI
+      const filteredPatients = data.filter((patient) => patient.id !== id);
+      mutate({ data: filteredPatients }, false);
+      deleteService(id);
+      toast({
+        className: cn(
+          "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
+        ),
+        variant: "success",
+        description: "Patient deleted successfully.",
+      });
+    } catch (error: any) {
+      toast({
+        className: cn(
+          "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
+        ),
+        description: `Failed to delete the patient: ${error.message}`,
+      });
+    }
   };
 
   return (
@@ -92,6 +122,7 @@ export function DataTableDemo({
                       )}
                 </TableHead>
               ))}
+              <TableHead>Actions</TableHead>
             </TableRow>
           ))}
         </TableHeader>
@@ -111,6 +142,14 @@ export function DataTableDemo({
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
+                <TableCell>
+                  <div className="flex px-2">
+                    <DeleteModal
+                      formAction={() => handleDelete(row.original.id)}
+                    />
+                    <EditService data={row.original} />
+                  </div>
+                </TableCell>
               </TableRow>
             ))
           ) : (

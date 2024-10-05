@@ -11,8 +11,8 @@ export default function Navigation() {
         <div className="flex  items-center">
           <Image height={50} width={50} src={Logo} alt="Logo" />
           <Link href="/">Home</Link>
-          <Link href="/admin/appointments">Appointments</Link>
-          <Link href="/admin/inventory">Inventory</Link>
+          <Link href="/appointments">Appointments</Link>
+          <Link href="/inventory">Inventory</Link>
 
           <h1 className="text-lg font-bold">Lobodent Dental Clinic</h1>
         </div>

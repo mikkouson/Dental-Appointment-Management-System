@@ -1,280 +1,184 @@
+import { AreaGraph } from "@/components/charts/area-graph";
+import { BarGraph } from "@/components/charts/bar-graph";
+import { PieGraph } from "@/components/charts/pie-graph";
+import { CalendarDateRangePicker } from "@/components/date-range-picker";
+import Header from "@/components/layout/header";
+import PageContainer from "@/components/layout/page-container";
+import { RecentSales } from "@/components/recent-sales";
+import { SidebarDemo } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import Image from "next/image";
-import Link from "next/link";
-import { JSX, SVGProps } from "react";
+import type { Metadata } from "next";
 
-export default function DentalClinicLanding() {
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+export const metadata: Metadata = {
+  title: "Lobodent Dental Clinic - Dashboard",
+  description:
+    "Lobodent Dental Clinic is now an Orthero certified provider offering comfortable and invisible Orthero Clear Aligners. Visit us at 2nd Floor, R Building, President Jose P. Laurel Highway, Brgy 1, Marawoy, Lipa City. We are open Monday - Saturday, 10am - 5pm, and Sunday, 10am - 3pm. Parking spaces available.",
+};
+
+export default function page() {
   return (
-    <div className="flex flex-col min-h-screen">
-      <header className="px-4 lg:px-6 h-14 flex items-center">
-        <Link className="flex items-center justify-center" href="#">
-          <MountainIcon className="h-6 w-6" />
-          <span className="sr-only">Dental Clinic</span>
-        </Link>
-      </header>
-      <main className="flex-1">
-        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
-          <div className="container px-4 md:px-6">
-            <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
-              <div className="flex flex-col justify-center space-y-4">
-                <div className="space-y-2">
-                  <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                    Welcome to Lobodent Dental Clinic: Where Your Smile Shines
-                    Brighter
-                  </h1>
-                  <p className="max-w-[600px] text-gray-500 md:text-xl dark:text-gray-400">
-                    From routine checkups to advanced cosmetic treatments, our
-                    dedicated team of professionals is here to give you the
-                    healthy, radiant smile you deserve. Step into our clinic and
-                    experience personalized care tailored to your comfort and
-                    needs, all in a welcoming and modern environment.
-                  </p>
-                </div>
+    <SidebarDemo>
+      <main className=" overflow-auto  p-2  rounded-tl-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 flex flex-col gap-2 flex-1 w-full h-full">
+        <Header />
+        <PageContainer scrollable={true}>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between space-y-2">
+              <h2 className="text-2xl font-bold tracking-tight">
+                Hi, Welcome back 👋
+              </h2>
+              <div className="hidden items-center space-x-2 md:flex">
+                <CalendarDateRangePicker />
+                <Button>Download</Button>
               </div>
-              <Image
-                alt="Dentist"
-                className="rounded-xl object-cover object-center lg:order-last"
-                src="/dentist.png"
-                width={300}
-                height={300}
-              />
             </div>
+            <Tabs defaultValue="overview" className="space-y-4">
+              <TabsList>
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="analytics" disabled>
+                  Analytics
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="overview" className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">
+                        Total Revenue
+                      </CardTitle>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        className="h-4 w-4 text-muted-foreground"
+                      >
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                      </svg>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">$45,231.89</div>
+                      <p className="text-xs text-muted-foreground">
+                        +20.1% from last month
+                      </p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">
+                        Total Patients
+                      </CardTitle>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        className="h-4 w-4 text-muted-foreground"
+                      >
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                      </svg>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">+2350</div>
+                      <p className="text-xs text-muted-foreground">
+                        +180.1% from last month
+                      </p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">
+                        Sales
+                      </CardTitle>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        className="h-4 w-4 text-muted-foreground"
+                      >
+                        <rect width="20" height="14" x="2" y="5" rx="2" />
+                        <path d="M2 10h20" />
+                      </svg>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">+12,234</div>
+                      <p className="text-xs text-muted-foreground">
+                        +19% from last month
+                      </p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">
+                        Active Now
+                      </CardTitle>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        className="h-4 w-4 text-muted-foreground"
+                      >
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                      </svg>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">+573</div>
+                      <p className="text-xs text-muted-foreground">
+                        +201 since last hour
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7">
+                  <div className="col-span-4">
+                    <BarGraph />
+                  </div>
+                  <Card className="col-span-4 md:col-span-3">
+                    <CardHeader>
+                      <CardTitle>Recent Patients</CardTitle>
+                      <CardDescription>
+                        You made 265 sales this month.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <RecentSales />
+                    </CardContent>
+                  </Card>
+                  <div className="col-span-4">
+                    <AreaGraph />
+                  </div>
+                  <div className="col-span-4 md:col-span-3">
+                    <PieGraph />
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
-        </section>
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800">
-          <div className="container px-4 md:px-6">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-center mb-8">
-              Our Services
-            </h2>
-            <div className="grid gap-6 lg:grid-cols-3">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Dental Consultation</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>
-                    Receive personalized dental advice and care tailored to your
-                    oral health needs.
-                  </p>
-                  <Image
-                    alt="Dental Consultation"
-                    className="rounded-lg mt-4"
-                    src="/services/consultation.jpg"
-                    width={400}
-                    height={300}
-                  />
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Dental Cleaning</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>
-                    Keep your smile bright and your teeth healthy with
-                    professional dental cleaning.
-                  </p>
-                  <Image
-                    alt="Dental Cleaning"
-                    className="rounded-lg mt-4"
-                    src="/services/cleaning.jpg"
-                    width={400}
-                    height={300}
-                  />
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Dental Fillings</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>
-                    Restore damaged teeth and maintain a natural look with our
-                    high-quality fillings.
-                  </p>
-                  <Image
-                    alt="Dental Fillings"
-                    className="rounded-lg mt-4"
-                    src="/services/fillings.jpg"
-                    width={400}
-                    height={300}
-                  />
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Orthodontic Treatment/Braces</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>
-                    Achieve a straighter smile with our advanced braces and
-                    orthodontic treatments.
-                  </p>
-                  <Image
-                    alt="Orthodontic Treatment"
-                    className="rounded-lg mt-4"
-                    src="/services/braces.jpg"
-                    width={400}
-                    height={300}
-                  />
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Wisdom Tooth Removal</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>
-                    Experience safe and effective wisdom tooth extraction to
-                    prevent future dental issues.
-                  </p>
-                  <Image
-                    alt="Wisdom Tooth Removal"
-                    className="rounded-lg mt-4"
-                    src="/services/wisdom.jpg"
-                    width={400}
-                    height={300}
-                  />
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Root Canal Treatment</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>
-                    Save your natural teeth and alleviate pain with expert root
-                    canal treatments.
-                  </p>
-                  <Image
-                    alt="Root Canal Treatment"
-                    className="rounded-lg mt-4"
-                    src="/services/root-canal.jpg"
-                    width={400}
-                    height={300}
-                  />
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Tooth Extraction</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>
-                    Remove problematic teeth with minimal discomfort and optimal
-                    care.
-                  </p>
-                  <Image
-                    alt="Tooth Extraction"
-                    className="rounded-lg mt-4"
-                    src="/services/extraction.jpg"
-                    width={400}
-                    height={300}
-                  />
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Laser Teeth Whitening</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>
-                    Brighten your smile with our safe and effective laser teeth
-                    whitening treatments.
-                  </p>
-                  <Image
-                    alt="Laser Teeth Whitening"
-                    className="rounded-lg mt-4"
-                    src="/services/whitening.png"
-                    width={400}
-                    height={300}
-                  />
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Removable Partial Denture (Pustiso)</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>
-                    Regain your confidence with custom-fitted, removable partial
-                    dentures.
-                  </p>
-                  <Image
-                    alt="Removable Partial Denture"
-                    className="rounded-lg mt-4"
-                    src="/services/denture.png"
-                    width={400}
-                    height={300}
-                  />
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Veneers, Crowns, and Bridges</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>
-                    Enhance your smile and restore damaged teeth with veneers,
-                    crowns, and bridges.
-                  </p>
-                  <Image
-                    alt="Veneers, Crowns, and Bridges"
-                    className="rounded-lg mt-4"
-                    src="/services/crowns.jpg"
-                    width={400}
-                    height={300}
-                  />
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
+        </PageContainer>
       </main>
-      <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
-        <p className="text-xs text-gray-500 dark:text-gray-400">
-          © 2024 Dental Clinic. All rights reserved.
-        </p>
-        <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-          <Link className="text-xs hover:underline underline-offset-4" href="#">
-            Terms of Service
-          </Link>
-          <Link className="text-xs hover:underline underline-offset-4" href="#">
-            Privacy
-          </Link>
-        </nav>
-      </footer>
-    </div>
-  );
-}
-
-function MountainIcon(
-  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
-) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m8 3 4 8 5-5 5 15H2L8 3z" />
-    </svg>
+    </SidebarDemo>
   );
 }

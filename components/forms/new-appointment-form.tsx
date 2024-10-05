@@ -19,7 +19,8 @@ import useSWR from "swr";
 import { CalendarForm } from "../buttons/selectDate";
 import TimeSlot from "../buttons/selectTime";
 import Field from "./formField";
-import { newApp } from "@/app/admin/action";
+import { newApp } from "@/app/(admin)/action";
+import { ScrollArea } from "../ui/scroll-area";
 
 type Appointment = {
   id: string;
@@ -70,15 +71,15 @@ export function NewAppointmentForm({
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     newApp(data);
-    setOpen(false);
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+    // setOpen(false);
+    // toast({
+    //   title: "You submitted the following values:",
+    //   description: (
+    //     <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+    //       <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+    //     </pre>
+    //   ),
+    // });
   }
 
   if (!data) return <>Loading ...</>;
@@ -102,15 +103,15 @@ export function NewAppointmentForm({
     .filter((item) => item.patient_id === patient)
     .map((item) => item.date);
 
-  console.log(patients);
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full p-2">
+        {/* <ScrollArea className="h-80 w-full "> */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <Field
             form={form}
             name={"id"}
-            label={"patient"}
+            label={"Patient"}
             data={patients}
             num={true}
           />
@@ -199,6 +200,8 @@ export function NewAppointmentForm({
             )}
           />
         </div>
+        {/* </ScrollArea> */}
+
         <div className="flex justify-end">
           <Button type="submit">Submit</Button>
         </div>

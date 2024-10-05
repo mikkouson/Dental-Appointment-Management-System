@@ -1,4 +1,4 @@
-import { cancelAppointment } from "@/app/admin/action";
+import { cancelAppointment } from "@/app/(admin)/action";
 import type {
   Appointment,
   Patient,
@@ -6,8 +6,9 @@ import type {
   Status,
   TimeSlot,
 } from "@/app/schema";
-import { SheetDemo } from "./modal/appointments/editAppointment";
 import SubmitButton from "./buttons/submitBtn";
+import { Separator } from "./ui/separator";
+import { EditAppointment } from "./modal/appointment/editAppointment";
 
 interface AppointmentsMapProps {
   timeSlots: TimeSlot[];
@@ -30,8 +31,14 @@ export default function AppointmentsMap({
         );
 
         return (
-          <div key={time.id}>
-            <h3 className="text-lg font-semibold mb-2">{time.time}</h3>
+          <div key={time.id} className="mb-4 overflow-x-hidden">
+            <div className="flex items-center ">
+              <h3 className="text-lg font-semibold mr-2 whitespace-nowrap">
+                {time.time}
+              </h3>
+              {timeSlots.length && <Separator className="my-2 max-w-30 " />}
+            </div>
+
             {filteredAppointments.length > 0 ? (
               <div>
                 {filteredAppointments.map((apt: any) => (
@@ -72,13 +79,8 @@ export default function AppointmentsMap({
                           Cancel
                         </SubmitButton>
                       )}
-                      <SheetDemo
-                        date={apt.date || ""}
-                        pid={String(apt.patients?.id || "")}
-                        time={Number(apt.time || "")}
-                        aptId={apt.id}
-                        apt={apt}
-                      />
+
+                      <EditAppointment appointment={apt} text={true} />
                     </form>
                   </div>
                 ))}
