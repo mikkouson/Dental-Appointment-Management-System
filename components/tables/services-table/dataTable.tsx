@@ -1,4 +1,4 @@
-import { deleteService } from "@/app/admin/action";
+import { deleteService } from "@/app/(admin)/action";
 import type { Service } from "@/app/schema";
 import { useSetActiveAppointments } from "@/app/store";
 import { toast } from "@/components/hooks/use-toast";

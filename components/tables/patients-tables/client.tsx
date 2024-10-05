@@ -84,8 +84,8 @@ export default function UserClient() {
   }
 
   const breadcrumbItems = [
-    { title: "Dashboard", link: "/admin" },
-    { title: "Patients", link: "/admin/patients" },
+    { title: "Dashboard", link: "/" },
+    { title: "Patients", link: "/patients" },
   ];
 
   const totalPages = data ? Math.ceil(data.count / 10) : 1;

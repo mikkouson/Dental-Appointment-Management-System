@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { toast } from "@/components/hooks/use-toast";
-import { updatePatient } from "@/app/admin/action";
+import { updatePatient } from "@/app/(admin)/action";
 import { PatientCol } from "@/app/schema";
 import { PatientSchema } from "@/app/types";
 import PatientFields from "@/components/forms/patients/patientFields";

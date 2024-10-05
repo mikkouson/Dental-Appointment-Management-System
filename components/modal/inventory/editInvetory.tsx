@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
-import { updateInventory } from "@/app/admin/action";
+import { updateInventory } from "@/app/(admin)/action";
 import { InventorySchema } from "@/app/types";
 import { Inventory } from "@/app/schema";
 import {

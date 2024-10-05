@@ -89,8 +89,8 @@ export default function UserClient() {
 
   // Breadcrumb items
   const breadcrumbItems = [
-    { title: "Dashboard", link: "/admin" },
-    { title: "Inventory", link: "/admin/inventory" },
+    { title: "Dashboard", link: "/" },
+    { title: "Inventory", link: "/inventory" },
   ];
 
   // Calculate total pages for pagination

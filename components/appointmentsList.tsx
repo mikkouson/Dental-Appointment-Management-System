@@ -1,4 +1,4 @@
-import { cancelAppointment } from "@/app/admin/action";
+import { cancelAppointment } from "@/app/(admin)/action";
 import type {
   Appointment,
   Patient,

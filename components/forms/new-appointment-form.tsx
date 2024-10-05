@@ -19,7 +19,7 @@ import useSWR from "swr";
 import { CalendarForm } from "../buttons/selectDate";
 import TimeSlot from "../buttons/selectTime";
 import Field from "./formField";
-import { newApp } from "@/app/admin/action";
+import { newApp } from "@/app/(admin)/action";
 import { ScrollArea } from "../ui/scroll-area";
 
 type Appointment = {

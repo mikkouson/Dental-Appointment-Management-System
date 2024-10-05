@@ -17,7 +17,7 @@ import {
 import { SquarePen } from "lucide-react";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
-import { rescheduleAppointment } from "@/app/admin/action";
+import { rescheduleAppointment } from "@/app/(admin)/action";
 import { toast } from "@/components/hooks/use-toast";
 import { AppointmentField } from "@/components/forms/appointment/appointmentField";
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { deletePatient } from "@/app/admin/action";
+import { deletePatient } from "@/app/(admin)/action";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

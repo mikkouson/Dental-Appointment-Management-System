@@ -48,7 +48,7 @@ export async function cancelAppointment({ aptId }: AppointmentActionProps) {
   await supabase.from("appointments").update({ status: 3 }).eq("id", aptId);
 
   revalidatePath("/");
-  redirect("/admin/appointments");
+  redirect("/appointments");
 }
 
 export async function deleteAppointment(id: number) {
@@ -94,7 +94,7 @@ export async function rescheduleAppointment(data: Inputs) {
   }
 
   revalidatePath("/");
-  redirect("/admin/appointments");
+  redirect("/appointments");
 }
 
 export async function newApp(data: Inputs) {

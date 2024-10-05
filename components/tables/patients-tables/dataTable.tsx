@@ -1,5 +1,5 @@
 "use client";
-import { deletePatient } from "@/app/admin/action";
+import { deletePatient } from "@/app/(admin)/action";
 import type { PatientCol } from "@/app/schema";
 import { useSetActive } from "@/app/store";
 import { toast } from "@/components/hooks/use-toast";

@@ -30,7 +30,7 @@ export default function Sidebar({ className }: SidebarProps) {
       )}
     >
       <div className="hidden p-5 pt-10 lg:block">
-        <Link href={"/admin"}>
+        <Link href={"/"}>
           <div className="flex items-center">
             <Image height={50} width={50} src={Logo} alt="Logo" />
             {!isMinimized && (

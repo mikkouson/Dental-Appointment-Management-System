@@ -1,4 +1,5 @@
 "use client";
+
 import React, { ReactNode, useState } from "react";
 import { Sidebar, SidebarBody, SidebarLink } from "./ui/sidebar";
 import {
@@ -18,21 +19,21 @@ import { usePathname } from "next/navigation";
 export const links = [
   {
     label: "Dashboard",
-    href: "/admin",
+    href: "/",
     icon: (
       <IconBrandTabler className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
     ),
   },
   {
     label: "Appointments",
-    href: "/admin/appointments",
+    href: "/appointments",
     icon: (
       <Calendar className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
     ),
   },
   {
     label: "Patients",
-    href: "/admin/patients",
+    href: "/patients",
     icon: (
       <IconUserBolt className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
     ),
@@ -40,21 +41,21 @@ export const links = [
 
   {
     label: "Inventory",
-    href: "/admin/inventory",
+    href: "/inventory",
     icon: (
       <Package className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
     ),
   },
   {
     label: "Services",
-    href: "/admin/services",
+    href: "/services",
     icon: (
       <BriefcaseMedical className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
     ),
   },
   {
     label: "Settings",
-    href: "/admin/settings",
+    href: "/settings",
     icon: (
       <IconSettings className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
     ),
@@ -81,13 +82,13 @@ export function SidebarDemo({ children, ...props }: Props) {
   return (
     <div
       className={cn(
-        "rounded-md flex flex-col md:flex-row bg-gray-100 dark:bg-neutral-800 w-full flex-1 border border-neutral-200 dark:border-neutral-700 overflow-hidden",
-        "h-screen" // for your use case, use `h-screen` instead of `h-[60vh]`
+        "rounded-md flex flex-col md:flex-row bg-gray-100 dark:bg-neutral-800 w-full flex-1 border border-neutral-200 dark:border-neutral-700 overflow-hidden ",
+        "h-screen" // for your use case, use `h-screen` instead of `h-[60vh]`,
       )}
     >
       {/* Sidebar component */}
       <Sidebar open={open} setOpen={setOpen}>
-        <SidebarBody className="justify-between gap-10 md:relative">
+        <SidebarBody className="justify-between gap-10 md:relative ">
           <div
             className={cn(
               "flex flex-col flex-1 overflow-y-auto overflow-x-hidden "
@@ -152,7 +153,7 @@ export function SidebarDemo({ children, ...props }: Props) {
 export const Logos = () => {
   return (
     <Link
-      href="/admin"
+      href="/"
       className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
     >
       <Image
@@ -175,7 +176,7 @@ export const Logos = () => {
 export const LogoIcon = () => {
   return (
     <Link
-      href="/admin"
+      href="/"
       className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
     >
       <Image

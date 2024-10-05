@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { newInventory, newPatient, newService } from "@/app/admin/action";
+import { newInventory, newPatient, newService } from "@/app/(admin)/action";
 import { InventorySchema } from "@/app/types";
 import ServicesFields from "./inventoryField";
 import { toast } from "@/components/hooks/use-toast";

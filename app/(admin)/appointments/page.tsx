@@ -5,8 +5,8 @@ import AppointmentCalendar from "@/components/appointment";
 import { Breadcrumbs } from "@/components/breadcrumb";
 // Breadcrumb items
 const breadcrumbItems = [
-  { title: "Dashboard", link: "/admin" },
-  { title: "Appointments", link: "/admin/appointments" },
+  { title: "Dashboard", link: "/" },
+  { title: "Appointments", link: "/appointments" },
 ];
 export default function Page() {
   return (

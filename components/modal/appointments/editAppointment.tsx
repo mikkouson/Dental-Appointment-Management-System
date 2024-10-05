@@ -16,7 +16,7 @@ import TimeSlot from "../../buttons/selectTime";
 const fetcher = (url: string): Promise<any[]> =>
   fetch(url).then((res) => res.json());
 
-import { rescheduleAppointment } from "@/app/admin/action";
+import { rescheduleAppointment } from "@/app/(admin)/action";
 import { useGetDate } from "@/app/store";
 import {
   Sheet,

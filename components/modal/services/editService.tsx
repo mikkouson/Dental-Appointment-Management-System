@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/sheet";
 import { SquarePen } from "lucide-react";
 import { useEffect, useState } from "react";
-import { updateService } from "@/app/admin/action";
+import { updateService } from "@/app/(admin)/action";
 import useSWR from "swr";
 
 const fetcher = (url: string): Promise<any> =>

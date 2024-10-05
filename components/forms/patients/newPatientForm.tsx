@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { newPatient } from "@/app/admin/action";
+import { newPatient } from "@/app/(admin)/action";
 import { PatientSchema, PatientFormValues } from "@/app/types";
 import PatientFields from "./patientFields";
 import { cn } from "@/lib/utils";
