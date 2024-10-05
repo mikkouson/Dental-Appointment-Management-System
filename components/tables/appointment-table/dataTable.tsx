@@ -148,7 +148,7 @@ export function DataTableDemo({
                     <DeleteModal
                       formAction={() => handleDelete(row.original.id)}
                     />
-                    <EditAppointment appointment={row.original} />
+                    <EditAppointment appointment={row.original} text={false} />
                   </div>
                 </TableCell>
               </TableRow>

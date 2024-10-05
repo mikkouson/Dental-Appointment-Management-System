@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
+import { Button } from "@/components/ui/button";
 import { AppointmentsCol } from "@/app/schema";
 import { AppointmentSchema } from "@/app/types";
 import {
@@ -26,15 +26,14 @@ const fetcher = (url: string): Promise<any> =>
 
 export function EditAppointment({
   appointment,
+  text,
 }: {
   appointment: AppointmentsCol;
+  text: boolean;
 }) {
   const [open, setOpen] = useState(false);
   // Fetch patient data
   const { data: responseData, error } = useSWR("/api/apt/", fetcher);
-
-  // Extract the array of patients from the response data
-  const patients = responseData?.data || [];
 
   useEffect(() => {
     setTimeout(() => (document.body.style.pointerEvents = ""), 0);
@@ -95,10 +94,14 @@ export function EditAppointment({
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <SquarePen
-          className="text-sm w-5 text-[#fde68a] cursor-pointer"
-          onClick={() => set()}
-        />
+        {text ? (
+          <Button onClick={() => set()}>Edit</Button>
+        ) : (
+          <SquarePen
+            className="text-sm w-5 text-[#fde68a] cursor-pointer"
+            onClick={() => set()}
+          />
+        )}
       </SheetTrigger>
       <SheetContent
         className="w-full md:w-[800px] overflow-auto"

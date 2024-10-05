@@ -6,7 +6,6 @@ import type {
   Status,
   TimeSlot,
 } from "@/app/schema";
-import { SheetDemo } from "./modal/appointments/editAppointment";
 import SubmitButton from "./buttons/submitBtn";
 import { Separator } from "./ui/separator";
 import { EditAppointment } from "./modal/appointment/editAppointment";
@@ -81,7 +80,7 @@ export default function AppointmentsMap({
                         </SubmitButton>
                       )}
 
-                      <EditAppointment appointment={apt} />
+                      <EditAppointment appointment={apt} text={true} />
                     </form>
                   </div>
                 ))}
