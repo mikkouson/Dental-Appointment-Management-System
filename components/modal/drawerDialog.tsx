@@ -50,7 +50,7 @@ export function DrawerDialogDemo({
           </Button>
         </DialogTrigger>
         <DialogContent
-          className="sm:max-w-[1000px] "
+          className={"lg:max-w-screen-lg overflow-y-auto max-h-screen"}
           onInteractOutside={(e) => {
             const hasPacContainer = e.composedPath().some((el: EventTarget) => {
               if ("classList" in el) {
@@ -109,7 +109,7 @@ export function DrawerDialogDemo({
             Make changes to your profile here. Click save when youre done.
           </DrawerDescription>
         </DrawerHeader>
-        <ScrollArea className="h-[40rem] w-full ">{children}</ScrollArea>
+        <ScrollArea className="h-[50vh] w-full ">{children}</ScrollArea>
 
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
