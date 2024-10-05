@@ -1,3 +1,4 @@
+"use client";
 import ThemeToggle from "@/components/layout/ThemeToggle/theme-toggle";
 import { cn } from "@/lib/utils";
 import {
@@ -18,51 +19,26 @@ import {
   IconSettings,
   IconUserBolt,
 } from "@tabler/icons-react"; // Assuming ChevronLeft is part of Tabler Icons
-const links = [
-  {
-    label: "Dashboard",
-    href: "#",
-    icon: (
-      <IconBrandTabler className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-    ),
-  },
-  {
-    label: "Profile",
-    href: "#",
-    icon: (
-      <IconUserBolt className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-    ),
-  },
-  {
-    label: "Settings",
-    href: "#",
-    icon: (
-      <IconSettings className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-    ),
-  },
-  {
-    label: "Logout",
-    href: "#",
-    icon: (
-      <IconArrowLeft className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-    ),
-  },
-];
+import { links, LogoIcon, Logos } from "../sidebar";
+import { useState } from "react";
+
 export default function Header() {
+  const [open, setOpen] = useState(false);
+
   return (
     <header>
       <nav className="flex items-center justify-between px-4 py-2 lg:justify-end">
         <div className={cn("block lg:!hidden")}>
           <div>
             {/* Sidebar component */}
-            <Sidebar>
+            <Sidebar open={open} setOpen={setOpen}>
               <MobileBody className="justify-between gap-10 xl:relative">
                 <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-                  {/* {open ? (
-              <Logo /> // Replace with your open state content
-            ) : (
-              <LogoIcon /> // Replace with your closed state content
-            )} */}
+                  {open ? (
+                    <Logos /> // Replace with your open state content
+                  ) : (
+                    <LogoIcon /> // Replace with your closed state content
+                  )}
 
                   <div className="mt-8 flex flex-col gap-2">
                     {links.map((link, idx) => (

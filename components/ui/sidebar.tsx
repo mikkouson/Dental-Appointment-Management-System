@@ -117,40 +117,67 @@ export const MobileSidebar = ({
   ...props
 }: React.ComponentProps<"div">) => {
   const { open, setOpen } = useSidebar();
+  const [showBackdrop, setShowBackdrop] = useState(false);
+
+  const toggleSidebar = () => {
+    setOpen(!open);
+    setShowBackdrop(!showBackdrop);
+  };
+
+  const closeSidebar = () => {
+    setOpen(false);
+    setShowBackdrop(false);
+  };
+
   return (
     <>
       <div
         className={cn(
-          "h-10 px-4 py-4 flex flex-row lg:hidden  items-center justify-between w-full "
+          "h-10 px-4 py-4 flex flex-row lg:hidden items-center justify-between w-full"
         )}
         {...props}
       >
         <div className="flex justify-end z-20 w-full">
-          <IconMenu2 onClick={() => setOpen(!open)} />
+          <IconMenu2 onClick={toggleSidebar} />
         </div>
         <AnimatePresence>
           {open && (
-            <motion.div
-              initial={{ x: "-100%", opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: "-100%", opacity: 0 }}
-              transition={{
-                duration: 0.3,
-                ease: "easeInOut",
-              }}
-              className={cn(
-                "fixed h-full w-full inset-0 bg-white dark:bg-neutral-900 p-10 z-[100] flex flex-col justify-between",
-                className
-              )}
-            >
-              <div
-                className="absolute right-10 top-10 z-50 text-neutral-800 dark:text-neutral-200"
-                onClick={() => setOpen(!open)}
+            <>
+              <motion.div
+                initial={{ x: "-100%", opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: "-100%", opacity: 0 }}
+                transition={{
+                  duration: 0.3,
+                  ease: "easeInOut",
+                }}
+                className={cn(
+                  "fixed h-full w-3/4 md:w-1/2 inset-0 bg-white dark:bg-neutral-900 p-10 z-[100] flex flex-col justify-between",
+                  className
+                )}
               >
-                <IconX />
-              </div>
-              {children}
-            </motion.div>
+                <div
+                  className="absolute right-10 top-10 z-50 text-neutral-800 dark:text-neutral-200 cursor-pointer"
+                  onClick={toggleSidebar}
+                >
+                  <IconX />
+                </div>
+                {children}
+              </motion.div>
+              {showBackdrop && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 0.5 }}
+                  exit={{ opacity: 0 }}
+                  transition={{
+                    duration: 0.3,
+                    ease: "easeInOut",
+                  }}
+                  className="fixed inset-0 bg-black opacity-50 z-50"
+                  onClick={closeSidebar}
+                />
+              )}
+            </>
           )}
         </AnimatePresence>
       </div>
