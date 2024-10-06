@@ -14,11 +14,9 @@ import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/utils/supabase/client";
 import PageContainer from "./layout/page-container";
-import { AppointmentsCol } from "@/app/schema";
-
-import Loading from "@/app/(admin)/appointments/loading";
 const fetcher = (url: string): Promise<any[]> =>
   fetch(url).then((res) => res.json());
+
 const timeSlots = [
   { id: 1, time: "8:00 AM" },
   { id: 2, time: "9:00 AM" },
@@ -55,7 +53,7 @@ export default function AppointmentCalendar() {
   const branch = useGetDate((state) => state.branch);
   const formatDate = moment(date).format("MM/DD/YYYY");
   const statusList = React.useMemo(
-    () => statuses?.map((s: { id: number }) => s.id) || [],
+    () => statuses?.map((s) => s.id) || [],
     [statuses]
   );
 
@@ -65,7 +63,7 @@ export default function AppointmentCalendar() {
     isLoading,
     mutate,
   } = useSWR(
-    `/api/apt?date=${formatDate}&branch=${
+    `/api/appointments?date=${formatDate}&branch=${
       branches && branch !== 0 ? branch : branches ? branches[0]?.id : branch
     }&status=${statusIds.length === 0 ? statusList.join(",") : statusIds}`,
     fetcher
@@ -90,8 +88,10 @@ export default function AppointmentCalendar() {
     };
   }, [supabase, mutate]);
 
-  if (!statuses || !branches) return <Loading />;
+  if (!statuses || !branches) return <>Loading ...</>;
   if (statusesError || branchesError) return <>Error loading data</>;
+
+  if (appointmentsError) return <div>Error loading appointments</div>;
 
   return (
     <PageContainer>
