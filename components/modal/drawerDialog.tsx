@@ -44,7 +44,7 @@ export function DrawerDialogDemo({
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button className="bg-primary">
+          <Button className="bg-primary ">
             <Plus size={20} className="mr-2 " />
             {label}
           </Button>
@@ -81,7 +81,9 @@ export function DrawerDialogDemo({
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button className="bg-primary text-xs p-0 px-2">{label}</Button>
+        <Button className="bg-primary text-xs p-0  sm:text-sm px-2 sm:px-4">
+          {label}
+        </Button>
       </DrawerTrigger>
 
       <DrawerContent

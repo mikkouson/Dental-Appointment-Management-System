@@ -56,7 +56,7 @@ export default function RadioComboBox<T extends DropdownItem>({
                 ? data[0].name
                 : "Select a branch"}
             </span>
-            <ChevronDownIcon className="ml-2 h-4 w-4" />
+            <ChevronDownIcon className="ml-2 h-4 w-4 hidden sm:block" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56">

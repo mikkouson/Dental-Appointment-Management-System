@@ -10,13 +10,16 @@ import { PaginationDemo } from "@/components/pagitnation";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/utils/supabase/client";
-import { Search } from "lucide-react";
+import { Search, Table } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useOptimistic, useState } from "react";
 import useSWR, { preload } from "swr";
 import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
 import { NewPatientForm } from "@/components/forms/patients/newPatientForm";
+import Skeleton from "@/components/skeleton/tableskeleton";
+import TableLoadingSkeleton from "@/components/skeleton/tableskeleton";
+import PatientCardSkeleton from "@/components/skeleton/patientCardSkeleton";
 const fetcher = async (
   url: string
 ): Promise<{
@@ -131,7 +134,7 @@ export default function UserClient() {
         <div className="flex flex-col  xl:flex-row">
           <div className="flex-1">
             {isLoading ? (
-              <p>Loading...</p>
+              <TableLoadingSkeleton />
             ) : data && data.data && data.data.length > 0 ? (
               <>
                 <DataTableDemo
@@ -155,12 +158,14 @@ export default function UserClient() {
             )}
           </div>
           <div className="w-full mt-5 xl:w-1/5 xl:ml-5 xl:mt-0">
-            {data && data.data && data.data.length > 0 && (
+            {data && data.data && data.data.length > 0 ? (
               <PatientCard
                 activePatient={
-                  activePatient == 0 ? data.data[0].id : activePatient
+                  activePatient === 0 ? data.data[0].id : activePatient
                 }
               />
+            ) : (
+              <PatientCardSkeleton />
             )}
           </div>
         </div>

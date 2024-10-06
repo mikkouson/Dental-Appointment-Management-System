@@ -43,8 +43,8 @@ export function PaginationDemo({
   };
 
   return (
-    <div className="flex justify-between items-center mt-4">
-      <div className="flex w-[100px] items-center justify-center text-sm font-medium text-gray-400">
+    <div className="flex flex-col sm:flex-row justify-between items-center mt-4">
+      <div className="flex w-[100px] items-center justify-center text-sm font-medium text-gray-400 mb-2 sm:mb-0">
         Page {currentPage} of {totalPages}
       </div>
       <Pagination>

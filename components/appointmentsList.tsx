@@ -1,6 +1,7 @@
 import { cancelAppointment } from "@/app/(admin)/action";
 import type {
   Appointment,
+  AppointmentsCol,
   Patient,
   Service,
   Status,
@@ -12,11 +13,7 @@ import { EditAppointment } from "./modal/appointment/editAppointment";
 
 interface AppointmentsMapProps {
   timeSlots: TimeSlot[];
-  appointments: (Appointment & {
-    services?: Service;
-    patients?: Patient;
-    status?: Status;
-  })[];
+  appointments: AppointmentsCol[];
 }
 
 export default function AppointmentsMap({

@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AppointmentCalendar from "@/components/appointment";
 import { Breadcrumbs } from "@/components/breadcrumb";
 import { Metadata } from "next";
+import Loading from "./loading";
 export const metadata: Metadata = {
   title: "Lobodent Dental Clinic - Appointments",
 };
@@ -15,7 +16,7 @@ const breadcrumbItems = [
 
 export default function Page() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loading />}>
       <Tabs defaultValue="table">
         <div className="px-4 md:px-8">
           <Breadcrumbs items={breadcrumbItems} />

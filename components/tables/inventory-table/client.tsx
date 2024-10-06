@@ -16,6 +16,7 @@ import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
 import { PaginationDemo } from "@/components/pagitnation";
 import { NewInventoryForm } from "@/components/forms/inventory/newInventoryForm";
+import TableLoadingSkeleton from "@/components/skeleton/tableskeleton";
 
 const fetcher = async (
   url: string
@@ -127,21 +128,18 @@ export default function UserClient() {
           </div>
         </div>
         <Separator />
-        <div className="flex">
-          <div className="flex-1">
+        <div>
+          <div>
             {isLoading ? (
-              <p>Loading...</p>
+              <TableLoadingSkeleton />
             ) : data && data.data ? (
               <>
-                <ScrollArea className="h-[calc(80vh-220px)] rounded-md border md:h-[calc(80dvh-200px)]">
-                  <DataTableDemo
-                    columns={columns}
-                    data={data.data}
-                    mutate={mutate}
-                    activePatient={undefined}
-                  />
-                  <ScrollBar orientation="horizontal" />
-                </ScrollArea>
+                <DataTableDemo
+                  columns={columns}
+                  data={data.data}
+                  mutate={mutate}
+                  activePatient={undefined}
+                />
 
                 <PaginationDemo
                   currentPage={page}

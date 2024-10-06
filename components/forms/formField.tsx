@@ -12,7 +12,8 @@ interface FieldProps {
   defValue?: string;
   num?: boolean;
   age?: boolean;
-  textarea?: boolean; // Add a textarea prop
+  textarea?: boolean;
+  search?: boolean;
 }
 
 export default function Field({
@@ -23,6 +24,7 @@ export default function Field({
   erase = false,
   num = false,
   textarea = false, // Default to false if not provided
+  search = false,
 }: FieldProps) {
   return (
     <FormField
@@ -38,6 +40,7 @@ export default function Field({
               form={form}
               timeclear={erase}
               num={num}
+              text={search}
             />
           ) : textarea ? ( // Render Textarea if textarea prop is true
             <Textarea

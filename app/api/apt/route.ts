@@ -2,6 +2,8 @@ import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
+  const date = req.nextUrl.searchParams.get("date");
+
   const supabase = createClient();
   const pageParam = req.nextUrl.searchParams.get("page");
   const statusParam = req.nextUrl.searchParams.get("status");
@@ -48,6 +50,9 @@ export async function GET(req: NextRequest) {
   }
   if (branch) {
     query = query.eq("branch", branch);
+  }
+  if (date) {
+    query = query.eq("date", date);
   }
 
   // Apply range only if pageParam is provided
