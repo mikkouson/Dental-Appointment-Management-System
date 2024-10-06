@@ -16,6 +16,7 @@ import useSWR from "swr";
 import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
 import { PaginationDemo } from "@/components/pagitnation";
+import TableLoadingSkeleton from "@/components/skeleton/tableskeleton";
 const fetcher = async (
   url: string
 ): Promise<{
@@ -89,7 +90,7 @@ export default function UserClient() {
   // Breadcrumb items
   const breadcrumbItems = [
     { title: "Dashboard", link: "/" },
-    { title: "Inventory", link: "/inventory" },
+    { title: "Services", link: "/services" },
   ];
 
   // Calculate total pages for pagination
@@ -102,10 +103,10 @@ export default function UserClient() {
 
         <div className="flex flex-col 2xl:flex-row lg:items-start lg:justify-between">
           <Heading
-            title={`Total Inventory (${data ? data.count : "loading"})`}
-            description="Manage Inventory (Server side table functionalities.)"
+            title={`Total Services (${data ? data.count : "loading"})`}
+            description="Manage Services (Server side table functionalities.)"
           />
-          <div className="flex justify-end  max-w-full  w-full mt-2 sm:ml-0 ">
+          <div className="flex justify-end  max-w-full  w-full mt-2 sm:ml-0  sm:max-w-full 2xl:max-w-[730px] ">
             <div className="mr-2 relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -126,21 +127,18 @@ export default function UserClient() {
           </div>
         </div>
         <Separator />
-        <div className="flex">
-          <div className="flex-1">
+        <div>
+          <div>
             {isLoading ? (
-              <p>Loading...</p>
+              <TableLoadingSkeleton />
             ) : data && data.data ? (
               <>
-                <ScrollArea className="h-[calc(80vh-220px)] rounded-md border md:h-[calc(80dvh-200px)]">
-                  <DataTableDemo
-                    columns={columns}
-                    data={data.data}
-                    mutate={mutate}
-                    activePatient={undefined}
-                  />
-                  <ScrollBar orientation="horizontal" />
-                </ScrollArea>
+                <DataTableDemo
+                  columns={columns}
+                  data={data.data}
+                  mutate={mutate}
+                  activePatient={undefined}
+                />
 
                 <PaginationDemo
                   currentPage={page}

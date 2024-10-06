@@ -114,6 +114,7 @@ export function NewAppointmentForm({
             label={"Patient"}
             data={patients}
             num={true}
+            search={true}
           />
           <Field
             form={form}

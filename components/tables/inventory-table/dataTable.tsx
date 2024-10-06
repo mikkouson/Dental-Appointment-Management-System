@@ -106,19 +106,21 @@ export function DataTableDemo({
   };
 
   return (
-    <ScrollArea className="h-[calc(80vh-220px)] rounded-md border md:h-[calc(80dvh-200px)]">
+    <ScrollArea className="md:h-[calc(80vh-220px)] rounded-md border">
       <Table className="relative">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
                 <TableHead key={header.id}>
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
+                  {header.isPlaceholder ? null : (
+                    <div className="truncate">
+                      {flexRender(
                         header.column.columnDef.header,
                         header.getContext()
                       )}
+                    </div>
+                  )}
                 </TableHead>
               ))}
               <TableHead>Actions</TableHead>
@@ -138,7 +140,12 @@ export function DataTableDemo({
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    <div className="truncate">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </div>
                   </TableCell>
                 ))}
                 <TableCell>

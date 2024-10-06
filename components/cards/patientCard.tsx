@@ -22,6 +22,8 @@ import StaticMaps from "../staticMap";
 import { ScrollArea } from "../ui/scroll-area";
 import Link from "next/link";
 import moment from "moment";
+import { Skeleton } from "@/components/ui/skeleton";
+import PatientCardSkeleton from "../skeleton/patientCardSkeleton";
 
 const fetcher = async (url: string): Promise<any> => {
   const res = await fetch(url);
@@ -36,8 +38,9 @@ const PatientCard = ({ activePatient }: { activePatient: Number }) => {
     fetcher
   );
 
-  console.log(data);
-  if (isLoading) return <>loading</>;
+  if (isLoading) {
+    return <PatientCardSkeleton />;
+  }
 
   return (
     <Card className="overflow-hidden" x-chunk="dashboard-05-chunk-4">
@@ -103,12 +106,10 @@ const PatientCard = ({ activePatient }: { activePatient: Number }) => {
               <address className="grid gap-0.5 not-italic text-muted-foreground">
                 <span>{data?.address?.address}</span>
               </address>
-              {!isLoading && (
-                <StaticMaps
-                  latitude={data?.address?.latitude}
-                  longitude={data?.address?.longitude}
-                />
-              )}
+              <StaticMaps
+                latitude={data?.address?.latitude}
+                longitude={data?.address?.longitude}
+              />
             </div>
           </div>
           <Separator className="my-4" />

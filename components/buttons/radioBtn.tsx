@@ -1,5 +1,4 @@
 "use client";
-
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { FormControl } from "../ui/form";
@@ -59,6 +58,7 @@ interface RadioBtnProps {
   form?: UseFormReturn<z.infer<typeof FormSchema>>; // Make form optional
   timeclear?: boolean; // Keep timeclear optional
   num?: boolean; // Allow `num` to control type
+  text?: boolean; // Optional prop to control display of search input
 }
 
 export function RadioBtn({
@@ -67,6 +67,7 @@ export function RadioBtn({
   form,
   timeclear = false,
   num = false,
+  text = false, // Default to false if not provided
 }: RadioBtnProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -111,10 +112,12 @@ export function RadioBtn({
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command>
-          <CommandInput
-            placeholder="Search option..."
-            onValueChange={(value) => setSearchQuery(value.toString())}
-          />
+          {text && ( // Conditionally render search input based on `text` prop
+            <CommandInput
+              placeholder="Search option..."
+              onValueChange={(value) => setSearchQuery(value.toString())}
+            />
+          )}
           <CommandList>
             <CommandEmpty>No option found.</CommandEmpty>
             <ScrollArea
