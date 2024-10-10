@@ -20,6 +20,7 @@ import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
 import { CSVLink } from "react-csv";
 import Loading from "@/app/(admin)/appointments/loading";
+import { toast } from "@/components/hooks/use-toast";
 const fetcher = async (url: string) => {
   const res = await fetch(url);
   return res.json();
