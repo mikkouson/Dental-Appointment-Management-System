@@ -1,9 +1,11 @@
 import {
   Body,
+  Button,
   Container,
   Column,
   Head,
   Heading,
+  Hr,
   Html,
   Img,
   Link,
@@ -11,218 +13,162 @@ import {
   Row,
   Section,
   Text,
+  Tailwind,
 } from "@react-email/components";
-const baseUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "";
-
 import * as React from "react";
 
-interface EmailTemplateProps {
+interface DentalAppointmentEmailProps {
   appointmentData: any;
 }
 
-export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
+export const DentalAppointmentEmail = ({
   appointmentData,
-}) => (
-  <Html>
-    <Head />
-    <Preview>Confirm your email address</Preview>
-    <Body style={main}>
-      <Container style={container}>
-        <Section style={logoContainer}>
-          <img
-            src="https://github.com/mikkouson/Dental-Appointment-Management-System/blob/main/images/logo.png?raw=true"
-            width="120"
-            height="36"
-            alt="Logo"
-          />
-        </Section>
-        <Heading style={h1}>Confirm your email address</Heading>
-        <Text style={heroText}>
-          Your confirmation code is below - enter it in your open browser window
-          and we'll help you get signed in.
-        </Text>
+}: DentalAppointmentEmailProps) => {
+  const previewText = `Your dental application has been approved.`;
 
-        <Section style={codeBox}>
-          <Text style={confirmationCodeText}>asdasdq</Text>
-        </Section>
+  return (
+    <Html>
+      <Head />
+      <Preview>{previewText}</Preview>
+      <Tailwind>
+        <Body className="bg-white my-auto mx-auto font-sans px-6">
+          <Container className="border border-solid border-gray-300 rounded my-[40px] mx-auto p-[40px] max-w-[700px]">
+            {/* Logo */}
+            <Section className="text-center">
+              <Img
+                src={
+                  "https://scontent.fpag2-1.fna.fbcdn.net/v/t39.30808-6/372982805_277309235049873_634404805512807765_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeF0OqUbhPySIINyy245U74LHEJ4EZGwXwMcQngRkbBfAz791wG9ovFGHs8totzlrR0Wgj8nf7BhdtJFQVWj4GPX&_nc_ohc=uYACGUPadNoQ7kNvgGLNcpa&_nc_ht=scontent.fpag2-1.fna&_nc_gid=AVzaZOWIEGZGzq4MDZ7e8n_&oh=00_AYDbWugqRee3QbhGTE9NwEO0v_O8D6Mb8jnuakjLyDmuIA&oe=670E691B"
+                }
+                width="150"
+                height="150"
+                alt="Vercel"
+                className="my-0 mx-auto"
+              />
+            </Section>
 
-        <Text style={text}>
-          If you didn't request this email, there's nothing to worry about, you
-          can safely ignore it.
-        </Text>
+            {/* Approval */}
+            <Section className="text-center mt-[20px] mb-[20px]">
+              <Heading className="text-[24px] font-semibold m-0">
+                Your dental application has been approved.
+              </Heading>
+              <Text className="mt-2 text-gray-700 m-0">
+                Please take note of your ticket number below:
+              </Text>
+              <Heading
+                className="
+    text-[28px] font-bold  mt-4 p-[20px] 
+    bg-black/5 rounded-md mx-auto mb-[14px] 
+    align-middle w-[280px]
+  "
+              >
+                {appointmentData.appointment_ticket}
+              </Heading>
+            </Section>
 
-        <Section>
-          <Row style={footerLogos}>
-            <Column style={{ width: "66%" }}>
-              <Img src={`logo.png`} width="120" height="36" alt="Slack" />
-            </Column>
-            <Column>
-              <Section>
-                <Row>
-                  <Column>
-                    <Link href="/">
-                      {/* <Img
-                        src={`${baseUrl}/static/slack-twitter.png`}
-                        width="32"
-                        height="32"
-                        alt="Slack"
-                        style={socialMediaIcon}
-                      /> */}
-                    </Link>
-                  </Column>
-                  <Column>
-                    <Link href="/">
-                      {/* <Img
-                        src={`${baseUrl}/static/slack-facebook.png`}
-                        width="32"
-                        height="32"
-                        alt="Slack"
-                        style={socialMediaIcon}
-                      /> */}
-                    </Link>
-                  </Column>
-                  <Column>
-                    <Link href="/">
-                      {/* <Img
-                        src={`${baseUrl}/static/slack-linkedin.png`}
-                        width="32"
-                        height="32"
-                        alt="Slack"
-                        style={socialMediaIcon}
-                      /> */}
-                    </Link>
-                  </Column>
-                </Row>
-              </Section>
-            </Column>
-          </Row>
-        </Section>
+            {/* Appointment Details */}
+            <Hr className="border-gray-300 my-6" />
+            <Section>
+              <Text className="text-gray-700 font-semibold m-0 text-center">
+                Appointment Request Details
+              </Text>
+              <Row className="flex justify-between mt-2">
+                <Column className="flex-1">
+                  <Text className="m-0 mr-[70px] font-bold">Name:</Text>
+                </Column>
+                <Column className="flex-1 text-right text-gray-500">
+                  <Text className="m-0">{appointmentData.patients.name}</Text>
+                </Column>
+              </Row>
 
-        <Section>
-          <Link
-            style={footerLink}
-            href="https://slackhq.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Our blog
-          </Link>
-          &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-          <Link
-            style={footerLink}
-            href="https://slack.com/legal"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Policies
-          </Link>
-          &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-          <Link
-            style={footerLink}
-            href="https://slack.com/help"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Help center
-          </Link>
-          &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-          <Link
-            style={footerLink}
-            href="https://slack.com/community"
-            target="_blank"
-            rel="noopener noreferrer"
-            data-auth="NotApplicable"
-            data-linkindex="6"
-          >
-            Slack Community
-          </Link>
-          <Text style={footerText}>
-            ©2022 Slack Technologies, LLC, a Salesforce company. <br />
-            500 Howard Street, San Francisco, CA 94105, USA <br />
-            <br />
-            All rights reserved.
-          </Text>
-        </Section>
-      </Container>
-    </Body>
-  </Html>
-);
+              <Row className="flex justify-between mt-2">
+                <Column>
+                  <Text className="m-0 mr-6 font-bold">Date of birth:</Text>
+                </Column>
+                <Column className="flex-1 text-right text-gray-500">
+                  <Text className="m-0">{appointmentData.dob}</Text>
+                </Column>
+              </Row>
 
-export default EmailTemplate;
+              <Row className="flex justify-between mt-2">
+                <Column>
+                  <Text className="m-0 mr-[74px] font-bold">Email:</Text>
+                </Column>
+                <Column className="flex-1 text-right text-gray-500">
+                  <Text className="m-0">{appointmentData.patients.email}</Text>
+                </Column>
+              </Row>
 
-const footerText = {
-  fontSize: "12px",
-  color: "#b7b7b7",
-  lineHeight: "15px",
-  textAlign: "left" as const,
-  marginBottom: "50px",
+              <Row className="flex justify-between mt-2">
+                <Column>
+                  <Text className="m-0 mr-2 font-bold">Phone Number:</Text>
+                </Column>
+                <Column className="flex-1 text-right text-gray-500">
+                  <Text className="m-0">
+                    {appointmentData.patients.phone_number}
+                  </Text>
+                </Column>
+              </Row>
+
+              <Row className="flex justify-between mt-2">
+                <Column>
+                  <Text className="m-0 mr-5 font-bold">Clinic Branch:</Text>
+                </Column>
+                <Column className="flex-1 text-right text-gray-500">
+                  <Text className="m-0">{appointmentData.branch.name}</Text>
+                </Column>
+              </Row>
+
+              <Row className="flex justify-between mt-2">
+                <Column>
+                  <Text className="m-0 mr-[79px] font-bold">Date:</Text>
+                </Column>
+                <Column className="flex-1 text-right text-gray-500">
+                  <Text className="m-0">{appointmentData.date}</Text>
+                </Column>
+              </Row>
+
+              <Row className="flex justify-between mt-2">
+                <Column>
+                  <Text className="m-0 mr-[77px] font-bold">Time:</Text>
+                </Column>
+                <Column className="flex-1 text-right text-gray-500">
+                  <Text className="m-0">{appointmentData.time_slots.time}</Text>
+                </Column>
+              </Row>
+
+              <Row className="flex justify-between mt-2">
+                <Column>
+                  <Text className="m-0 mr-8 font-bold">Request for:</Text>
+                </Column>
+                <Column className="flex-1 text-right text-gray-500">
+                  <Text className="m-0">{appointmentData.services.name}</Text>
+                </Column>
+              </Row>
+            </Section>
+
+            {/* Manage Appointment Button */}
+            <Section className="text-center mt-8">
+              <Text className="text-gray-500 text-sm m-0">
+                IMPORTANT REMINDER: Please come one hour before the scheduled
+                time.
+              </Text>
+              <Button
+                className="bg-blue-600 rounded text-white text-[14px] font-semibold no-underline text-center px-5 py-3 mt-4"
+                href="#"
+              >
+                Manage Appointment
+              </Button>
+            </Section>
+
+            <Hr className="border-gray-300 my-6" />
+            <Text className="text-gray-500 text-xs text-center m-0">
+              *This is an automatically generated email* DO NOT REPLY
+            </Text>
+          </Container>
+        </Body>
+      </Tailwind>
+    </Html>
+  );
 };
 
-const footerLink = {
-  color: "#b7b7b7",
-  textDecoration: "underline",
-};
-
-const footerLogos = {
-  marginBottom: "32px",
-  paddingLeft: "8px",
-  paddingRight: "8px",
-  width: "100%",
-};
-
-const socialMediaIcon = {
-  display: "inline",
-  marginLeft: "32px",
-};
-
-const main = {
-  backgroundColor: "#ffffff",
-  margin: "0 auto",
-  fontFamily:
-    "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
-};
-
-const container = {
-  margin: "0 auto",
-  padding: "0px 20px",
-};
-
-const logoContainer = {
-  marginTop: "32px",
-};
-
-const h1 = {
-  color: "#1d1c1d",
-  fontSize: "36px",
-  fontWeight: "700",
-  margin: "30px 0",
-  padding: "0",
-  lineHeight: "42px",
-};
-
-const heroText = {
-  fontSize: "20px",
-  lineHeight: "28px",
-  marginBottom: "30px",
-};
-
-const codeBox = {
-  background: "rgb(245, 244, 245)",
-  borderRadius: "4px",
-  marginBottom: "30px",
-  padding: "40px 10px",
-};
-
-const confirmationCodeText = {
-  fontSize: "30px",
-  textAlign: "center" as const,
-  verticalAlign: "middle",
-};
-
-const text = {
-  color: "#000",
-  fontSize: "14px",
-  lineHeight: "24px",
-};
+export default DentalAppointmentEmail;

@@ -6,7 +6,7 @@ import {
   ServiceFormValues,
   ServiceSchema,
 } from "@/app/types";
-import EmailTemplate from "@/components/emailTemplates/newAppointment";
+import DentalAppointmentEmail from "@/components/emailTemplates/newAppointment";
 import { createClient } from "@/utils/supabase/server";
 import moment from "moment";
 import { revalidatePath } from "next/cache";
@@ -52,6 +52,95 @@ export async function cancelAppointment({ aptId }: AppointmentActionProps) {
   await supabase.from("appointments").update({ status: 3 }).eq("id", aptId);
 
   revalidatePath("/");
+  redirect("/appointments");
+}
+
+export async function acceptAppointment({ aptId }: AppointmentActionProps) {
+  const supabase = createClient();
+  const otpGenerator = require("otp-generator");
+
+  try {
+    // Generate a 6-digit appointment ticket
+    const appointmentTicket = otpGenerator.generate(6, {
+      upperCaseAlphabets: false,
+      specialChars: false,
+    });
+
+    // Combine status and appointment_ticket updates in one query
+    const { data: appointmentData, error: updateError } = await supabase
+      .from("appointments")
+      .update({
+        status: 1, // Accept the appointment (status 1)
+        appointment_ticket: appointmentTicket, // Add the generated appointment ticket
+      })
+      .eq("id", aptId)
+      .select(
+        `
+        *,
+        patients (
+          *
+        ),
+        services (
+          *
+        ),
+        time_slots (
+          *
+        ),
+        status (
+          *
+        ),
+        branch (
+          *
+        )
+      `
+      )
+      .single();
+
+    if (updateError) {
+      throw new Error(`Error updating appointment: ${updateError.message}`);
+    }
+
+    // Extract patient email from the related patient data
+    const patientEmail = appointmentData.patients?.email;
+
+    if (!patientEmail) {
+      throw new Error(
+        "No email found for the patient associated with this appointment."
+      );
+    }
+
+    // Send the confirmation email using the retrieved appointment data
+    const emailResponse = await resend.emails.send({
+      from: "Appointment@email.lobodentdentalclinic.online",
+      to: [patientEmail], // Send to the patient's email
+      subject: "Appointment Confirmation",
+      react: DentalAppointmentEmail({
+        appointmentData, // Pass the newly updated appointment with related data
+      }) as React.ReactElement, // Ensure this matches your email service's expected format
+    });
+
+    // Check if the email was sent successfully
+    if (emailResponse.error) {
+      throw new Error(
+        `Error sending confirmation email: ${emailResponse.error.message}`
+      );
+    }
+
+    console.log(
+      "Appointment created successfully with ticket:",
+      appointmentTicket,
+      "and confirmation email sent to:",
+      patientEmail
+    );
+
+    // Revalidate the path to update the cache
+    revalidatePath("/");
+  } catch (error) {
+    // Catch any errors that occur during the process and log them
+    console.error("An error occurred during appointment acceptance:", error);
+  }
+
+  // Redirect after all the async operations are complete
   redirect("/appointments");
 }
 
@@ -101,106 +190,32 @@ export async function rescheduleAppointment(data: Inputs) {
   redirect("/appointments");
 }
 
-export async function newApp(inputData: Inputs) {
-  // Validate the input data
-  const result = schema.safeParse(inputData);
+export async function newApp(data: Inputs) {
+  const result = schema.safeParse(data);
 
   if (!result.success) {
     console.log("Validation errors:", result.error.format());
     return;
   }
 
-  const supabase = createClient(); // Add Supabase client initialization params if needed
-  const otpGenerator = require("otp-generator");
+  const supabase = createClient();
 
-  // Generate a 6-digit appointment ticket
-  const appointmentTicket = otpGenerator.generate(6, {
-    upperCaseAlphabets: false,
-    specialChars: false,
-  });
+  const { error } = await supabase.from("appointments").insert([
+    {
+      patient_id: data.id,
+      service: data.service,
+      branch: data.branch,
+      date: moment(data.date).format("MM/DD/YYYY"),
+      time: data.time,
+      status: data.status,
+      type: data.type,
+    },
+  ]);
 
-  try {
-    // Insert the appointment data into the "appointments" table and retrieve the inserted appointment with related data
-    const { data: appointmentData, error: dbError } = await supabase
-      .from("appointments")
-      .insert([
-        {
-          patient_id: inputData.id,
-          service: inputData.service,
-          branch: inputData.branch,
-          date: moment(inputData.date).format("MM/DD/YYYY"),
-          time: inputData.time,
-          status: inputData.status,
-          type: inputData.type,
-          appointment_ticket: appointmentTicket,
-        },
-      ])
-      .select(
-        `
-        *,
-        patients (
-          *
-        ),
-        services (
-          *
-        ),
-        time_slots (
-          *
-        ),
-        status (
-          *
-        )
-      `
-      )
-      .single(); // Ensure only a single row is returned
-
-    if (dbError) {
-      console.error("Error inserting appointment data:", dbError.message);
-      return;
-    }
-
-    if (!appointmentData) {
-      console.error("No appointment data returned after insertion.");
-      return;
-    }
-
-    // Extract patient email from the related patient data
-    const patientEmail = appointmentData.patients?.email;
-
-    if (!patientEmail) {
-      console.error(
-        "No email found for the patient associated with this appointment."
-      );
-      return;
-    }
-
-    // Send the confirmation email using the retrieved appointment data
-    const emailResponse = await resend.emails.send({
-      from: "Appointment@email.lobodentdentalclinic.online",
-      to: [patientEmail], // Send to the patient's email
-      subject: "Appointment Confirmation",
-      react: EmailTemplate({
-        appointmentData, // Pass the newly created appointment with related data
-      }) as React.ReactElement, // Ensure this matches your email service's expected format
-    });
-
-    // Check if the email was sent successfully
-    if (emailResponse.error) {
-      console.error(
-        "Error sending confirmation email:",
-        emailResponse.error.message
-      );
-      return;
-    }
-
-    console.log(
-      "Appointment created successfully with ticket:",
-      appointmentTicket,
-      "and confirmation email sent to:",
-      patientEmail
-    );
-  } catch (error) {
-    console.error("An unexpected error occurred:", error);
+  if (error) {
+    console.error("Error inserting data:", error.message);
+  } else {
+    console.log("Data inserted successfully");
   }
 }
 
