@@ -21,7 +21,6 @@ import { DataTableDemo } from "./dataTable";
 import { CSVLink } from "react-csv";
 import Loading from "@/app/(admin)/appointments/loading";
 import { toast } from "@/components/hooks/use-toast";
-import { cancelAppointment } from "@/app/(admin)/action";
 import SubmitButton from "@/components/buttons/submitBtn";
 const fetcher = async (url: string) => {
   const res = await fetch(url);
@@ -146,19 +145,6 @@ export default function UserClient() {
     <PageContainer>
       <div className="space-y-4">
         <div className="flex flex-col 2xl:flex-row lg:items-start lg:justify-between">
-          <SubmitButton
-            className="bg-red-500 text-white px-3 py-1 rounded transition text-sm md:text-base"
-            formAction={async () => {
-              try {
-                await cancelAppointment({ aptId: 78 });
-              } catch (error) {
-                console.error("Failed to cancel appointment", error);
-              }
-            }}
-            pendingText="Cancelling..."
-          >
-            Cancel
-          </SubmitButton>
           <Heading
             title={`Total Appointments (${data ? data.count : "Loading"})`}
             description="Manage Inventory (Server side table functionalities.)"

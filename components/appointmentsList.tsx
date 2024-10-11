@@ -1,4 +1,8 @@
-import { acceptAppointment, cancelAppointment } from "@/app/(admin)/action";
+import {
+  acceptAppointment,
+  cancelAppointment,
+  rejectAppointment,
+} from "@/app/(admin)/action";
 import type {
   Appointment,
   AppointmentsCol,
@@ -58,8 +62,8 @@ export default function AppointmentsMap({
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center space-x-2 mt-3 md:mt-0">
-                      <form>
+                    <div className="flex flex-wrap items-center space-x-2 mt-3 md:mt-0 just">
+                      <form className="items-center flex">
                         {apt.status?.id === 1 && (
                           <SubmitButton
                             className="bg-red-500 text-white px-3 py-1 rounded mr-2"
@@ -79,22 +83,40 @@ export default function AppointmentsMap({
                           </SubmitButton>
                         )}
                         {apt.status?.id === 2 && (
-                          <SubmitButton
-                            className="bg-green-500 text-white px-3 py-1 rounded mr-2"
-                            formAction={async () => {
-                              try {
-                                await acceptAppointment({ aptId: apt.id });
-                              } catch (error) {
-                                console.error(
-                                  "Failed to cancel appointment",
-                                  error
-                                );
-                              }
-                            }}
-                            pendingText="Accepting..."
-                          >
-                            Accept
-                          </SubmitButton>
+                          <>
+                            <SubmitButton
+                              className="bg-green-500 text-white px-3 py-1 rounded mr-2"
+                              formAction={async () => {
+                                try {
+                                  await acceptAppointment({ aptId: apt.id });
+                                } catch (error) {
+                                  console.error(
+                                    "Failed to accept appointment",
+                                    error
+                                  );
+                                }
+                              }}
+                              pendingText="Accepting..."
+                            >
+                              Accept
+                            </SubmitButton>
+                            <SubmitButton
+                              className="bg-red-500 text-white px-3 py-1 rounded mr-2"
+                              formAction={async () => {
+                                try {
+                                  await rejectAppointment({ aptId: apt.id });
+                                } catch (error) {
+                                  console.error(
+                                    "Failed to reject appointment",
+                                    error
+                                  );
+                                }
+                              }}
+                              pendingText="Rejecting..."
+                            >
+                              Reject
+                            </SubmitButton>
+                          </>
                         )}
 
                         <EditAppointment appointment={apt} text={true} />
