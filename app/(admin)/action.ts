@@ -6,6 +6,7 @@ import {
   ServiceFormValues,
   ServiceSchema,
 } from "@/app/types";
+import DentalAppointmentCancellationEmail from "@/components/emailTemplates/cancelAppointment";
 import DentalAppointmentEmail from "@/components/emailTemplates/newAppointment";
 import DentalAppointmentRejectionEmail from "@/components/emailTemplates/rejectAppointment";
 import { createClient } from "@/utils/supabase/server";
@@ -46,100 +47,141 @@ const schema = z.object({
 type Inputs = z.infer<typeof schema>;
 
 type patientInput = z.infer<typeof PatientSchema>;
+export async function acceptAppointment({ aptId }: AppointmentActionProps) {
+  const supabase = createClient();
+  const otpGenerator = require("otp-generator");
+  // Generate a 6-digit appointment ticket
+  const appointmentTicket = otpGenerator.generate(6, {
+    upperCaseAlphabets: false,
+    specialChars: false,
+  });
+
+  // Combine status and appointment_ticket updates in one query
+  const { data: appointmentData, error: updateError } = await supabase
+    .from("appointments")
+    .update({
+      status: 1, // Accept the appointment (status 1)
+      appointment_ticket: appointmentTicket, // Add the generated appointment ticket
+    })
+    .eq("id", aptId)
+    .select(
+      `
+      *,
+      patients (
+        *
+      ),
+      services (
+        *
+      ),
+      time_slots (
+        *
+      ),
+      status (
+        *
+      ),
+      branch (
+        *
+      )
+    `
+    )
+    .single();
+
+  if (updateError) {
+    throw new Error(`Error updating appointment: ${updateError.message}`);
+  }
+
+  // Extract patient email from the related patient data
+  const patientEmail = appointmentData.patients?.email;
+
+  if (!patientEmail) {
+    throw new Error(
+      "No email found for the patient associated with this appointment."
+    );
+  }
+
+  // Send the confirmation email using the retrieved appointment data
+  const emailResponse = await resend.emails.send({
+    from: "Appointment@email.lobodentdentalclinic.online",
+    to: [patientEmail], // Send to the patient's email
+    subject: "Appointment Confirmation",
+    react: DentalAppointmentEmail({
+      appointmentData, // Pass the newly updated appointment with related data
+    }) as React.ReactElement, // Ensure this matches your email service's expected format
+  });
+
+  // Check if the email was sent successfully
+  if (emailResponse.error) {
+    throw new Error(
+      `Error sending confirmation email: ${emailResponse.error.message}`
+    );
+  }
+
+  console.log(
+    "Appointment created successfully with ticket:",
+    appointmentTicket,
+    "and confirmation email sent to:",
+    patientEmail
+  );
+
+  // Revalidate the path to update the cache
+  revalidatePath("/");
+
+  // Redirect after all the async operations are complete
+  redirect("/appointments");
+}
 
 export async function cancelAppointment({ aptId }: AppointmentActionProps) {
   const supabase = createClient();
 
-  await supabase.from("appointments").update({ status: 3 }).eq("id", aptId);
-
-  revalidatePath("/");
-  redirect("/appointments");
-}
-
-export async function acceptAppointment({ aptId }: AppointmentActionProps) {
-  const supabase = createClient();
-  const otpGenerator = require("otp-generator");
-
-  try {
-    // Generate a 6-digit appointment ticket
-    const appointmentTicket = otpGenerator.generate(6, {
-      upperCaseAlphabets: false,
-      specialChars: false,
-    });
-
-    // Combine status and appointment_ticket updates in one query
-    const { data: appointmentData, error: updateError } = await supabase
-      .from("appointments")
-      .update({
-        status: 1, // Accept the appointment (status 1)
-        appointment_ticket: appointmentTicket, // Add the generated appointment ticket
-      })
-      .eq("id", aptId)
-      .select(
-        `
+  // Combine status and appointment_ticket updates in one query
+  const { data: appointmentData, error: updateError } = await supabase
+    .from("appointments")
+    .update({
+      status: 3,
+    })
+    .eq("id", aptId)
+    .select(
+      `
         *,
         patients (
           *
-        ),
-        services (
-          *
-        ),
-        time_slots (
-          *
-        ),
-        status (
-          *
-        ),
-        branch (
-          *
         )
       `
-      )
-      .single();
+    )
+    .single();
 
-    if (updateError) {
-      throw new Error(`Error updating appointment: ${updateError.message}`);
-    }
-
-    // Extract patient email from the related patient data
-    const patientEmail = appointmentData.patients?.email;
-
-    if (!patientEmail) {
-      throw new Error(
-        "No email found for the patient associated with this appointment."
-      );
-    }
-
-    // Send the confirmation email using the retrieved appointment data
-    const emailResponse = await resend.emails.send({
-      from: "Appointment@email.lobodentdentalclinic.online",
-      to: [patientEmail], // Send to the patient's email
-      subject: "Appointment Confirmation",
-      react: DentalAppointmentEmail({
-        appointmentData, // Pass the newly updated appointment with related data
-      }) as React.ReactElement, // Ensure this matches your email service's expected format
-    });
-
-    // Check if the email was sent successfully
-    if (emailResponse.error) {
-      throw new Error(
-        `Error sending confirmation email: ${emailResponse.error.message}`
-      );
-    }
-
-    console.log(
-      "Appointment created successfully with ticket:",
-      appointmentTicket,
-      "and confirmation email sent to:",
-      patientEmail
-    );
-
-    // Revalidate the path to update the cache
-    revalidatePath("/");
-  } catch (error) {
-    // Catch any errors that occur during the process and log them
-    console.error("An error occurred during appointment acceptance:", error);
+  if (updateError) {
+    throw new Error(`Error updating appointment: ${updateError.message}`);
   }
+
+  // Extract patient email from the related patient data
+  const patientEmail = appointmentData.patients?.email;
+  console.log("Appointment cancellation email sent to:", patientEmail);
+  if (!patientEmail) {
+    throw new Error(
+      "No email found for the patient associated with this appointment."
+    );
+  }
+
+  // Send the confirmation email using the retrieved appointment data
+  const emailResponse = await resend.emails.send({
+    from: "Appointment@email.lobodentdentalclinic.online",
+    to: [patientEmail], // Send to the patient's email
+    subject: "Appointment Cancelled",
+    react: DentalAppointmentCancellationEmail() as React.ReactElement, // Ensure this matches your email service's expected format
+  });
+
+  // Check if the email was sent successfully
+  if (emailResponse.error) {
+    throw new Error(
+      `Error sending confirmation email: ${emailResponse.error.message}`
+    );
+  }
+
+  console.log("and confirmation email sent to:", patientEmail);
+
+  // Revalidate the path to update the cache
+  revalidatePath("/");
 
   // Redirect after all the async operations are complete
   redirect("/appointments");
@@ -194,7 +236,7 @@ export async function rejectAppointment({ aptId }: AppointmentActionProps) {
       );
     }
 
-    console.log("and confirmation email sent to:", patientEmail);
+    console.log("Appointment rejection email sent to:", patientEmail);
 
     // Revalidate the path to update the cache
     revalidatePath("/");
@@ -225,6 +267,10 @@ export async function rescheduleAppointment(data: Inputs) {
     console.log("Validation errors:", result.error.format());
     return;
   }
+  if (data.id === undefined) {
+    console.error("Appointment ID is missing or undefined.");
+    return;
+  }
   const supabase = createClient();
   const formattedDate = moment
     .utc(data.date)
@@ -246,6 +292,23 @@ export async function rescheduleAppointment(data: Inputs) {
   if (error) {
     console.error("Error updating appointment:", error.message);
     return;
+  }
+  // Call the appropriate action based on the updated status
+  switch (data.status) {
+    case 1: // Accepted
+      console.log("Calling acceptAppointment");
+      await acceptAppointment({ aptId: data.id });
+      break;
+    case 3: // Cancelled
+      console.log("Calling cancelAppointment");
+      await cancelAppointment({ aptId: data.id });
+      break;
+    case 5: // Rejected
+      console.log("Calling rejectAppointment");
+      await rejectAppointment({ aptId: data.id });
+      break;
+    default:
+      console.log("No additional actions required for status:", data.status);
   }
 
   revalidatePath("/");
