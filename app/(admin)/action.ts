@@ -271,7 +271,24 @@ export async function rescheduleAppointment(data: Inputs) {
     console.error("Appointment ID is missing or undefined.");
     return;
   }
+
   const supabase = createClient();
+
+  // Fetch the existing appointment to check if status has changed
+  const { data: existingAppointment, error: fetchError } = await supabase
+    .from("appointments")
+    .select("status")
+    .eq("id", data.id)
+    .single();
+
+  if (fetchError) {
+    console.error("Error fetching existing appointment:", fetchError.message);
+    return;
+  }
+
+  // Check if status has changed
+  const statusChanged = existingAppointment.status !== data.status;
+
   const formattedDate = moment
     .utc(data.date)
     .add(8, "hours")
@@ -293,24 +310,30 @@ export async function rescheduleAppointment(data: Inputs) {
     console.error("Error updating appointment:", error.message);
     return;
   }
-  // Call the appropriate action based on the updated status
-  switch (data.status) {
-    case 1: // Accepted
-      console.log("Calling acceptAppointment");
-      await acceptAppointment({ aptId: data.id });
-      break;
-    case 3: // Cancelled
-      console.log("Calling cancelAppointment");
-      await cancelAppointment({ aptId: data.id });
-      break;
-    case 5: // Rejected
-      console.log("Calling rejectAppointment");
-      await rejectAppointment({ aptId: data.id });
-      break;
-    default:
-      console.log("No additional actions required for status:", data.status);
+
+  // If status has changed, proceed to call the appropriate function
+  if (statusChanged) {
+    switch (data.status) {
+      case 1: // Accepted
+        console.log("Calling acceptAppointment");
+        await acceptAppointment({ aptId: data.id });
+        break;
+      case 3: // Cancelled
+        console.log("Calling cancelAppointment");
+        await cancelAppointment({ aptId: data.id });
+        break;
+      case 5: // Rejected
+        console.log("Calling rejectAppointment");
+        await rejectAppointment({ aptId: data.id });
+        break;
+      default:
+        console.log("No additional actions required for status:", data.status);
+    }
+  } else {
+    console.log("Status has not changed, no further actions required.");
   }
 
+  // Revalidate the path and redirect
   revalidatePath("/");
   redirect("/appointments");
 }
