@@ -110,7 +110,7 @@ export function RadioBtn({
           </Button>
         </FormControl>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
+      <PopoverContent className=" p-0 popover-content-width-same-as-its-trigger">
         <Command>
           {text && ( // Conditionally render search input based on `text` prop
             <CommandInput

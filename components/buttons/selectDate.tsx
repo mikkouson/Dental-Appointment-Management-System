@@ -84,7 +84,10 @@ export function CalendarForm({
           </Button>
         </FormControl>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent
+        className="w-auto p-0 popover-content-width-same-as-its-trigger"
+        align="start"
+      >
         <Calendar
           mode="single"
           selected={field.value ?? undefined}

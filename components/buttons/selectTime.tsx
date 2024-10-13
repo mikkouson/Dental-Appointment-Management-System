@@ -77,7 +77,7 @@ export default function TimeSlot({ branch, field, date }: TimeSlotProps) {
           </Button>
         </FormControl>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
+      <PopoverContent className=" p-0 popover-content-width-same-as-its-trigger">
         <Command>
           <CommandList>
             <CommandEmpty>No time slots available.</CommandEmpty>
