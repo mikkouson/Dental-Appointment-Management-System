@@ -53,12 +53,12 @@ const FormSchema = z.object({
 const fetcher = (url: string): Promise<any[]> =>
   fetch(url).then((res) => res.json());
 
-const type = [
-  { name: "Pending", id: "2" },
-  { name: "Completed", id: "4" },
+const statuses = [
+  { name: "Pending", id: 2 },
+  { name: "Completed", id: 4 },
 ] as const;
 
-const statuses = [
+const type = [
   { name: "Walk in", id: "walk in" },
   { name: "Phone Call", id: "phone call" },
 ] as const;
@@ -79,7 +79,7 @@ export function NewAppointmentForm({ setOpen, mutate }: NewServiceFormProps) {
 
     try {
       await newApp(formData); // Make sure this function returns a promise
-      setOpen(false); // Close the modal
+      // setOpen(false); // Close the modal
 
       toast({
         className: cn(
@@ -87,6 +87,7 @@ export function NewAppointmentForm({ setOpen, mutate }: NewServiceFormProps) {
         ),
         variant: "success",
         description: "Service added successfully.",
+        duration: 2000,
       });
       mutate(); // Revalidate to ensure data consistency
     } catch (error: any) {

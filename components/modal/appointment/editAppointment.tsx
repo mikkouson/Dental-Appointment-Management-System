@@ -27,9 +27,11 @@ const fetcher = (url: string): Promise<any> =>
 export function EditAppointment({
   appointment,
   text,
+  disabled,
 }: {
   appointment: AppointmentsCol;
   text: boolean;
+  disabled: boolean;
 }) {
   const [open, setOpen] = useState(false);
   // Fetch patient data
@@ -95,7 +97,9 @@ export function EditAppointment({
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         {text ? (
-          <Button onClick={() => set()}>Edit</Button>
+          <Button disabled={disabled} onClick={() => set()}>
+            Edit
+          </Button>
         ) : (
           <SquarePen
             className="text-sm w-5 text-[#fde68a] cursor-pointer"

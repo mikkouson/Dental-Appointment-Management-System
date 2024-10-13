@@ -96,6 +96,7 @@ export function DataTableDemo({
         ),
         variant: "success",
         description: "Appointment deleted successfully.",
+        duration: 2000,
       });
     } catch (error: any) {
       toast({
@@ -103,6 +104,7 @@ export function DataTableDemo({
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         description: `Failed to delete the patient: ${error.message}`,
+        duration: 2000,
       });
     }
   };
@@ -155,7 +157,11 @@ export function DataTableDemo({
                     <DeleteModal
                       formAction={() => handleDelete(row.original.id)}
                     />
-                    <EditAppointment appointment={row.original} text={false} />
+                    <EditAppointment
+                      appointment={row.original}
+                      text={false}
+                      disabled={false}
+                    />
                   </div>
                 </TableCell>
               </TableRow>

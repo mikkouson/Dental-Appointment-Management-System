@@ -415,22 +415,32 @@ export async function newApp(data: Inputs) {
 
   const supabase = createClient();
 
-  const { error } = await supabase.from("appointments").insert([
-    {
-      patient_id: data.id,
-      service: data.service,
-      branch: data.branch,
-      date: moment(data.date).format("MM/DD/YYYY"),
-      time: data.time,
-      status: data.status,
-      type: data.type,
-    },
-  ]);
+  const { error, data: newAppointmentData } = await supabase
+    .from("appointments")
+    .insert([
+      {
+        patient_id: data.id,
+        service: data.service,
+        branch: data.branch,
+        date: moment(data.date).format("MM/DD/YYYY"),
+        time: data.time,
+        status: data.status,
+        type: data.type,
+      },
+    ])
+    .select("id")
+    .single(); // Fetch the inserted appointment data with its ID
 
   if (error) {
     console.error("Error inserting data:", error.message);
-  } else {
-    console.log("Data inserted successfully");
+    return;
+  }
+
+  console.log("Data inserted successfully");
+
+  // If the status is 2 (pending), call the pendingAppointment function
+  if (data.status === 2 && newAppointmentData) {
+    await pendingAppointment({ aptId: newAppointmentData.id });
   }
 }
 

@@ -34,6 +34,7 @@ export function NewPatientForm({ setOpen, mutate }: NewPatientFormProps) {
       ),
       variant: "destructive",
       description: `Failed to load patients: ${error.message}`,
+      duration: 2000,
     });
   }
 
@@ -91,6 +92,7 @@ export function NewPatientForm({ setOpen, mutate }: NewPatientFormProps) {
       ),
       variant: "success",
       description: "Patient added successfully.",
+      duration: 2000,
     });
 
     try {
@@ -106,6 +108,7 @@ export function NewPatientForm({ setOpen, mutate }: NewPatientFormProps) {
         ),
         variant: "destructive",
         description: `Failed to add patient: ${error.message}`,
+        duration: 2000,
       });
     }
   }

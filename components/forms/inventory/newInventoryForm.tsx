@@ -73,6 +73,7 @@ export function NewInventoryForm({
       ),
       variant: "success",
       description: "Inventory added successfully.",
+      duration: 2000,
     });
     try {
       await newInventory(data); // Make sure this function returns a promise
@@ -86,6 +87,7 @@ export function NewInventoryForm({
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         description: `Failed to add inventory: ${error.message}`,
+        duration: 2000,
       });
     }
   }

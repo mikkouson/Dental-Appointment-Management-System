@@ -94,6 +94,7 @@ export function DataTableDemo({
         ),
         variant: "success",
         description: "Patient deleted successfully.",
+        duration: 2000,
       });
     } catch (error: any) {
       toast({
@@ -101,6 +102,7 @@ export function DataTableDemo({
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         description: `Failed to delete the patient: ${error.message}`,
+        duration: 2000,
       });
     }
   };

@@ -78,6 +78,7 @@ export function NewServiceForm({ setOpen, mutate }: NewServiceFormProps) {
       ),
       variant: "success",
       description: "Service added successfully.",
+      duration: 2000,
     });
 
     try {
@@ -93,6 +94,7 @@ export function NewServiceForm({ setOpen, mutate }: NewServiceFormProps) {
         ),
         variant: "destructive",
         description: `Failed to add service: ${error.message}`,
+        duration: 2000,
       });
     }
   }
