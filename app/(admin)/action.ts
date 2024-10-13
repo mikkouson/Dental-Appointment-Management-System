@@ -667,3 +667,16 @@ export async function updateInventory(data: InventoryFormValues) {
     console.log("Patient data updated successfully");
   }
 }
+
+export async function deleteInventory(id: number) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("inventory")
+    .update({
+      deleteOn: new Date().toISOString(),
+    })
+    .eq("id", id);
+  if (error) {
+    console.log("Error deleting patient", error.message);
+  }
+}

@@ -1,5 +1,5 @@
 "use client";
-import { deletePatient } from "@/app/(admin)/action";
+import { deleteInventory } from "@/app/(admin)/action";
 import type { Inventory } from "@/app/schema";
 import { useSetActive } from "@/app/store";
 import { toast } from "@/components/hooks/use-toast";
@@ -87,7 +87,7 @@ export function DataTableDemo({
       // Optimistically update the UI
       const filteredPatients = data.filter((patient) => patient.id !== id);
       mutate({ data: filteredPatients }, false);
-      deletePatient(id);
+      deleteInventory(id);
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
