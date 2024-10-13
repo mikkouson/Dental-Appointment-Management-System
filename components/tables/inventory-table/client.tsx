@@ -112,7 +112,7 @@ export default function UserClient() {
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Search Patient Name ..."
+                placeholder="Search Item Name ..."
                 className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px]"
                 value={searchQuery}
                 onChange={handleInputChange}
@@ -121,9 +121,9 @@ export default function UserClient() {
             <DrawerDialogDemo
               open={open}
               setOpen={setOpen}
-              label={"New Service"}
+              label={"New Inventory"}
             >
-              <NewInventoryForm setOpen={setOpen} />
+              <NewInventoryForm setOpen={setOpen} mutate={mutate} />
             </DrawerDialogDemo>
           </div>
         </div>
