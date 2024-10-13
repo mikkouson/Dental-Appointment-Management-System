@@ -155,7 +155,7 @@ export function DataTableDemo({
                     <DeleteModal
                       formAction={() => handleDelete(row.original.id)}
                     />
-                    <EditInventory data={row.original} />
+                    <EditInventory data={row.original} mutate={mutate} />
                   </div>
                 </TableCell>
               </TableRow>
