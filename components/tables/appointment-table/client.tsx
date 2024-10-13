@@ -3,7 +3,6 @@ import { AppointmentsCol } from "@/app/schema";
 import { useGetDate } from "@/app/store";
 import { CheckboxReactHookFormMultiple } from "@/components/buttons/comboBoxSelect";
 import BranchSelect from "@/components/buttons/selectbranch-btn";
-import { NewAppointmentForm } from "@/components/forms/new-appointment-form";
 import { Heading } from "@/components/heading";
 import PageContainer from "@/components/layout/page-container";
 import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
@@ -20,6 +19,7 @@ import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
 import { CSVLink } from "react-csv";
 import Loading from "@/app/(admin)/appointments/loading";
+import { NewAppointmentForm } from "@/components/forms/appointment/new-appointment-form";
 const fetcher = async (url: string) => {
   const res = await fetch(url);
   return res.json();
@@ -193,7 +193,7 @@ export default function UserClient() {
                 setOpen={setOpen}
                 label={"New Appointment"}
               >
-                <NewAppointmentForm setOpen={setOpen} />
+                <NewAppointmentForm setOpen={setOpen} mutate={mutate} />
               </DrawerDialogDemo>
             </div>
           </div>

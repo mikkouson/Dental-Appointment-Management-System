@@ -9,11 +9,11 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import useSWR, { preload } from "swr";
 import AppointmentsMap from "@/components/appointmentsList";
-import { NewAppointmentForm } from "@/components/forms/new-appointment-form";
 import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/utils/supabase/client";
 import PageContainer from "./layout/page-container";
+import { NewAppointmentForm } from "./forms/appointment/new-appointment-form";
 const fetcher = (url: string): Promise<any[]> =>
   fetch(url).then((res) => res.json());
 
@@ -116,7 +116,7 @@ export default function AppointmentCalendar() {
               setOpen={setOpen}
               label={"New Appointment"}
             >
-              <NewAppointmentForm setOpen={setOpen} />
+              <NewAppointmentForm setOpen={setOpen} mutate={mutate} />
             </DrawerDialogDemo>
           </div>
           {isLoading ? (

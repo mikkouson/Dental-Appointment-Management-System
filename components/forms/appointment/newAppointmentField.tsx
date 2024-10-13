@@ -1,10 +1,8 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-import { toast } from "@/components/hooks/use-toast";
+import { AppointmentSchemaType } from "@/app/types";
+import { CalendarForm } from "@/components/buttons/selectDate";
+import TimeSlot from "@/components/buttons/selectTime";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -15,40 +13,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { ChevronDownIcon } from "lucide-react";
+import { UseFormReturn } from "react-hook-form";
 import useSWR from "swr";
-import { CalendarForm } from "../buttons/selectDate";
-import TimeSlot from "../buttons/selectTime";
-import Field from "./formField";
-import { newApp } from "@/app/(admin)/action";
-import { ScrollArea } from "../ui/scroll-area";
+import Field from "../formField";
 
 type Appointment = {
   id: string;
   patient_id: number;
   date: Date;
 };
-
-const FormSchema = z.object({
-  id: z.number(),
-  service: z.number({
-    required_error: "Please select an email to display.",
-  }),
-  branch: z.number({
-    required_error: "Please select an email to display.",
-  }),
-  date: z.date({
-    required_error: "A date of birth is required.",
-  }),
-  time: z.number({
-    required_error: "A date of birth is required.",
-  }),
-  type: z.string({
-    required_error: "A date of birth is required.",
-  }),
-  status: z.number({
-    required_error: "Please select an email to display.",
-  }),
-});
 
 const fetcher = (url: string): Promise<any[]> =>
   fetch(url).then((res) => res.json());
@@ -57,30 +30,12 @@ const type = [
   { name: "Walk in", id: "walk in" },
   { name: "Phone Call", id: "phone call" },
 ] as const;
-
-export function NewAppointmentForm({
-  setOpen,
-}: {
-  setOpen: (open: boolean) => void;
-}) {
+interface PatientFieldsProps {
+  form: UseFormReturn<AppointmentSchemaType>;
+  onSubmit: (data: AppointmentSchemaType) => void;
+}
+export function NewAppointmentField({ form, onSubmit }: PatientFieldsProps) {
   const { data, error } = useSWR("/api/data/", fetcher);
-
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-  });
-
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    newApp(data);
-    // setOpen(false);
-    // toast({
-    //   title: "You submitted the following values:",
-    //   description: (
-    //     <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-    //       <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-    //     </pre>
-    //   ),
-    // });
-  }
 
   if (!data) return <>Loading ...</>;
   const date = form.watch("date");
@@ -106,7 +61,6 @@ export function NewAppointmentForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full p-2">
-        {/* <ScrollArea className="h-80 w-full "> */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <Field
             form={form}
@@ -139,7 +93,7 @@ export function NewAppointmentForm({
           />
           <Field form={form} name={"type"} label={"Type"} data={type} />
 
-          <FormField
+          {/* <FormField
             control={form.control}
             name="date"
             render={({ field }) => (
@@ -199,13 +153,14 @@ export function NewAppointmentForm({
                 <FormMessage />
               </FormItem>
             )}
-          />
+          /> */}
         </div>
-        {/* </ScrollArea> */}
 
-        <div className="flex justify-end">
-          <Button type="submit">Submit</Button>
-        </div>
+        {/* <div className="flex justify-end">
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Submitting..." : "Submit"}
+          </Button>
+        </div> */}
       </form>
     </Form>
   );
