@@ -10,6 +10,7 @@ interface PatientFieldsProps {
 }
 
 const ServicesFields = ({ form, onSubmit }: PatientFieldsProps) => {
+  const { isSubmitting } = form.formState;
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full p-2">
@@ -25,7 +26,9 @@ const ServicesFields = ({ form, onSubmit }: PatientFieldsProps) => {
           />
         </div>
         <div className="flex justify-end">
-          <Button type="submit">Submit</Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Submitting..." : "Submit"}
+          </Button>
         </div>
       </form>
     </Form>
