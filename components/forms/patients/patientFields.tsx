@@ -32,13 +32,13 @@ interface PatientFieldsProps {
 }
 
 const PatientFields = ({ form, onSubmit }: PatientFieldsProps) => {
+  const { isSubmitting } = form.formState;
+
   console.log(form);
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full p-2">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          <Field form={form} name={"id"} label={"id"} />
-
           <Field form={form} name={"name"} label={"Name"} />
           <Field form={form} name={"email"} label={"Email"} />
           <Field form={form} data={sex} name={"sex"} label={"Sex"} />
@@ -104,7 +104,9 @@ const PatientFields = ({ form, onSubmit }: PatientFieldsProps) => {
           />
         </div>
         <div className="flex justify-end">
-          <Button type="submit">Submit</Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Submitting..." : "Submit"}
+          </Button>
         </div>
       </form>
     </Form>

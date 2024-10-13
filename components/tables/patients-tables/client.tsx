@@ -126,7 +126,7 @@ export default function UserClient() {
               setOpen={setOpen}
               label={"New Patient"}
             >
-              <NewPatientForm setOpen={setOpen} />
+              <NewPatientForm setOpen={setOpen} mutate={mutate} />
             </DrawerDialogDemo>
           </div>
         </div>
