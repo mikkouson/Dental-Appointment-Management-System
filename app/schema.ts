@@ -50,6 +50,7 @@ export type Database = {
       };
       appointments: {
         Row: {
+          updated_at: string | number | Date;
           patients: any;
           appointment_ticket: string | null;
           branch: number | null;
@@ -162,6 +163,7 @@ export type Database = {
       };
       inventory: {
         Row: {
+          updated_at: string | number | Date;
           deleteOn: string | null;
           description: string;
           id: number;
@@ -186,6 +188,7 @@ export type Database = {
       };
       patients: {
         Row: {
+          updated_at: string | number | Date;
           address: number | null;
           age: number | null;
           created_at: string | null;
@@ -236,6 +239,7 @@ export type Database = {
       };
       services: {
         Row: {
+          updated_at: string | number | Date;
           deleteOn: string | null;
           description: string | null;
           id: number;
