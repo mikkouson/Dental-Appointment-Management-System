@@ -136,6 +136,7 @@ export default function AppointmentCalendar() {
             <AppointmentsMap
               timeSlots={timeSlots}
               appointments={appointments}
+              mutate={mutate}
             />
           )}
         </div>

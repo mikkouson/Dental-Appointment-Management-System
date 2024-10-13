@@ -161,6 +161,7 @@ export function DataTableDemo({
                       appointment={row.original}
                       text={false}
                       disabled={false}
+                      mutate={mutate}
                     />
                   </div>
                 </TableCell>

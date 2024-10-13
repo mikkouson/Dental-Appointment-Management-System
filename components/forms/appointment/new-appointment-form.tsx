@@ -79,7 +79,7 @@ export function NewAppointmentForm({ setOpen, mutate }: NewServiceFormProps) {
 
     try {
       await newApp(formData); // Make sure this function returns a promise
-      // setOpen(false); // Close the modal
+      setOpen(false); // Close the modal
 
       toast({
         className: cn(

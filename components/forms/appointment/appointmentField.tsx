@@ -57,7 +57,7 @@ export function AppointmentField({
       .map((item: any) => item.date) || [];
 
   const appointmentDate = appointment.date ? new Date(appointment.date) : null;
-
+  const { isSubmitting } = form.formState;
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
@@ -140,7 +140,9 @@ export function AppointmentField({
           )}
         </div>
         <div className="flex justify-end">
-          <Button type="submit">Submit</Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Submitting..." : "Submit"}
+          </Button>
         </div>
       </form>
     </Form>

@@ -14,11 +14,13 @@ import { cn } from "@/lib/utils";
 interface AppointmentsMapProps {
   timeSlots: TimeSlot[];
   appointments: AppointmentsCol[];
+  mutate: any;
 }
 
 export default function AppointmentsMap({
   timeSlots,
   appointments,
+  mutate,
 }: AppointmentsMapProps) {
   const [loading, setLoading] = useState<number | null>(null);
 
@@ -148,6 +150,7 @@ export default function AppointmentsMap({
                         appointment={apt}
                         text={true}
                         disabled={loading === apt.id} // Disable while loading
+                        mutate={mutate}
                       />
                     </div>
                   </div>

@@ -20,6 +20,7 @@ import useSWR from "swr";
 import { rescheduleAppointment } from "@/app/(admin)/action";
 import { toast } from "@/components/hooks/use-toast";
 import { AppointmentField } from "@/components/forms/appointment/appointmentField";
+import { cn } from "@/lib/utils";
 
 const fetcher = (url: string): Promise<any> =>
   fetch(url).then((res) => res.json());
@@ -28,10 +29,12 @@ export function EditAppointment({
   appointment,
   text,
   disabled,
+  mutate,
 }: {
   appointment: AppointmentsCol;
   text: boolean;
   disabled: boolean;
+  mutate: any;
 }) {
   const [open, setOpen] = useState(false);
   // Fetch patient data
@@ -66,27 +69,55 @@ export function EditAppointment({
   //   const checkEmailExists = async (email: string): Promise<boolean> => {
   //     return patients.some((patient: PatientCol) => patient.email === email);
   //   };
-  async function onSubmit(data: z.infer<typeof AppointmentSchema>) {
-    // const emailExists = await checkEmailExists(data.email);
-    // if (emailExists) {
-    //   form.setError("email", {
-    //     type: "manual",
-    //     message: "Email already exists",
-    //   });
-    //   return;
-    // }
-    rescheduleAppointment(data);
-    setOpen(false);
-    console.log(data);
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
-    form.reset();
+  // async function onSubmit(data: z.infer<typeof AppointmentSchema>) {
+  //   // const emailExists = await checkEmailExists(data.email);
+  //   // if (emailExists) {
+  //   //   form.setError("email", {
+  //   //     type: "manual",
+  //   //     message: "Email already exists",
+  //   //   });
+  //   //   return;
+  //   // }
+  //   rescheduleAppointment(data);
+  //   console.log(data);
+  //   toast({
+  //     title: "You submitted the following values:",
+  //     description: (
+  //       <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+  //         <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+  //       </pre>
+  //     ),
+  //   });
+  //   form.reset();
+  // }
+
+  async function onSubmit(formData: z.infer<typeof AppointmentSchema>) {
+    mutate();
+
+    try {
+      await rescheduleAppointment(formData); // Make sure this function returns a promise
+      setOpen(false); // Close the modal
+
+      toast({
+        className: cn(
+          "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
+        ),
+        variant: "success",
+        description: "Service added successfully.",
+        duration: 2000,
+      });
+      mutate(); // Revalidate to ensure data consistency
+    } catch (error: any) {
+      // Revert the optimistic update in case of an error
+      mutate();
+      toast({
+        className: cn(
+          "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
+        ),
+        variant: "destructive",
+        description: `Failed to add service: ${error.message}`,
+      });
+    }
   }
 
   useEffect(() => {
@@ -127,7 +158,7 @@ export function EditAppointment({
         <SheetHeader>
           <SheetTitle>Edit profile</SheetTitle>
           <SheetDescription>
-            Make changes to your profile here. Click save when you’re done.
+            Make changes to your profile here. Click save when youre done.
           </SheetDescription>
         </SheetHeader>
         <AppointmentField
