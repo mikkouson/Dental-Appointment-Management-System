@@ -23,6 +23,7 @@ export default function AppointmentsMap({
   mutate,
 }: AppointmentsMapProps) {
   const [loading, setLoading] = useState<number | null>(null);
+  const [loadingType, setLoadingType] = useState<string | null>(null); // Track the type of action
 
   const handleAction = async (
     action: () => Promise<void>,
@@ -30,6 +31,7 @@ export default function AppointmentsMap({
     actionType: string
   ) => {
     setLoading(aptId);
+    setLoadingType(actionType); // Set the type of loading action
     try {
       await action();
       toast({
@@ -53,6 +55,7 @@ export default function AppointmentsMap({
       });
     } finally {
       setLoading(null);
+      setLoadingType(null); // Reset loading type
     }
   };
 
@@ -108,7 +111,9 @@ export default function AppointmentsMap({
                             )
                           }
                         >
-                          {loading === apt.id ? "Cancelling..." : "Cancel"}
+                          {loading === apt.id && loadingType === "cancelled"
+                            ? "Cancelling..."
+                            : "Cancel"}
                         </Button>
                       )}
 
@@ -126,7 +131,9 @@ export default function AppointmentsMap({
                               )
                             }
                           >
-                            {loading === apt.id ? "Accepting..." : "Accept"}
+                            {loading === apt.id && loadingType === "accepted"
+                              ? "Accepting..."
+                              : "Accept"}
                           </Button>
 
                           <Button
@@ -141,7 +148,9 @@ export default function AppointmentsMap({
                               )
                             }
                           >
-                            {loading === apt.id ? "Rejecting..." : "Reject"}
+                            {loading === apt.id && loadingType === "rejected"
+                              ? "Rejecting..."
+                              : "Reject"}
                           </Button>
                         </>
                       )}
