@@ -131,7 +131,7 @@ export default function UserClient() {
           </div>
         </div>
         <Separator />
-        <div className="flex flex-col  xl:flex-row">
+        <div className="flex flex-col  2xl:flex-row">
           <div className="flex-1">
             {isLoading ? (
               <TableLoadingSkeleton />
@@ -157,7 +157,7 @@ export default function UserClient() {
               <p>No data available</p>
             )}
           </div>
-          <div className="w-full mt-5 xl:w-1/5 xl:ml-5 xl:mt-0">
+          <div className="w-full mt-5 2xl:w-1/5 2xl:ml-5 2xl:mt-0">
             {data && data.data && data.data.length > 0 ? (
               <PatientCard
                 activePatient={
