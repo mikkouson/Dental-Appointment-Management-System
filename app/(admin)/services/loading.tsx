@@ -20,10 +20,6 @@ export default function Loading() {
             <Skeleton className="h-6 w-1/6" />
           </div>
         </div>
-
-        <div className="w-1/3">
-          <PatientCardSkeleton />
-        </div>
       </div>
     </PageContainer>
   );
