@@ -5,6 +5,7 @@ import {
   PatientSchema,
   ServiceFormValues,
   ServiceSchema,
+  UserForm,
 } from "@/app/types";
 import DentalAppointmentCancellationEmail from "@/components/emailTemplates/cancelAppointment";
 import DentalAppointmentEmail from "@/components/emailTemplates/newAppointment";
@@ -698,10 +699,7 @@ const FormSchema = z.object({
   }),
 });
 
-export async function createNewUser(formData: {
-  email: string;
-  password: string;
-}) {
+export async function createNewUser(formData: UserForm) {
   const result = FormSchema.safeParse(formData);
 
   if (!result.success) {
@@ -711,15 +709,35 @@ export async function createNewUser(formData: {
 
   const supabase = createClient();
 
-  const { data, error } = await supabase.auth.signUp({
+  // Sign up the user
+  const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
     email: formData.email,
     password: formData.password,
   });
 
-  if (error) {
-    console.error("Error creating user:", error.message);
+  if (signUpError) {
+    console.error("Error creating user:", signUpError.message);
+    return;
   }
 
+  // Insert user profile into 'profiles' table after successful sign-up
+  const userId = signUpData.user?.id;
+
+  if (userId) {
+    const { error: profileError } = await supabase
+      .from("profiles")
+      .update({
+        id: userId, // Assuming 'id' in profiles table is the same as the user's ID
+        name: formData.name,
+      })
+      .eq("id", userId);
+
+    if (profileError) {
+      console.error("Error inserting profile:", profileError.message);
+    }
+  }
+
+  // Optionally, you can revalidate and redirect after everything is successful
   revalidatePath("/", "layout");
   redirect("/users");
 }
