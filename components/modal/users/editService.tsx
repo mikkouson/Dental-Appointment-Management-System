@@ -4,7 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { UserSchema } from "@/app/types";
+import { Service } from "@/app/schema";
+import { ServiceSchema } from "@/app/types";
 import ServicesFields from "@/components/forms/services/servicesField";
 import {
   Sheet,
@@ -16,16 +17,15 @@ import {
 } from "@/components/ui/sheet";
 import { SquarePen } from "lucide-react";
 import { useEffect, useState } from "react";
-import { updateService, updateUser } from "@/app/(admin)/action";
+import { updateService } from "@/app/(admin)/action";
 import useSWR from "swr";
 import { toast } from "@/components/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import UserField from "@/components/forms/users/userField";
 
 const fetcher = (url: string): Promise<any> =>
   fetch(url).then((res) => res.json());
 type EditServiceProps = {
-  data: any;
+  data: Service;
   mutate: any;
 };
 export function EditService({ data, mutate }: EditServiceProps) {
@@ -40,24 +40,24 @@ export function EditService({ data, mutate }: EditServiceProps) {
     setTimeout(() => (document.body.style.pointerEvents = ""), 0);
   });
 
-  // Use z.infer to derive the type from UserSchema
-  const form = useForm<z.infer<typeof UserSchema>>({
-    resolver: zodResolver(UserSchema),
+  // Use z.infer to derive the type from ServiceSchema
+  const form = useForm<z.infer<typeof ServiceSchema>>({
+    resolver: zodResolver(ServiceSchema),
   });
 
   const set = () => {
-    form.setValue("id", data.id || "");
+    form.setValue("id", data.id || 0);
     form.setValue("name", data.name || "");
-    form.setValue("email", data.email || "");
-    form.setValue("password", data.password || "");
+    form.setValue("description", data.description || "");
+    form.setValue("price", data.price || 0);
   };
 
   async function validateName(name: string): Promise<boolean> {
-    const filteredService = service.filter((i: any) => i.id !== data.id);
+    const filteredService = service.filter((i: Service) => i.id !== data.id);
 
-    return filteredService.some((i: any) => i.name === name);
+    return filteredService.some((i: Service) => i.name === name);
   }
-  // async function onSubmit(data: z.infer<typeof UserSchema>) {
+  // async function onSubmit(data: z.infer<typeof ServiceSchema>) {
   //   const nameExists = await validateName(data.name);
 
   //   if (nameExists) {
@@ -81,7 +81,7 @@ export function EditService({ data, mutate }: EditServiceProps) {
   // }
   // Inside your EditService component
 
-  async function onSubmit(formData: z.infer<typeof UserSchema>) {
+  async function onSubmit(formData: z.infer<typeof ServiceSchema>) {
     const nameExists = await validateName(formData.name);
 
     if (nameExists) {
@@ -93,7 +93,7 @@ export function EditService({ data, mutate }: EditServiceProps) {
     }
 
     // Prepare the updated inventory item
-    const updatedItem: any = {
+    const updatedItem: Service = {
       ...data,
       ...formData,
       updated_at: new Date().toISOString(), // Update the timestamp
@@ -101,7 +101,7 @@ export function EditService({ data, mutate }: EditServiceProps) {
 
     // Optimistically update the UI
     mutate(
-      (currentData: { data: any[]; count: number }) => {
+      (currentData: { data: Service[]; count: number }) => {
         let updatedData = currentData.data.map((item) =>
           item.id === updatedItem.id ? updatedItem : item
         );
@@ -130,7 +130,7 @@ export function EditService({ data, mutate }: EditServiceProps) {
     });
 
     try {
-      await updateUser(formData); // Make sure this function returns a promise
+      await updateService(formData); // Make sure this function returns a promise
 
       mutate(); // Revalidate to ensure data consistency
     } catch (error: any) {
@@ -183,7 +183,7 @@ export function EditService({ data, mutate }: EditServiceProps) {
             Make changes to your profile here. Click save when you’re done.
           </SheetDescription>
         </SheetHeader>
-        <UserField form={form} onSubmit={onSubmit} />
+        <ServicesFields form={form} onSubmit={onSubmit} />
       </SheetContent>
     </Sheet>
   );
