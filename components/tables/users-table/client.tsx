@@ -17,6 +17,7 @@ import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
 import { PaginationDemo } from "@/components/pagitnation";
 import TableLoadingSkeleton from "@/components/skeleton/tableskeleton";
+import { NewUserForm } from "@/components/forms/users/newUserForm";
 const fetcher = async (
   url: string
 ): Promise<{
@@ -90,7 +91,7 @@ export default function UserClient() {
   // Breadcrumb items
   const breadcrumbItems = [
     { title: "Dashboard", link: "/" },
-    { title: "Services", link: "/services" },
+    { title: "Users", link: "/users" },
   ];
 
   // Calculate total pages for pagination
@@ -118,7 +119,7 @@ export default function UserClient() {
               />
             </div>
             <DrawerDialogDemo open={open} setOpen={setOpen} label={"New User"}>
-              <NewServiceForm setOpen={setOpen} mutate={mutate} />
+              <NewUserForm setOpen={setOpen} mutate={mutate} />
             </DrawerDialogDemo>
           </div>
         </div>

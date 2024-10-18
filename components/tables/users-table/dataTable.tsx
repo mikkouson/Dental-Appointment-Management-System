@@ -1,9 +1,8 @@
-import { deleteService } from "@/app/(admin)/action";
+import { deleteService, deleteUser } from "@/app/(admin)/action";
 import type { Service } from "@/app/schema";
 import { useSetActiveAppointments } from "@/app/store";
 import { toast } from "@/components/hooks/use-toast";
 import { DeleteModal } from "@/components/modal/deleteModal";
-import { EditPatient } from "@/components/modal/patients/editPatient";
 import {
   Table,
   TableBody,
@@ -88,7 +87,7 @@ export function DataTableDemo({
       // Optimistically update the UI
       const filteredPatients = data.filter((patient) => patient.id !== id);
       mutate({ data: filteredPatients }, false);
-      deleteService(id);
+      deleteUser(id);
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
