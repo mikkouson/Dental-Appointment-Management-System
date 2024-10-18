@@ -11,7 +11,7 @@ import DentalAppointmentCancellationEmail from "@/components/emailTemplates/canc
 import DentalAppointmentEmail from "@/components/emailTemplates/newAppointment";
 import DentalAppointmentPendingEmail from "@/components/emailTemplates/pendingAppointment";
 import DentalAppointmentRejectionEmail from "@/components/emailTemplates/rejectAppointment";
-import { createClient } from "@/utils/supabase/server";
+import { createAdminClient, createClient } from "@/utils/supabase/server";
 import moment from "moment";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -740,4 +740,39 @@ export async function createNewUser(formData: UserForm) {
   // Optionally, you can revalidate and redirect after everything is successful
   revalidatePath("/", "layout");
   redirect("/users");
+}
+
+export async function deleteUser(id: number) {
+  const supabase = createAdminClient();
+  const { error } = await supabase.auth.admin.deleteUser(id.toString());
+
+  if (error) {
+    console.log("Error deleting patient", error.message);
+  }
+}
+
+export async function updateUser(formData: UserForm) {
+  const result = FormSchema.safeParse(formData);
+  if (!result.success) {
+    console.log("Validation errors:", result.error.format());
+    return;
+  }
+
+  if (!formData?.id) {
+    console.log("User ID is missing.");
+    return;
+  }
+
+  const supabase = createAdminClient();
+  const { data: user, error } = await supabase.auth.admin.updateUserById(
+    formData.id, // Ensure formData.id is not undefined
+    {
+      email: formData.email,
+      password: formData.password,
+    }
+  );
+
+  if (error) {
+    console.log("Error deleting patient", error.message);
+  }
 }

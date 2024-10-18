@@ -78,12 +78,13 @@ export const InventorySchema = z.object({
 
 export type InventoryFormValues = z.infer<typeof InventorySchema>;
 
-const FormSchema = z.object({
+export const UserSchema = z.object({
+  id: z.string().optional(),
   email: z.string().email({ message: "Invalid email address" }),
   password: z
     .string()
-    .min(6, { message: "Password must be at least 6 characters" }),
+    .min(1, { message: "Password must be at least 6 characters" }),
   name: z.string().min(1, { message: "name" }),
 });
 
-export type UserForm = z.infer<typeof FormSchema>;
+export type UserForm = z.infer<typeof UserSchema>;
