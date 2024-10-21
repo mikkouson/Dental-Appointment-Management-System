@@ -19,7 +19,10 @@ export async function GET(req: NextRequest) {
       `*,
        address (
          *
+       )appointments (
+         *
        )`,
+
       { count: "exact" }
     )
     .ilike("name", `%${filterParam}%`) // Example filter for 'name' column

@@ -45,6 +45,7 @@ export async function GET(req: NextRequest) {
     )
     .ilike("patients.name", `%${filterParam}%`) // Filter by patient name
     .is("deleteOn", null) // Exclude soft-deleted appointments
+    .is("patients.deleteOn", null) // Exclude soft-deleted patients
     .order("updated_at", { ascending: false }); // Sort by latest updated
 
   // Apply status filter if provided

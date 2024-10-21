@@ -23,7 +23,6 @@ export type AppointmentsCol = Tables<"appointments"> & {
   status: Tables<"status"> | null; // Example: Relationship to status table
   time_slots: Tables<"time_slots"> | null; // Example: Relationship to time_slots table
 };
-
 export type Database = {
   public: {
     Tables: {
@@ -50,8 +49,6 @@ export type Database = {
       };
       appointments: {
         Row: {
-          updated_at: string | number | Date;
-          patients: any;
           appointment_ticket: string | null;
           branch: number | null;
           date: string | null;
@@ -62,6 +59,7 @@ export type Database = {
           status: number | null;
           time: number | null;
           type: string | null;
+          updated_at: string | null;
         };
         Insert: {
           appointment_ticket?: string | null;
@@ -74,6 +72,7 @@ export type Database = {
           status?: number | null;
           time?: number | null;
           type?: string | null;
+          updated_at?: string | null;
         };
         Update: {
           appointment_ticket?: string | null;
@@ -86,6 +85,7 @@ export type Database = {
           status?: number | null;
           time?: number | null;
           type?: string | null;
+          updated_at?: string | null;
         };
         Relationships: [
           {
@@ -127,21 +127,32 @@ export type Database = {
       };
       branch: {
         Row: {
+          addr: number | null;
           address: string | null;
           id: number;
           name: string | null;
         };
         Insert: {
+          addr?: number | null;
           address?: string | null;
           id?: number;
           name?: string | null;
         };
         Update: {
+          addr?: number | null;
           address?: string | null;
           id?: number;
           name?: string | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "branch_addr_fkey";
+            columns: ["addr"];
+            isOneToOne: false;
+            referencedRelation: "addresses";
+            referencedColumns: ["id"];
+          }
+        ];
       };
       doctors: {
         Row: {
@@ -163,12 +174,12 @@ export type Database = {
       };
       inventory: {
         Row: {
-          updated_at: string | number | Date;
           deleteOn: string | null;
           description: string;
           id: number;
           name: string;
           quantity: number;
+          updated_at: string | null;
         };
         Insert: {
           deleteOn?: string | null;
@@ -176,6 +187,7 @@ export type Database = {
           id?: number;
           name: string;
           quantity: number;
+          updated_at?: string | null;
         };
         Update: {
           deleteOn?: string | null;
@@ -183,12 +195,12 @@ export type Database = {
           id?: number;
           name?: string;
           quantity?: number;
+          updated_at?: string | null;
         };
         Relationships: [];
       };
       patients: {
         Row: {
-          updated_at: string | number | Date;
           address: number | null;
           age: number | null;
           created_at: string | null;
@@ -200,6 +212,7 @@ export type Database = {
           phone_number: number | null;
           sex: string | null;
           status: string | null;
+          updated_at: string | null;
         };
         Insert: {
           address?: number | null;
@@ -213,6 +226,7 @@ export type Database = {
           phone_number?: number | null;
           sex?: string | null;
           status?: string | null;
+          updated_at?: string | null;
         };
         Update: {
           address?: number | null;
@@ -226,6 +240,7 @@ export type Database = {
           phone_number?: number | null;
           sex?: string | null;
           status?: string | null;
+          updated_at?: string | null;
         };
         Relationships: [
           {
@@ -237,14 +252,44 @@ export type Database = {
           }
         ];
       };
+      profiles: {
+        Row: {
+          avatar_url: string | null;
+          email: string | null;
+          id: string;
+          name: string | null;
+          updated_at: string | null;
+          username: string | null;
+          website: string | null;
+        };
+        Insert: {
+          avatar_url?: string | null;
+          email?: string | null;
+          id: string;
+          name?: string | null;
+          updated_at?: string | null;
+          username?: string | null;
+          website?: string | null;
+        };
+        Update: {
+          avatar_url?: string | null;
+          email?: string | null;
+          id?: string;
+          name?: string | null;
+          updated_at?: string | null;
+          username?: string | null;
+          website?: string | null;
+        };
+        Relationships: [];
+      };
       services: {
         Row: {
-          updated_at: string | number | Date;
           deleteOn: string | null;
           description: string | null;
           id: number;
           name: string | null;
           price: number | null;
+          updated_at: string | null;
         };
         Insert: {
           deleteOn?: string | null;
@@ -252,6 +297,7 @@ export type Database = {
           id?: number;
           name?: string | null;
           price?: number | null;
+          updated_at?: string | null;
         };
         Update: {
           deleteOn?: string | null;
@@ -259,6 +305,7 @@ export type Database = {
           id?: number;
           name?: string | null;
           price?: number | null;
+          updated_at?: string | null;
         };
         Relationships: [];
       };
@@ -502,4 +549,19 @@ export type Enums<
   ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
   ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+  : never;
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof PublicSchema["CompositeTypes"]
+    | { schema: keyof Database },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof Database;
+  }
+    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
+  ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
   : never;

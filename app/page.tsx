@@ -1,3 +1,4 @@
+"use client";
 import { AreaGraph } from "@/components/charts/area-graph";
 import { BarGraph } from "@/components/charts/bar-graph";
 import { PieGraph } from "@/components/charts/pie-graph";
@@ -7,8 +8,10 @@ import PageContainer from "@/components/layout/page-container";
 import { RecentSales } from "@/components/recent-sales";
 import { SidebarDemo } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
-import type { Metadata } from "next";
-
+const fetcher = async (url: string) => {
+  const res = await fetch(url);
+  return res.json();
+};
 import {
   Card,
   CardContent,
@@ -17,18 +20,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-export const metadata: Metadata = {
-  title: "Lobodent Dental Clinic - Dashboard",
-  description:
-    "Lobodent Dental Clinic is now an Orthero certified provider offering comfortable and invisible Orthero Clear Aligners. Visit us at 2nd Floor, R Building, President Jose P. Laurel Highway, Brgy 1, Marawoy, Lipa City. We are open Monday - Saturday, 10am - 5pm, and Sunday, 10am - 3pm. Parking spaces available.",
-};
+import useSWR from "swr";
 
 export default function page() {
+  const { data, isLoading } = useSWR("/api/apt", fetcher);
+  console.log(data);
   return (
     <SidebarDemo>
       <main className=" overflow-auto  p-2  rounded-tl-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 flex flex-col gap-2 flex-1 w-full h-full">
         <Header />
-        <PageContainer scrollable={true}>
+        <PageContainer>
           <div className="space-y-2">
             <div className="flex items-center justify-between space-y-2">
               <h2 className="text-2xl font-bold tracking-tight">
