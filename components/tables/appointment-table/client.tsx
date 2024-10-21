@@ -1,8 +1,10 @@
 "use client";
+import Loading from "@/app/(admin)/appointments/loading";
 import { AppointmentsCol } from "@/app/schema";
 import { useGetDate } from "@/app/store";
 import { CheckboxReactHookFormMultiple } from "@/components/buttons/comboBoxSelect";
 import BranchSelect from "@/components/buttons/selectbranch-btn";
+import { NewAppointmentForm } from "@/components/forms/appointment/new-appointment-form";
 import { Heading } from "@/components/heading";
 import PageContainer from "@/components/layout/page-container";
 import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
@@ -13,37 +15,46 @@ import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/utils/supabase/client";
 import { File, Search } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import React, { useState, useMemo, useEffect, ChangeEvent } from "react";
+import React, { ChangeEvent, useEffect, useMemo, useState } from "react";
+import { CSVLink } from "react-csv";
 import useSWR from "swr";
 import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
-import { CSVLink } from "react-csv";
-import Loading from "@/app/(admin)/appointments/loading";
-import { NewAppointmentForm } from "@/components/forms/appointment/new-appointment-form";
+
 const fetcher = async (url: string) => {
   const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error("An error occurred while fetching the data.");
+  }
   return res.json();
 };
-export default function UserClient() {
+
+const UserClient: React.FC = () => {
+  // State Management
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>(
     useSearchParams().get("query") || ""
   );
 
+  // Routing and URL Management
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const { replace } = useRouter();
+  const router = useRouter();
   const page = parseInt(searchParams.get("page") || "1", 10);
   const query = searchParams.get("query") || "";
 
+  // Global Store
   const { status: storeStatus, branch } = useGetDate((state) => ({
     status: state.status,
     branch: state.branch,
   }));
 
-  const statusIds = storeStatus.map((stat) => stat.id);
+  const statusIds = useMemo(
+    () => storeStatus.map((stat) => stat.id),
+    [storeStatus]
+  );
 
-  // Fetch statuses and branches data
+  // Data Fetching
   const { data: statuses, isLoading: statusLoading } = useSWR(
     "/api/status/",
     fetcher
@@ -53,13 +64,11 @@ export default function UserClient() {
     fetcher
   );
 
-  // Generate statusList only once when statuses are fetched
   const statusList = useMemo(
     () => statuses?.map((s: { id: number }) => s.id) || [],
     [statuses]
   );
 
-  // Fetch appointments data with necessary query parameters
   const { data, isLoading, mutate } = useSWR<{
     data: AppointmentsCol[] | [];
     count: number;
@@ -72,7 +81,7 @@ export default function UserClient() {
     fetcher
   );
 
-  // Fetch data for export (remove if export is not frequently used)
+  // Fetching all data with no pagination for export
   const { data: exportData } = useSWR<{
     data: AppointmentsCol[] | [];
     count: number;
@@ -89,10 +98,10 @@ export default function UserClient() {
 
   const supabase = createClient();
 
-  // Subscribe to realtime updates
+  // Realtime Updates
   useEffect(() => {
     const channel = supabase
-      .channel("realtime appointments")
+      .channel("realtime-appointments")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "appointments" },
@@ -107,14 +116,13 @@ export default function UserClient() {
     };
   }, [supabase, mutate]);
 
-  // Handle search input change
+  // Handlers
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchQuery(value);
     handleSearch(value);
   };
 
-  // Handle search and update URL query parameters
   const handleSearch = (term: string) => {
     const params = new URLSearchParams(searchParams);
     if (term) {
@@ -124,17 +132,15 @@ export default function UserClient() {
       params.delete("query");
       params.delete("page");
     }
-    replace(`${pathname}?${params.toString()}`);
+    router.replace(`${pathname}?${params.toString()}`);
   };
 
-  // Handle page change and update URL page parameter
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams);
     params.set("page", newPage.toString());
-    replace(`${pathname}?${params.toString()}`);
+    router.replace(`${pathname}?${params.toString()}`);
   };
 
-  // Calculate total pages for pagination
   const totalPages = data ? Math.ceil(data.count / 10) : 1;
 
   if (isLoading || statusLoading || branchLoading) return <Loading />;
@@ -142,13 +148,16 @@ export default function UserClient() {
   return (
     <PageContainer>
       <div className="space-y-4">
+        {/* Header Section */}
         <div className="flex flex-col 2xl:flex-row lg:items-start lg:justify-between">
           <Heading
             title={`Total Appointments (${data ? data.count : "Loading"})`}
-            description="Manage Inventory (Server side table functionalities.)"
+            description="Manage Appointments (Server side table functionalities.)"
           />
 
+          {/* Search and Actions */}
           <div className="flex justify-end max-w-full flex-col md:flex-row w-full sm:max-w-full 2xl:max-w-[830px]">
+            {/* Search Input */}
             <div className="mr-0 mt-2 sm:mr-2 sm:mt-0 relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -159,10 +168,13 @@ export default function UserClient() {
                 onChange={handleInputChange}
               />
             </div>
+
+            {/* Action Buttons */}
             <div className="flex justify-end mt-2 sm:mt-0">
+              {/* Export Button */}
               <CSVLink
                 data={(exported || []).map((apt: AppointmentsCol) => ({
-                  patient_name: apt.patients.name || "null",
+                  patient_name: apt?.patients?.name || "null",
                   appointment_ticket: apt.appointment_ticket || "null",
                   branch: apt?.branch?.name || "null",
                   status: apt?.status?.name || "null",
@@ -177,17 +189,23 @@ export default function UserClient() {
                   variant="outline"
                   className="text-xs sm:text-sm px-2 sm:px-4 mr-2"
                 >
-                  <File className="h-3.5 w-3.5" />
+                  <File className="h-3.5 w-3.5 mr-2" />
                   <span className="sr-only sm:not-sr-only">Export</span>
                 </Button>
               </CSVLink>
+
+              {/* Status Filter */}
               {statuses && (
                 <CheckboxReactHookFormMultiple
                   items={statuses}
                   label="Status"
                 />
               )}
+
+              {/* Branch Selector */}
               <BranchSelect />
+
+              {/* New Appointment Drawer */}
               <DrawerDialogDemo
                 open={open}
                 setOpen={setOpen}
@@ -198,8 +216,10 @@ export default function UserClient() {
             </div>
           </div>
         </div>
+
         <Separator />
 
+        {/* Data Table and Pagination */}
         <div>
           {data && data.data.length ? (
             <>
@@ -215,10 +235,12 @@ export default function UserClient() {
               />
             </>
           ) : (
-            <p>No data</p>
+            <p>No data available.</p>
           )}
         </div>
       </div>
     </PageContainer>
   );
-}
+};
+
+export default UserClient;
