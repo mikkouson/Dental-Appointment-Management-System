@@ -10,9 +10,9 @@ import { PaginationDemo } from "@/components/pagitnation";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/utils/supabase/client";
-import { Search, Table } from "lucide-react";
+import { Search, Table, File } from "lucide-react"; // Import File for CSV export
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect, useOptimistic, useState } from "react";
+import React, { useEffect, useState } from "react";
 import useSWR, { preload } from "swr";
 import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
@@ -20,6 +20,10 @@ import { NewPatientForm } from "@/components/forms/patients/newPatientForm";
 import Skeleton from "@/components/skeleton/tableskeleton";
 import TableLoadingSkeleton from "@/components/skeleton/tableskeleton";
 import PatientCardSkeleton from "@/components/skeleton/patientCardSkeleton";
+import { CSVLink } from "react-csv"; // Import CSVLink for exporting
+import { Button } from "@/components/ui/button";
+
+
 const fetcher = async (
   url: string
 ): Promise<{
@@ -28,6 +32,7 @@ const fetcher = async (
 }> => fetch(url).then((res) => res.json());
 
 preload(`/api/patients`, fetcher);
+
 export default function UserClient() {
   const [open, setOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = useState<string>(
@@ -44,6 +49,7 @@ export default function UserClient() {
     data: (Patient & { address?: Address | null })[];
     count: number;
   }>(`/api/patients?page=${page}&query=${query}`, fetcher);
+  
 
   const supabase = createClient();
 
@@ -99,6 +105,7 @@ export default function UserClient() {
     handleSearch(value);
   };
 
+  
   return (
     <PageContainer>
       <div className="space-y-4">
@@ -110,17 +117,41 @@ export default function UserClient() {
             description="Manage patients (Server side table functionalities.)"
           />
 
-          <div className="flex justify-end  max-w-full  w-full mt-2 sm:ml-0  sm:max-w-full 2xl:max-w-[730px] ">
+          <div className="flex justify-end max-w-full w-full mt-2 sm:ml-0 sm:max-w-full 2xl:max-w-[730px] ">
             <div className="mr-2 relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
                 placeholder="Search Patient Name ..."
-                className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px] "
+                className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px]"
                 onChange={handleInputChange}
                 value={searchQuery}
               />
             </div>
+            
+            {/* CSV Export Button */}
+            <CSVLink
+              data={(data?.data || []).map((patient: Patient & { address?: Address | null }) => ({
+                name: patient.name || "null", 
+                email: patient.email || "null",
+                sex: patient.sex || "null",
+                age: patient.age || "null",
+                address: patient.address?.address || "null",
+                phone: patient.phone_number || "null",    
+                birthdate: patient.dob || "null", 
+                status: patient.status || "null",
+                created_at: patient.created_at || "null",
+                updated_at: patient.updated_at || "null",
+                
+              }))}
+              filename={"patients.csv"}
+            >
+              <Button variant="outline" className="text-xs sm:text-sm px-2 sm:px-4 mr-2">
+                <File className="h-3.5 w-3.5 mr-2" />
+                <span className="sr-only sm:not-sr-only">Export</span>
+              </Button>
+            </CSVLink>
+
             <DrawerDialogDemo
               open={open}
               setOpen={setOpen}
