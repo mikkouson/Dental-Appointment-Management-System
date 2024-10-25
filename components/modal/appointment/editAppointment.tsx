@@ -22,9 +22,6 @@ import { toast } from "@/components/hooks/use-toast";
 import { AppointmentField } from "@/components/forms/appointment/appointmentField";
 import { cn } from "@/lib/utils";
 
-const fetcher = (url: string): Promise<any> =>
-  fetch(url).then((res) => res.json());
-
 export function EditAppointment({
   appointment,
   text,
@@ -38,8 +35,6 @@ export function EditAppointment({
 }) {
   const [open, setOpen] = useState(false);
   // Fetch patient data
-  const { data: responseData, error } = useSWR("/api/apt/", fetcher);
-
   useEffect(() => {
     setTimeout(() => (document.body.style.pointerEvents = ""), 0);
   });
@@ -59,12 +54,10 @@ export function EditAppointment({
       appointment?.branch?.id || appointment?.branch || 0
     );
     form.setValue("status", appointment?.status?.id || 0);
-    form.setValue("service", appointment?.service || 0);
+    form.setValue("service", appointment?.service || 0); // Adjust here if `service` is directly accessible
     form.setValue("type", appointment?.type || "");
     form.setValue("patient", appointment?.patients?.name || "");
   };
-
-  const date = form.watch("date");
 
   //   const checkEmailExists = async (email: string): Promise<boolean> => {
   //     return patients.some((patient: PatientCol) => patient.email === email);
@@ -133,7 +126,7 @@ export function EditAppointment({
           </Button>
         ) : (
           <SquarePen
-            className="text-sm w-5 text-[#fde68a] cursor-pointer"
+            className="text-sm w-5 text-muted-foreground  cursor-pointer"
             onClick={() => set()}
           />
         )}

@@ -4,8 +4,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { updateUser } from "@/app/(admin)/action";
 import { UserSchema } from "@/app/types";
-import ServicesFields from "@/components/forms/services/servicesField";
+import UserField from "@/components/forms/users/userField";
+import { toast } from "@/components/hooks/use-toast";
 import {
   Sheet,
   SheetContent,
@@ -14,26 +16,17 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
 import { SquarePen } from "lucide-react";
 import { useEffect, useState } from "react";
-import { updateService, updateUser } from "@/app/(admin)/action";
-import useSWR from "swr";
-import { toast } from "@/components/hooks/use-toast";
-import { cn } from "@/lib/utils";
-import UserField from "@/components/forms/users/userField";
 
 const fetcher = (url: string): Promise<any> =>
   fetch(url).then((res) => res.json());
-type EditServiceProps = {
+type EditUserProps = {
   data: any;
   mutate: any;
 };
-export function EditService({ data, mutate }: EditServiceProps) {
-  const { data: responseData, error } = useSWR("/api/service/", fetcher);
-
-  // Extract the array of service from the response data
-  const service = responseData?.data || [];
-
+export function EditUser({ data, mutate }: EditUserProps) {
   const [open, setOpen] = useState(false);
   console.log(data);
   useEffect(() => {
@@ -52,11 +45,6 @@ export function EditService({ data, mutate }: EditServiceProps) {
     form.setValue("password", data.password || "");
   };
 
-  async function validateName(name: string): Promise<boolean> {
-    const filteredService = service.filter((i: any) => i.id !== data.id);
-
-    return filteredService.some((i: any) => i.name === name);
-  }
   // async function onSubmit(data: z.infer<typeof UserSchema>) {
   //   const nameExists = await validateName(data.name);
 
@@ -79,19 +67,9 @@ export function EditService({ data, mutate }: EditServiceProps) {
   //   //   ),
   //   // });
   // }
-  // Inside your EditService component
+  // Inside your EditUser component
 
   async function onSubmit(formData: z.infer<typeof UserSchema>) {
-    const nameExists = await validateName(formData.name);
-
-    if (nameExists) {
-      form.setError("name", {
-        type: "manual",
-        message: "Service item already exists.",
-      });
-      return;
-    }
-
     // Prepare the updated inventory item
     const updatedItem: any = {
       ...data,
@@ -109,7 +87,8 @@ export function EditService({ data, mutate }: EditServiceProps) {
         // Reorder the updatedData array based on updated_at descending
         updatedData = updatedData.sort((a, b) => {
           return (
-            new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+            new Date(b.updated_at ?? "").getTime() -
+            new Date(a.updated_at ?? "").getTime()
           );
         });
 

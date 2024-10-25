@@ -21,6 +21,7 @@ import { SquarePen } from "lucide-react";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { cn } from "@/lib/utils";
+import { usePatients } from "@/components/hooks/usePatient";
 
 const fetcher = (url: string): Promise<any> =>
   fetch(url).then((res) => res.json());
@@ -31,8 +32,11 @@ type EditPatientProps = {
 export function EditPatient({ patient, mutate }: EditPatientProps) {
   const [open, setOpen] = useState(false);
   // Fetch patient data
-  const { data: responseData, error } = useSWR("/api/patients/", fetcher);
-
+  const {
+    patients: responseData,
+    patientError,
+    patientLoading,
+  } = usePatients();
   // Extract the array of patients from the response data
   const patients = responseData?.data || [];
 
@@ -51,10 +55,7 @@ export function EditPatient({ patient, mutate }: EditPatientProps) {
     form.setValue("email", patient.email || "");
     form.setValue("sex", patient.sex || "");
     form.setValue("status", patient.status || "");
-    form.setValue(
-      "dob",
-      patient.dob ? new Date(patient.dob) : patients.Row.dob
-    );
+    form.setValue("dob", patient.dob ? new Date(patient.dob) : new Date());
     form.setValue("phoneNumber", patient.phone_number || 0);
     form.setValue("address.id", patient.address?.id || 0);
     form.setValue("address.address", patient.address?.address || "");
@@ -117,10 +118,10 @@ export function EditPatient({ patient, mutate }: EditPatientProps) {
           item.id === updatedItem.id ? updatedItem : item
         );
 
-        // Reorder the updatedData array based on updated_at descending
         updatedData = updatedData.sort((a, b) => {
           return (
-            new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+            new Date(b.updated_at ?? "").getTime() -
+            new Date(a.updated_at ?? "").getTime()
           );
         });
 

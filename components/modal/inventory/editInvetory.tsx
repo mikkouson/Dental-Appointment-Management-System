@@ -88,7 +88,8 @@ export function EditInventory({ data, mutate }: EditInventoryProps) {
         // Reorder the updatedData array based on updated_at descending
         updatedData = updatedData.sort((a, b) => {
           return (
-            new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+            new Date(b.updated_at ?? "").getTime() -
+            new Date(a.updated_at ?? "").getTime()
           );
         });
 

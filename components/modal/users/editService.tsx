@@ -21,6 +21,7 @@ import { updateService } from "@/app/(admin)/action";
 import useSWR from "swr";
 import { toast } from "@/components/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { useService } from "@/components/hooks/useService";
 
 const fetcher = (url: string): Promise<any> =>
   fetch(url).then((res) => res.json());
@@ -29,10 +30,10 @@ type EditServiceProps = {
   mutate: any;
 };
 export function EditService({ data, mutate }: EditServiceProps) {
-  const { data: responseData, error } = useSWR("/api/service/", fetcher);
+  const { services, serviceError, serviceLoading } = useService();
 
   // Extract the array of service from the response data
-  const service = responseData?.data || [];
+  const service = services?.data || [];
 
   const [open, setOpen] = useState(false);
   console.log(data);
@@ -106,10 +107,10 @@ export function EditService({ data, mutate }: EditServiceProps) {
           item.id === updatedItem.id ? updatedItem : item
         );
 
-        // Reorder the updatedData array based on updated_at descending
         updatedData = updatedData.sort((a, b) => {
           return (
-            new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+            new Date(b.updated_at ?? "").getTime() -
+            new Date(a.updated_at ?? "").getTime()
           );
         });
 
@@ -180,7 +181,7 @@ export function EditService({ data, mutate }: EditServiceProps) {
         <SheetHeader>
           <SheetTitle>Edit profile</SheetTitle>
           <SheetDescription>
-            Make changes to your profile here. Click save when you’re done.
+            Make changes to your profile here. Click save when youre done.
           </SheetDescription>
         </SheetHeader>
         <ServicesFields form={form} onSubmit={onSubmit} />

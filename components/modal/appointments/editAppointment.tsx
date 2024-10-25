@@ -32,6 +32,11 @@ import useSWR from "swr";
 import Field from "../../forms/formField";
 import { toast } from "../../hooks/use-toast";
 import { Input } from "../../ui/input";
+import { useAppointments } from "@/components/hooks/useAppointment";
+import { useBranches } from "@/components/hooks/useBranches";
+import { usePatients } from "@/components/hooks/usePatient";
+import { useService } from "@/components/hooks/useService";
+import { useStatuses } from "@/components/hooks/useStatuses";
 
 interface Appointment {
   branch: number;
@@ -82,19 +87,19 @@ const type = [
 export function SheetDemo({ date, pid, time, aptId, apt }: SheetDemoProps) {
   const [open, setOpen] = React.useState(false);
   const selectedBranch = useGetDate((state) => state.setBranch);
-  const { data, error } = useSWR("/api/data/", fetcher);
 
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(FormSchema),
   });
 
-  const appointmentsTable = data?.find(
-    (item) => item.table_name === "appointments"
-  );
-  const branchTable = data?.find((item) => item.table_name === "branch");
+  const { statuses, statusLoading } = useStatuses();
+  const { branches, branchLoading } = useBranches();
+  const { services, serviceError, serviceLoading } = useService();
+  const { appointments, appointmentsLoading } = useAppointments();
+  const { patients, patientError, patientLoading } = usePatients();
 
   const patientAppointments =
-    appointmentsTable?.row_data
+    appointments?.data
       .filter((item: any) => item.patient_id === pid)
       .map((item: any) => item.date) || [];
 
@@ -122,9 +127,14 @@ export function SheetDemo({ date, pid, time, aptId, apt }: SheetDemoProps) {
     // });
   };
 
-  if (!data) return <>Loading ...</>;
-  const services = data.find((item) => item.table_name === "services");
-  const statuses = data.find((item) => item.table_name === "status");
+  if (
+    statusLoading ||
+    branchLoading ||
+    serviceLoading ||
+    appointmentsLoading ||
+    patientLoading
+  )
+    return <>Loading</>;
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
@@ -157,7 +167,7 @@ export function SheetDemo({ date, pid, time, aptId, apt }: SheetDemoProps) {
                 form={form}
                 name={"branch"}
                 label={"Branch"}
-                data={branchTable.row_data}
+                data={branches}
                 num={true}
               />
 
@@ -165,7 +175,7 @@ export function SheetDemo({ date, pid, time, aptId, apt }: SheetDemoProps) {
                 form={form}
                 name={"service"}
                 label={"Service"}
-                data={services.row_data}
+                data={services?.data}
                 num={true}
               />
               <Field
@@ -207,7 +217,7 @@ export function SheetDemo({ date, pid, time, aptId, apt }: SheetDemoProps) {
                       branch={
                         selectedBranch.length < 0
                           ? selectedBranch
-                          : branchTable?.row_data[0]?.id
+                          : branches?.data[0]?.id
                       }
                       field={field}
                       date={new Date(date)}
