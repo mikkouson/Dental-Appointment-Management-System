@@ -1,19 +1,19 @@
 "use client";
 import { useGetDate } from "@/app/store";
-import BranchSelect from "@/components/buttons/selectbranch-btn";
+import AppointmentsMap from "@/components/appointmentsList";
 import { CheckboxReactHookFormMultiple } from "@/components/buttons/comboBoxSelect";
+import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
 import { Calendar } from "@/components/ui/calendar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/utils/supabase/client";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import useSWR, { preload } from "swr";
-import AppointmentsMap from "@/components/appointmentsList";
-import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
-import { Separator } from "@/components/ui/separator";
-import { createClient } from "@/utils/supabase/client";
-import PageContainer from "./layout/page-container";
 import { NewAppointmentForm } from "./forms/appointment/new-appointment-form";
+import PageContainer from "./layout/page-container";
+import { useBranches } from "./hooks/useBranches";
+import { useStatuses } from "./hooks/useStatuses";
+import SelectBranch from "./buttons/selectBranch";
 const fetcher = (url: string): Promise<any[]> =>
   fetch(url).then((res) => res.json());
 
@@ -29,21 +29,11 @@ const timeSlots = [
   { id: 9, time: "4:00 PM" },
 ];
 
-preload(`/api/appointments`, fetcher);
-preload(`/api/status`, fetcher);
-preload(`/api/branch`, fetcher);
 export default function AppointmentCalendar() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [open, setOpen] = React.useState(false);
-
-  const { data: statuses, error: statusesError } = useSWR(
-    "/api/status/",
-    fetcher
-  );
-  const { data: branches, error: branchesError } = useSWR(
-    "/api/branch/",
-    fetcher
-  );
+  const { statuses, statusLoading, statusError } = useStatuses();
+  const { branches, branchLoading, branchError } = useBranches();
 
   const { status: storeStatus } = useGetDate((state) => ({
     status: state.status,
@@ -53,7 +43,7 @@ export default function AppointmentCalendar() {
   const branch = useGetDate((state) => state.branch);
   const formatDate = moment(date).format("MM/DD/YYYY");
   const statusList = React.useMemo(
-    () => statuses?.map((s) => s.id) || [],
+    () => statuses?.map((s: { id: number }) => s.id) || [],
     [statuses]
   );
 
@@ -88,8 +78,8 @@ export default function AppointmentCalendar() {
     };
   }, [supabase, mutate]);
 
-  if (!statuses || !branches) return <>Loading ...</>;
-  if (statusesError || branchesError) return <>Error loading data</>;
+  if (statusLoading || branchLoading) return <>Loading ...</>;
+  if (statusError || branchError) return <>Error loading data</>;
 
   if (appointmentsError) return <div>Error loading appointments</div>;
 
@@ -110,7 +100,7 @@ export default function AppointmentCalendar() {
         <div className="flex flex-col flex-1">
           <div className="flex justify-end mb-4 ">
             <CheckboxReactHookFormMultiple items={statuses} label="Status" />
-            <BranchSelect />
+            <SelectBranch />
             <DrawerDialogDemo
               open={open}
               setOpen={setOpen}

@@ -7,74 +7,50 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
-import { Input } from "./ui/input";
+import { useQueryState } from "nuqs";
 
 interface PaginationDemoProps {
-  currentPage: number;
   totalPages: number;
-  onPageChange: (page: number) => void;
 }
 
-export function PaginationDemo({
-  currentPage,
-  totalPages,
-  onPageChange,
-}: PaginationDemoProps) {
-  const [inputPage, setInputPage] = useState(currentPage);
-  const [isInputVisible, setInputVisible] = useState(false);
+export function PaginationDemo({ totalPages }: PaginationDemoProps) {
+  // Use nuqs to sync the current page with the URL
+  const [currentPage, setCurrentPage] = useQueryState("page", {
+    defaultValue: 1,
+    parse: (value) => parseInt(value, 10) || 1,
+    serialize: (value) => value.toString(),
+  });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (/^\d*$/.test(value)) {
-      setInputPage(Number(value));
-    }
-  };
-
-  const handleInputBlur = () => {
-    if (inputPage >= 1 && inputPage <= totalPages) {
-      onPageChange(inputPage);
-    }
-    setInputVisible(false);
-  };
-
-  const handleEllipsisClick = () => {
-    setInputVisible(true);
-  };
-
-  // Helper function to generate page numbers with a single ellipsis
+  // Helper function to generate page numbers (max 5)
   const getPageNumbers = () => {
-    const pages: (number | string)[] = [];
+    const pages: number[] = [];
 
     if (totalPages <= 5) {
-      // If total pages are 5 or less, show all pages
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
       }
     } else {
-      // Always show the first page
-      pages.push(1);
+      const startPage = Math.max(1, currentPage - 2);
+      const endPage = Math.min(totalPages, currentPage + 2);
 
-      if (currentPage > 3) {
-        // Show ellipsis if the current page is beyond the 3rd page
-        pages.push("ellipsis");
+      // Adjust start and end pages if near the edges
+      if (startPage === 1) {
+        for (let i = startPage; i <= Math.min(endPage, 5); i++) {
+          pages.push(i);
+        }
+      } else if (endPage === totalPages) {
+        for (let i = Math.max(1, totalPages - 4); i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(
+          startPage,
+          startPage + 1,
+          startPage + 2,
+          endPage - 1,
+          endPage
+        );
       }
-
-      // Determine range of middle pages
-      const startPage = Math.max(2, currentPage - 1);
-      const endPage = Math.min(totalPages - 1, currentPage + 1);
-
-      for (let i = startPage; i <= endPage; i++) {
-        pages.push(i);
-      }
-
-      if (currentPage < totalPages - 2) {
-        // Show ellipsis if current page is far from the last pages
-        pages.push("ellipsis");
-      }
-
-      // Always show the last page
-      pages.push(totalPages);
     }
 
     return pages;
@@ -95,7 +71,7 @@ export function PaginationDemo({
               aria-disabled={currentPage <= 1}
               onClick={(e) => {
                 if (currentPage > 1) {
-                  onPageChange(currentPage - 1);
+                  setCurrentPage(currentPage - 1);
                 } else {
                   e.preventDefault();
                 }
@@ -105,47 +81,17 @@ export function PaginationDemo({
           </PaginationItem>
 
           {/* Page Numbers */}
-          {getPageNumbers().map((page, index) => {
-            if (page === "ellipsis") {
-              return (
-                <PaginationItem key={`ellipsis-${index}`}>
-                  <span
-                    onClick={handleEllipsisClick}
-                    className="cursor-pointer text-gray-400"
-                  >
-                    &hellip;
-                  </span>
-                </PaginationItem>
-              );
-            } else {
-              return (
-                <PaginationItem key={page}>
-                  <PaginationLink
-                    href="#"
-                    isActive={currentPage === page}
-                    onClick={() => onPageChange(page as number)}
-                  >
-                    {page}
-                  </PaginationLink>
-                </PaginationItem>
-              );
-            }
-          })}
-
-          {/* Input for Page Number (Optional) */}
-          {isInputVisible && (
-            <PaginationItem>
-              <Input
-                value={inputPage}
-                min={1}
-                max={totalPages}
-                onChange={handleInputChange}
-                onBlur={handleInputBlur}
-                className="w-10 text-center rounded"
-                autoFocus
-              />
+          {getPageNumbers().map((page) => (
+            <PaginationItem key={page}>
+              <PaginationLink
+                href="#"
+                isActive={currentPage === page}
+                onClick={() => setCurrentPage(page)}
+              >
+                {page}
+              </PaginationLink>
             </PaginationItem>
-          )}
+          ))}
 
           {/* Next Button */}
           <PaginationItem>
@@ -154,7 +100,7 @@ export function PaginationDemo({
               aria-disabled={currentPage >= totalPages}
               onClick={(e) => {
                 if (currentPage < totalPages) {
-                  onPageChange(currentPage + 1);
+                  setCurrentPage(currentPage + 1);
                 } else {
                   e.preventDefault();
                 }
