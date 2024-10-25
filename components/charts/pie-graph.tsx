@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { TrendingUp } from 'lucide-react';
-import { Label, Pie, PieChart } from 'recharts';
+import * as React from "react";
+import { TrendingUp } from "lucide-react";
+import { Label, Pie, PieChart, Cell } from "recharts";
 
 import {
   Card,
@@ -10,58 +10,97 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle
-} from '@/components/ui/card';
+  CardTitle,
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
-  ChartTooltipContent
-} from '@/components/ui/chart';
-const chartData = [
-  { browser: 'chrome', visitors: 275, fill: 'var(--color-chrome)' },
-  { browser: 'safari', visitors: 200, fill: 'var(--color-safari)' },
-  { browser: 'firefox', visitors: 287, fill: 'var(--color-firefox)' },
-  { browser: 'edge', visitors: 173, fill: 'var(--color-edge)' },
-  { browser: 'other', visitors: 190, fill: 'var(--color-other)' }
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+
+// Define types for appointment and statusCounts
+interface Appointment {
+  status: string;
+}
+
+interface StatusCounts {
+  [key: string]: number;
+}
+
+// Sample appointment data
+const appointments: Appointment[] = [
+  { status: "Canceled" },
+  { status: "Reject" },
+  { status: "Accepted" },
+  { status: "Canceled" },
+  { status: "Canceled" },
+  { status: "Pending" },
+  { status: "Canceled" },
+  { status: "Accepted" },
+  { status: "Canceled" },
+  { status: "Canceled" },
 ];
+
+// Initialize and populate statusCounts with type annotations
+const statusCounts: StatusCounts = appointments.reduce(
+  (acc: StatusCounts, appointment) => {
+    const { status } = appointment;
+    if (!acc[status]) {
+      acc[status] = 0;
+    }
+    acc[status]++;
+    return acc;
+  },
+  {}
+);
+
+// Create data for pie chart with specific colors
+const chartData = Object.keys(statusCounts).map((status) => ({
+  status,
+  count: statusCounts[status],
+  fill:
+    status === "Accepted"
+      ? "#4caf50"
+      : status === "Canceled"
+      ? "#f44336"
+      : status === "Reject"
+      ? "#ff9800"
+      : "#2196f3", // Custom colors
+}));
 
 const chartConfig = {
   visitors: {
-    label: 'Visitors'
+    label: "Appointments",
   },
-  chrome: {
-    label: 'Chrome',
-    color: 'hsl(var(--chart-1))'
+  Canceled: {
+    label: "Canceled",
+    color: "hsl(var(--chart-1))",
   },
-  safari: {
-    label: 'Safari',
-    color: 'hsl(var(--chart-2))'
+  Reject: {
+    label: "Reject",
+    color: "hsl(var(--chart-2))",
   },
-  firefox: {
-    label: 'Firefox',
-    color: 'hsl(var(--chart-3))'
+  Accepted: {
+    label: "Accepted",
+    color: "hsl(var(--chart-3))",
   },
-  edge: {
-    label: 'Edge',
-    color: 'hsl(var(--chart-4))'
+  Pending: {
+    label: "Pending",
+    color: "hsl(var(--chart-4))",
   },
-  other: {
-    label: 'Other',
-    color: 'hsl(var(--chart-5))'
-  }
 } satisfies ChartConfig;
 
 export function PieGraph() {
-  const totalVisitors = React.useMemo(() => {
-    return chartData.reduce((acc, curr) => acc + curr.visitors, 0);
+  const totalAppointments = React.useMemo(() => {
+    return chartData.reduce((acc, curr) => acc + curr.count, 0);
   }, []);
 
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Pie Chart - Donut with Text</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardTitle>Pie Chart - Appointment Status</CardTitle>
+        <CardDescription>October 2024</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -75,14 +114,17 @@ export function PieGraph() {
             />
             <Pie
               data={chartData}
-              dataKey="visitors"
-              nameKey="browser"
+              dataKey="count"
+              nameKey="status"
               innerRadius={60}
               strokeWidth={5}
             >
+              {chartData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.fill} />
+              ))}
               <Label
                 content={({ viewBox }) => {
-                  if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
+                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
                     return (
                       <text
                         x={viewBox.cx}
@@ -95,14 +137,14 @@ export function PieGraph() {
                           y={viewBox.cy}
                           className="fill-foreground text-3xl font-bold"
                         >
-                          {totalVisitors.toLocaleString()}
+                          {totalAppointments.toLocaleString()}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 24}
                           className="fill-muted-foreground"
                         >
-                          Visitors
+                          Appointments
                         </tspan>
                       </text>
                     );
@@ -115,10 +157,7 @@ export function PieGraph() {
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="flex items-center gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-        </div>
-        <div className="leading-none text-muted-foreground">
-          Showing total visitors for the last 6 months
+          Showing status distribution for October 2024
         </div>
       </CardFooter>
     </Card>
