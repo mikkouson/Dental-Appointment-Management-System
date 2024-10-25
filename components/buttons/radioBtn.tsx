@@ -135,6 +135,7 @@ export function RadioBtn({
                         item.id === field.value ? "opacity-100" : "opacity-0"
                       )}
                     />
+                    <span className="hidden">{item.id}</span>
                     {item.name}
                   </CommandItem>
                 ))}
