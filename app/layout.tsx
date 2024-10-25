@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { SWRProvider } from "./swr-provider";
 import { Toaster } from "@/components/ui/toaster";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,7 +32,9 @@ export default function RootLayout({
           >
             {/* <Navigation /> */}
             <main className="h-screen flex flex-col  ">
-              <SWRProvider>{children}</SWRProvider>
+              <SWRProvider>
+                <NuqsAdapter>{children}</NuqsAdapter>
+              </SWRProvider>
             </main>
             <Toaster />
           </ThemeProvider>
