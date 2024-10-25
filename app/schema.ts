@@ -23,6 +23,12 @@ export type AppointmentsCol = Tables<"appointments"> & {
   status: Tables<"status"> | null; // Example: Relationship to status table
   time_slots: Tables<"time_slots"> | null; // Example: Relationship to time_slots table
 };
+export type InventoryCol = Tables<"inventory"> & {
+  branch: Tables<"branch"> | null; 
+  name: string | null;              
+  quantity: number | null;          
+  description: string | null;      
+};
 export type Database = {
   public: {
     Tables: {
@@ -181,6 +187,7 @@ export type Database = {
           name: string;
           quantity: number;
           updated_at: string | null;
+          branch: number | null;
         };
         Insert: {
           deleteOn?: string | null;
@@ -189,6 +196,7 @@ export type Database = {
           name: string;
           quantity: number;
           updated_at?: string | null;
+          branch?: number | null;
         };
         Update: {
           deleteOn?: string | null;
@@ -197,8 +205,18 @@ export type Database = {
           name?: string;
           quantity?: number;
           updated_at?: string | null;
+          branch?: number | null;
+          
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "inventory_branch_fkey";
+            columns: ["branch"];
+            isOneToOne: false;
+            referencedRelation: "branch";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       patients: {
         Row: {

@@ -1,33 +1,26 @@
 "use client";
-import { Inventory } from "@/app/schema";
-import { Breadcrumbs } from "@/components/breadcrumb";
+import Loading from "@/app/(admin)/inventory/loading";
+import { useGetDate } from "@/app/store";
+import { CheckboxReactHookFormMultiple } from "@/components/buttons/comboBoxSelect";
+import InventoryExport from "@/components/buttons/exportButtons/inventoryExport";
+import { NewInventoryForm } from "@/components/forms/inventory/newInventoryForm";
 import { Heading } from "@/components/heading";
+import { useInventory } from "@/components/hooks/useInventory";
 import PageContainer from "@/components/layout/page-container";
 import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
+import { PaginationDemo } from "@/components/pagitnation";
+import TableLoadingSkeleton from "@/components/skeleton/tableskeleton";
 import { Input } from "@/components/ui/input";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { createClient } from "@/utils/supabase/client";
-import { Search, File } from "lucide-react";
+import { Search } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import React, { useState } from "react";
-import useSWR from "swr";
+import { ChangeEvent, useState } from "react";
 import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
-import { PaginationDemo } from "@/components/pagitnation";
-import { NewInventoryForm } from "@/components/forms/inventory/newInventoryForm";
-import TableLoadingSkeleton from "@/components/skeleton/tableskeleton";
-import { CSVLink } from "react-csv";
-import { Button } from "@/components/ui/button";
+import { useBranches } from "@/components/hooks/useBranches"; 
 import SelectBranch from "@/components/buttons/selectBranch"; 
-const fetcher = async (
-  url: string
-): Promise<{
-  data: Inventory[] | [];
-  count: number;
-}> => fetch(url).then((res) => res.json());
 
-export default function UserClient() {
+export default function InventoryClient() {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>(
     useSearchParams().get("query") || ""
@@ -35,44 +28,24 @@ export default function UserClient() {
 
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const { replace } = useRouter();
+  const router = useRouter();
   const page = parseInt(searchParams.get("page") || "1", 10);
   const query = searchParams.get("query") || "";
-  const branches = searchParams.get("branches") || ""; 
+  const branch = searchParams.get("branches") || ""; 
 
-  const { data, error, isLoading, mutate } = useSWR<{
-    data: Inventory[] | [];
-    count: number;
-  }>(`/api/inventory?page=${page}&query=${query}&branches=${branches}`, fetcher);
+  const { branches, branchLoading } = useBranches();
+  const {
+    inventory: data,
+    inventoryLoading: isLoading,
+    mutate,
+  } = useInventory(page, query, branch); 
 
-  const supabase = createClient();
-
-  // Subscribe to realtime updates
-  React.useEffect(() => {
-    const channel = supabase
-      .channel("realtime inventory")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "inventory" },
-        () => {
-          mutate();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [supabase, mutate]);
-
-  // Handle search input change
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchQuery(value);
     handleSearch(value);
   };
 
-  // Handle search and update URL query parameters
   const handleSearch = (term: string) => {
     const params = new URLSearchParams(searchParams);
     if (term) {
@@ -82,99 +55,64 @@ export default function UserClient() {
       params.delete("query");
       params.delete("page");
     }
-    replace(`${pathname}?${params.toString()}`);
+    router.replace(`${pathname}?${params.toString()}`);
   };
 
-  // Handle page change and update URL page parameter
-  const handlePageChange = (newPage: number) => {
-    const params = new URLSearchParams(searchParams);
-    params.set("page", newPage.toString());
-    replace(`${pathname}?${params.toString()}`);
-  };
-
-  // Breadcrumb items
-  const breadcrumbItems = [
-    { title: "Dashboard", link: "/" },
-    { title: "Inventory", link: "/inventory" },
-  ];
-
-  // Calculate total pages for pagination
   const totalPages = data ? Math.ceil(data.count / 10) : 1;
+
+  if (branchLoading) return <Loading />;
 
   return (
     <PageContainer>
-      <div className="space-y-4">
-        <Breadcrumbs items={breadcrumbItems} />
-
+      <div className="space-y-4 h-[calc(100vh-144px)]">
         <div className="flex flex-col 2xl:flex-row lg:items-start lg:justify-between">
           <Heading
-            title={`Total Inventory (${data ? data.count : "loading"})`}
+            title={`Total Inventory (${data ? data.count : "Loading"})`}
             description="Manage Inventory (Server side table functionalities.)"
           />
-          <div className="flex justify-end max-w-full w-full mt-2 sm:ml-0 sm:max-w-full 2xl:max-w-[730px]">
-            <div className="mr-2 relative">
+          <div className="flex justify-end max-w-full flex-col md:flex-row w-full sm:max-w-full 2xl:max-w-[830px]">
+            <div className="mr-0 mt-2 sm:mr-2 sm:mt-0 relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Search Item Name ..."
-                className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px]"
+                placeholder="Search Inventory Item ..."
+                className="w-full rounded-lg bg-background pl-8"
                 value={searchQuery}
                 onChange={handleInputChange}
               />
             </div>
-
-            <SelectBranch /> {/* Add branch selection component */}
-
-            {/* CSV Export Button */}
-            <CSVLink
-              data={(data?.data || []).map((item: Inventory) => ({
-                name: item.name || "null",
-                description: item.description || "null",
-                quantity: item.quantity || "null",
-                deleteOn: item.deleteOn || "null",
-                updated_at: item.updated_at || "null",
-              }))}
-              filename={"inventory.csv"}
-            >
-              <Button
-                variant="outline"
-                className="text-xs sm:text-sm px-2 sm:px-4 mr-2"
+            <div className="flex justify-end mt-2 sm:mt-0">
+              <InventoryExport />
+              <SelectBranch /> 
+              <DrawerDialogDemo
+                open={open}
+                setOpen={setOpen}
+                label={"New Inventory Item"}
               >
-                <File className="h-3.5 w-3.5 mr-2" />
-                <span className="sr-only sm:not-sr-only">Export</span>
-              </Button>
-            </CSVLink>
-
-            <DrawerDialogDemo
-              open={open}
-              setOpen={setOpen}
-              label={"New Inventory"}
-            >
-              <NewInventoryForm setOpen={setOpen} mutate={mutate} />
-            </DrawerDialogDemo>
+                <NewInventoryForm setOpen={setOpen} mutate={mutate} />
+              </DrawerDialogDemo>
+            </div>
           </div>
         </div>
         <Separator />
-        <div>
+        {!isLoading ? (
           <div>
-            {isLoading ? (
-              <TableLoadingSkeleton />
-            ) : data && data.data ? (
+            {data && data.data.length ? (
               <>
                 <DataTableDemo
                   columns={columns}
                   data={data.data}
                   mutate={mutate}
-                  activePatient={undefined}
                 />
-
                 <PaginationDemo totalPages={totalPages} />
               </>
             ) : (
-              <p>No data available</p>
+              <p>No data available.</p>
             )}
           </div>
-        </div>
+        ) : (
+          <TableLoadingSkeleton />
+        )}
       </div>
     </PageContainer>
   );
