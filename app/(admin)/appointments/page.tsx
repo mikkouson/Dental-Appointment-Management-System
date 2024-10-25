@@ -19,7 +19,7 @@ export default function Page() {
     <Suspense fallback={<Loading />}>
       <Tabs defaultValue="table">
         <div className="px-4 md:px-8">
-          <Breadcrumbs items={breadcrumbItems} />
+          {/* <Breadcrumbs items={breadcrumbItems} /> */}
 
           <div className="flex  items-center mt-2  sm:mt-4">
             <TabsList>

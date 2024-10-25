@@ -37,6 +37,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { File, ListFilter } from "lucide-react";
 import moment from "moment";
 import Link from "next/link";
+
 const fetcher = async (url: any): Promise<any> => {
   const res = await fetch(url);
   if (!res.ok) {
@@ -44,12 +45,13 @@ const fetcher = async (url: any): Promise<any> => {
   }
   return res.json();
 };
+
 interface PageProps {
   params: {
     id: string; // Assuming id is a string, adjust type accordingly if different
-    // Add other fields if params has more properties
   };
 }
+
 export default function Page({ params }: PageProps) {
   const { data, error, isLoading, mutate } = useSWR(
     `/api/patientdetails?id=${params.id}`,
@@ -60,10 +62,10 @@ export default function Page({ params }: PageProps) {
   if (isLoading) return <>Loading</>;
 
   const acceptedAppointments = data.appointments.filter(
-    (appointment: { status: { id: number } }) => appointment.status.id === 1
+    (appointment: { status?: { id?: number } }) => appointment.status?.id === 1
   );
   const completedAppointments = data.appointments.filter(
-    (appointment: { status: { id: number } }) => appointment.status.id === 4
+    (appointment: { status?: { id?: number } }) => appointment.status?.id === 4
   );
   const activeAppointment = data.appointments.find(
     (appointment: { id: number }) => appointment.id === active
@@ -96,7 +98,6 @@ export default function Page({ params }: PageProps) {
         <main className="grid flex-1 items-start gap-4  sm:px-6 sm:py-0 md:gap-8 lg:grid-cols-3 xl:grid-cols-3">
           <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
             <div className="grid gap-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-3 xl:grid-cols-3">
-              {/* Card 1 - Personal Information */}
               <Card
                 className="sm:col-span-1 md:col-span-1 lg:col-span-1 xl:col-span-1"
                 x-chunk="dashboard-05-chunk-0"
@@ -137,7 +138,6 @@ export default function Page({ params }: PageProps) {
                 <CardFooter className="text-center"></CardFooter>
               </Card>
 
-              {/* Card 2 - Contact Information */}
               <Card
                 className="sm:col-span-1 md:col-span-1 lg:col-span-1 xl:col-span-1"
                 x-chunk="dashboard-05-chunk-9"
@@ -190,7 +190,6 @@ export default function Page({ params }: PageProps) {
                 </CardContent>
               </Card>
 
-              {/* Card 3 - Address Information */}
               <Card
                 className="sm:col-span-1 md:col-span-1 lg:col-span-1 xl:col-span-1"
                 x-chunk="dashboard-05-chunk-10"
@@ -257,14 +256,14 @@ export default function Page({ params }: PageProps) {
                   <CardHeader className="px-7">
                     <CardTitle>Appointments</CardTitle>
                     <CardDescription>
-                      Recent appointmets from your clinic.
+                      Recent appointments from your clinic.
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <DataTableDemo
                       columns={columns}
                       data={data.appointments}
-                      activePatient={active}
+                      // activePatient={active}
                       mutate={mutate}
                     />
                   </CardContent>
@@ -276,9 +275,6 @@ export default function Page({ params }: PageProps) {
             <Card className="">
               <CardHeader>
                 <CardTitle>Patient Notes</CardTitle>
-                {/* <CardDescription>
-                  Deploy your new project in one-click.
-                </CardDescription> */}
               </CardHeader>
               <CardContent>
                 <TextareaForm />
