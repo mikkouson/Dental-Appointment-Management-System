@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import useSWR, { mutate as globalMutate } from "swr";
 import { Patient, PatientCol } from "@/app/schema";
 import { toast } from "@/components/hooks/use-toast";
+import { usePatients } from "@/components/hooks/usePatient";
 
 const fetcher = (url: string): Promise<any> =>
   fetch(url).then((res) => res.json());
@@ -25,15 +26,18 @@ interface NewPatientFormProps {
 
 export function NewPatientForm({ setOpen, mutate }: NewPatientFormProps) {
   // Fetch patient data
-  const { data: responseData, error } = useSWR("/api/patients/", fetcher);
-
-  if (error) {
+  const {
+    patients: responseData,
+    patientError,
+    patientLoading,
+  } = usePatients();
+  if (patientError) {
     toast({
       className: cn(
         "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
       ),
       variant: "destructive",
-      description: `Failed to load patients: ${error.message}`,
+      description: `Failed to load patients: ${patientError.message}`,
       duration: 2000,
     });
   }

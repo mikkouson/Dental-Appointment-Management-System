@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import useSWR from "swr";
 import { Service } from "@/app/schema";
 import UserField from "./userField";
+import { useService } from "@/components/hooks/useService";
 
 const fetcher = (url: string): Promise<any> =>
   fetch(url).then((res) => res.json());
@@ -20,7 +21,7 @@ interface NewServiceFormProps {
 }
 
 export function NewUserForm({ setOpen, mutate }: NewServiceFormProps) {
-  const { data: responseData, error } = useSWR("/api/service/", fetcher);
+  const { services: responseData, serviceError, serviceLoading } = useService();
 
   // Extract the array of services from the response data
   const services = responseData?.data || [];

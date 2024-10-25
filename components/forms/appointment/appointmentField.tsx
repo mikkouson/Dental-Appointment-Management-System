@@ -20,6 +20,10 @@ import Field from "../../forms/formField";
 import { Input } from "../../ui/input";
 import { AppointmentSchemaType } from "@/app/types";
 import { Appointment } from "@/app/schema";
+import { useBranches } from "@/components/hooks/useBranches";
+import { useStatuses } from "@/components/hooks/useStatuses";
+import { useService } from "@/components/hooks/useService";
+import { useAppointments } from "@/components/hooks/useAppointment";
 
 interface AppointmentFieldsProps {
   form: UseFormReturn<AppointmentSchemaType>;
@@ -38,26 +42,24 @@ export function AppointmentField({
   form,
   onSubmit,
 }: AppointmentFieldsProps) {
-  const [open, setOpen] = React.useState(false);
   const selectedBranch = useGetDate((state) => state.setBranch);
-  const { data, error } = useSWR("/api/data/", fetcher);
 
-  if (!data) return <>Loading ...</>;
-
-  const appointmentsTable = data.find(
-    (item) => item.table_name === "appointments"
-  );
-  const branchTable = data.find((item) => item.table_name === "branch");
-  const services = data.find((item) => item.table_name === "services");
-  const statuses = data.find((item) => item.table_name === "status");
+  const { statuses, statusLoading } = useStatuses();
+  const { branches, branchLoading } = useBranches();
+  const { services, serviceError, serviceLoading } = useService();
+  const { appointments, appointmentsLoading } = useAppointments();
 
   const patientAppointments =
-    appointmentsTable?.row_data
+    appointments?.data
       .filter((item: any) => item.patient_id === appointment.id)
       .map((item: any) => item.date) || [];
 
   const appointmentDate = appointment.date ? new Date(appointment.date) : null;
   const { isSubmitting } = form.formState;
+
+  if (statusLoading || branchLoading || serviceLoading || appointmentsLoading)
+    return <>Loading</>;
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
@@ -68,7 +70,7 @@ export function AppointmentField({
             render={() => (
               <FormItem>
                 <FormLabel>Patients Name</FormLabel>
-                <Input disabled defaultValue={appointment.patients?.name} />
+                <Input disabled defaultValue={appointment?.patients?.name} />
               </FormItem>
             )}
           />
@@ -76,21 +78,21 @@ export function AppointmentField({
             form={form}
             name={"branch"}
             label={"Branch"}
-            data={branchTable.row_data}
+            data={branches}
             num={true}
           />
           <Field
             form={form}
             name={"service"}
             label={"Service"}
-            data={services.row_data}
+            data={services?.data}
             num={true}
           />
           <Field
             form={form}
             name={"status"}
             label={"Status"}
-            data={statuses.row_data}
+            data={statuses}
             num={true}
           />
           <Field
@@ -128,7 +130,7 @@ export function AppointmentField({
                     branch={
                       selectedBranch.length < 0
                         ? selectedBranch
-                        : branchTable?.row_data[0]?.id
+                        : branches[0]?.id
                     }
                     field={field}
                     date={appointmentDate}

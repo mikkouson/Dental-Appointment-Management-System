@@ -13,6 +13,7 @@ import useSWR from "swr";
 import { Service } from "@/app/schema";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
+import { useService } from "@/components/hooks/useService";
 
 const fetcher = (url: string): Promise<any> =>
   fetch(url).then((res) => res.json());
@@ -23,7 +24,7 @@ interface NewServiceFormProps {
 }
 
 export function NewServiceForm({ setOpen, mutate }: NewServiceFormProps) {
-  const { data: responseData, error } = useSWR("/api/service/", fetcher);
+  const { services: responseData, serviceError, serviceLoading } = useService();
 
   // Extract the array of services from the response data
   const services = responseData?.data || [];

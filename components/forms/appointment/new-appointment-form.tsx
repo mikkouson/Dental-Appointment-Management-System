@@ -4,7 +4,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { newApp } from "@/app/(admin)/action";
+import { CalendarForm } from "@/components/buttons/selectDate";
+import TimeSlot from "@/components/buttons/selectTime";
 import { toast } from "@/components/hooks/use-toast";
+import { useAppointments } from "@/components/hooks/useAppointment";
+import { useBranches } from "@/components/hooks/useBranches";
+import { usePatients } from "@/components/hooks/usePatient";
+import { useService } from "@/components/hooks/useService";
+import { useStatuses } from "@/components/hooks/useStatuses";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -14,13 +22,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { ChevronDownIcon } from "lucide-react";
-import useSWR from "swr";
-import { newApp } from "@/app/(admin)/action";
-import TimeSlot from "@/components/buttons/selectTime";
-import { CalendarForm } from "@/components/buttons/selectDate";
-import Field from "../formField";
 import { cn } from "@/lib/utils";
+import { ChevronDownIcon } from "lucide-react";
+import Field from "../formField";
 
 type Appointment = {
   id: string;
@@ -50,9 +54,6 @@ const FormSchema = z.object({
   }),
 });
 
-const fetcher = (url: string): Promise<any[]> =>
-  fetch(url).then((res) => res.json());
-
 const statuses = [
   { name: "Pending", id: 2 },
   { name: "Completed", id: 4 },
@@ -68,7 +69,10 @@ interface NewServiceFormProps {
   mutate: any; // It's better to type this more specifically if possible
 }
 export function NewAppointmentForm({ setOpen, mutate }: NewServiceFormProps) {
-  const { data, error } = useSWR("/api/data/", fetcher);
+  const { branches, branchLoading } = useBranches();
+  const { services, serviceError, serviceLoading } = useService();
+  const { appointments, appointmentsLoading } = useAppointments();
+  const { patients, patientError, patientLoading } = usePatients();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -103,25 +107,17 @@ export function NewAppointmentForm({ setOpen, mutate }: NewServiceFormProps) {
     }
   }
 
-  if (!data) return <>Loading ...</>;
+  if (branchLoading || serviceLoading || appointmentsLoading || patientLoading)
+    return <>Loading</>;
+
   const date = form.watch("date");
   const selectedBranch = form.watch("branch");
   const patient = form.watch("id");
 
-  const patientsTable = data.find((item) => item.table_name === "patients");
-  const patients = patientsTable?.row_data?.filter(
-    (item: { deleteOn: null | Date }) => item.deleteOn === null
-  );
-  const appointmentsTable = data.find(
-    (item) => item.table_name === "appointments"
-  );
-
-  const services = data.find((item) => item.table_name === "services");
-  const branch = data.find((item) => item.table_name === "branch");
-
-  const patientAppointments = (appointmentsTable.row_data as Appointment[])
+  const patientAppointments = (appointments?.data as Appointment[])
     .filter((item) => item.patient_id === patient)
     .map((item) => item.date);
+
   const { isSubmitting } = form.formState;
 
   return (
@@ -133,7 +129,7 @@ export function NewAppointmentForm({ setOpen, mutate }: NewServiceFormProps) {
             form={form}
             name={"id"}
             label={"Patient"}
-            data={patients}
+            data={patients?.data}
             num={true}
             search={true}
           />
@@ -141,7 +137,7 @@ export function NewAppointmentForm({ setOpen, mutate }: NewServiceFormProps) {
             form={form}
             name={"branch"}
             label={"Branch"}
-            data={branch.row_data}
+            data={branches}
             num={true}
           />
           <Field
@@ -155,7 +151,7 @@ export function NewAppointmentForm({ setOpen, mutate }: NewServiceFormProps) {
             form={services}
             name={"service"}
             label={"Service"}
-            data={services.row_data}
+            data={services?.data}
             num={true}
           />
           <Field form={form} name={"type"} label={"Type"} data={type} />
