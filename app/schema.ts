@@ -49,6 +49,7 @@ export type Database = {
       };
       appointments: {
         Row: {
+          patients: any;
           appointment_ticket: string | null;
           branch: number | null;
           date: string | null;
@@ -284,6 +285,7 @@ export type Database = {
       };
       services: {
         Row: {
+          email: string;
           deleteOn: string | null;
           description: string | null;
           id: number;
