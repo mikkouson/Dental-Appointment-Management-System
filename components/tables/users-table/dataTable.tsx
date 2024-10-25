@@ -1,8 +1,9 @@
-import { deleteService, deleteUser } from "@/app/(admin)/action";
+import { deleteUser } from "@/app/(admin)/action";
 import type { Service } from "@/app/schema";
 import { useSetActiveAppointments } from "@/app/store";
 import { toast } from "@/components/hooks/use-toast";
 import { DeleteModal } from "@/components/modal/deleteModal";
+import { EditUser } from "@/components/modal/services/editUser";
 import {
   Table,
   TableBody,
@@ -27,7 +28,6 @@ import {
 } from "@tanstack/react-table";
 import * as React from "react";
 import { ScrollArea, ScrollBar } from "../../ui/scroll-area";
-import { EditService } from "@/components/modal/services/editService";
 
 type Column = ColumnDef<Service>;
 
@@ -153,7 +153,7 @@ export function DataTableDemo({
                     <DeleteModal
                       formAction={() => handleDelete(row.original.id)}
                     />
-                    <EditService data={row.original} mutate={mutate} />
+                    <EditUser data={row.original} mutate={mutate} />
                   </div>
                 </TableCell>
               </TableRow>

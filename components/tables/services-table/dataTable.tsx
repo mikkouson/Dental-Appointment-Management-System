@@ -28,7 +28,7 @@ import {
 } from "@tanstack/react-table";
 import * as React from "react";
 import { ScrollArea, ScrollBar } from "../../ui/scroll-area";
-import { EditService } from "@/components/modal/services/editService";
+import { EditService } from "@/components/modal/users/editService";
 
 type Column = ColumnDef<Service>;
 

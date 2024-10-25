@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/utils/supabase/client";
-import { Search, File } from "lucide-react"; 
+import { Search, File } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 import useSWR from "swr";
@@ -18,7 +18,7 @@ import { DataTableDemo } from "./dataTable";
 import { PaginationDemo } from "@/components/pagitnation";
 import TableLoadingSkeleton from "@/components/skeleton/tableskeleton";
 import { NewUserForm } from "@/components/forms/users/newUserForm";
-import { CSVLink } from "react-csv"; 
+import { CSVLink } from "react-csv";
 import { Button } from "@/components/ui/button";
 
 const fetcher = async (
@@ -125,15 +125,16 @@ export default function UserClient() {
             {/* CSV Export Button */}
             <CSVLink
               data={(data?.data || []).map((user) => ({
-                name: user.name || "null", 
-                username: user.username || "null", 
+                name: user.name || "null",
                 email: user.email || "null",
                 updated_at: user.updated_at || "null",
-        
               }))}
               filename={"users.csv"}
             >
-              <Button variant="outline" className="text-xs sm:text-sm px-2 sm:px-4 mr-2">
+              <Button
+                variant="outline"
+                className="text-xs sm:text-sm px-2 sm:px-4 mr-2"
+              >
                 <File className="h-3.5 w-3.5 mr-2" />
                 <span className="sr-only sm:not-sr-only">Export</span>
               </Button>
@@ -158,11 +159,7 @@ export default function UserClient() {
                   activePatient={undefined}
                 />
 
-                <PaginationDemo
-                  currentPage={page}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
+                <PaginationDemo totalPages={totalPages} />
               </>
             ) : (
               <p>No data available</p>

@@ -129,11 +129,13 @@ export default function UserClient() {
                 quantity: item.quantity || "null",
                 deleteOn: item.deleteOn || "null",
                 updated_at: item.updated_at || "null",
-                
               }))}
               filename={"inventory.csv"}
             >
-              <Button variant="outline" className="text-xs sm:text-sm px-2 sm:px-4 mr-2">
+              <Button
+                variant="outline"
+                className="text-xs sm:text-sm px-2 sm:px-4 mr-2"
+              >
                 <File className="h-3.5 w-3.5 mr-2" />
                 <span className="sr-only sm:not-sr-only">Export</span>
               </Button>
@@ -162,11 +164,7 @@ export default function UserClient() {
                   activePatient={undefined}
                 />
 
-                <PaginationDemo
-                  currentPage={page}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
+                <PaginationDemo totalPages={totalPages} />
               </>
             ) : (
               <p>No data available</p>

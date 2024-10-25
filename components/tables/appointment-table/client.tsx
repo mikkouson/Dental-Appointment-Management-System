@@ -1,35 +1,29 @@
 "use client";
 import Loading from "@/app/(admin)/appointments/loading";
-import { AppointmentsCol } from "@/app/schema";
 import { useGetDate } from "@/app/store";
 import { CheckboxReactHookFormMultiple } from "@/components/buttons/comboBoxSelect";
-import BranchSelect from "@/components/buttons/selectbranch-btn";
+import AppointmentExport from "@/components/buttons/exportButtons/appointmentExport";
 import { NewAppointmentForm } from "@/components/forms/appointment/new-appointment-form";
 import { Heading } from "@/components/heading";
+import { useAppointments } from "@/components/hooks/useAppointment";
+import { useStatuses } from "@/components/hooks/useStatuses";
 import PageContainer from "@/components/layout/page-container";
 import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
 import { PaginationDemo } from "@/components/pagitnation";
-import { Button } from "@/components/ui/button";
+import TableLoadingSkeleton from "@/components/skeleton/tableskeleton";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { createClient } from "@/utils/supabase/client";
-import { File, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import React, { ChangeEvent, useEffect, useMemo, useState } from "react";
-import { CSVLink } from "react-csv";
-import useSWR from "swr";
+import { ChangeEvent, useMemo, useState } from "react";
 import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
+import { useBranches } from "@/components/hooks/useBranches";
+import FilterSelect from "@/components/buttons/filterSelect";
+import SelectBranch from "@/components/buttons/selectBranch";
+import SelectStatus from "@/components/buttons/selectStatus";
 
-const fetcher = async (url: string) => {
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error("An error occurred while fetching the data.");
-  }
-  return res.json();
-};
-
-const UserClient: React.FC = () => {
+export default function UserClient() {
   // State Management
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>(
@@ -42,80 +36,18 @@ const UserClient: React.FC = () => {
   const router = useRouter();
   const page = parseInt(searchParams.get("page") || "1", 10);
   const query = searchParams.get("query") || "";
-
-  // Global Store
-  const { status: storeStatus, branch } = useGetDate((state) => ({
-    status: state.status,
-    branch: state.branch,
-  }));
-
-  const statusIds = useMemo(
-    () => storeStatus.map((stat) => stat.id),
-    [storeStatus]
-  );
+  const branch = searchParams.get("branches");
+  const status = searchParams.get("statuses");
 
   // Data Fetching
-  const { data: statuses, isLoading: statusLoading } = useSWR(
-    "/api/status/",
-    fetcher
-  );
-  const { data: branches, isLoading: branchLoading } = useSWR(
-    "/api/branch/",
-    fetcher
-  );
+  const { statuses, statusLoading } = useStatuses();
+  const { branches, branchLoading } = useBranches();
 
-  const statusList = useMemo(
-    () => statuses?.map((s: { id: number }) => s.id) || [],
-    [statuses]
-  );
-
-  const { data, isLoading, mutate } = useSWR<{
-    data: AppointmentsCol[] | [];
-    count: number;
-  }>(
-    branches
-      ? `/api/apt?page=${page}&query=${query}&branch=${
-          branch !== 0 ? branch : branches[0]?.id
-        }&status=${statusIds.length === 0 ? statusList.join(",") : statusIds}`
-      : null,
-    fetcher
-  );
-
-  // Fetching all data with no pagination for export
-  const { data: exportData } = useSWR<{
-    data: AppointmentsCol[] | [];
-    count: number;
-  }>(
-    branches
-      ? `/api/apt?query=${query}&branch=${
-          branch !== 0 ? branch : branches[0]?.id
-        }&status=${statusIds.length === 0 ? statusList.join(",") : statusIds}`
-      : null,
-    fetcher
-  );
-
-  const exported = exportData?.data;
-
-  const supabase = createClient();
-
-  // Realtime Updates
-  useEffect(() => {
-    const channel = supabase
-      .channel("realtime-appointments")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "appointments" },
-        () => {
-          mutate();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [supabase, mutate]);
-
+  const {
+    appointments: data,
+    appointmentsLoading: isLoading,
+    mutate,
+  } = useAppointments(page, query, branch, status);
   // Handlers
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -135,19 +67,19 @@ const UserClient: React.FC = () => {
     router.replace(`${pathname}?${params.toString()}`);
   };
 
-  const handlePageChange = (newPage: number) => {
-    const params = new URLSearchParams(searchParams);
-    params.set("page", newPage.toString());
-    router.replace(`${pathname}?${params.toString()}`);
-  };
-
   const totalPages = data ? Math.ceil(data.count / 10) : 1;
+  if (statusLoading || branchLoading) return <Loading />;
+  // if (isLoading) return <Loading />;
 
-  if (isLoading || statusLoading || branchLoading) return <Loading />;
-
+  const statusOptions = statuses.map(
+    (status: { id: number; name: string }) => ({
+      id: status.id,
+      name: status.name,
+    })
+  );
   return (
     <PageContainer>
-      <div className="space-y-4">
+      <div className="space-y-4 h-[calc(100vh-144px)]">
         {/* Header Section */}
         <div className="flex flex-col 2xl:flex-row lg:items-start lg:justify-between">
           <Heading
@@ -172,38 +104,10 @@ const UserClient: React.FC = () => {
             {/* Action Buttons */}
             <div className="flex justify-end mt-2 sm:mt-0">
               {/* Export Button */}
-              <CSVLink
-                data={(exported || []).map((apt: AppointmentsCol) => ({
-                  patient_name: apt?.patients?.name || "null",
-                  appointment_ticket: apt.appointment_ticket || "null",
-                  branch: apt?.branch?.name || "null",
-                  status: apt?.status?.name || "null",
-                  services: apt?.services?.name || "null",
-                  time_slots: apt.time_slots?.time || "null",
-                  type: apt.type || "null",
-                  deleteOn: apt.deleteOn || "null",
-                }))}
-                filename={"appointments.csv"}
-              >
-                <Button
-                  variant="outline"
-                  className="text-xs sm:text-sm px-2 sm:px-4 mr-2"
-                >
-                  <File className="h-3.5 w-3.5 mr-2" />
-                  <span className="sr-only sm:not-sr-only">Export</span>
-                </Button>
-              </CSVLink>
+              <AppointmentExport />
 
-              {/* Status Filter */}
-              {statuses && (
-                <CheckboxReactHookFormMultiple
-                  items={statuses}
-                  label="Status"
-                />
-              )}
-
-              {/* Branch Selector */}
-              <BranchSelect />
+              <SelectBranch />
+              <SelectStatus />
 
               {/* New Appointment Drawer */}
               <DrawerDialogDemo
@@ -220,27 +124,25 @@ const UserClient: React.FC = () => {
         <Separator />
 
         {/* Data Table and Pagination */}
-        <div>
-          {data && data.data.length ? (
-            <>
-              <DataTableDemo
-                columns={columns}
-                data={data.data}
-                mutate={mutate}
-              />
-              <PaginationDemo
-                currentPage={page}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
-            </>
-          ) : (
-            <p>No data available.</p>
-          )}
-        </div>
+        {!isLoading ? (
+          <div>
+            {data && data.data.length ? (
+              <>
+                <DataTableDemo
+                  columns={columns}
+                  data={data.data}
+                  mutate={mutate}
+                />
+                <PaginationDemo totalPages={totalPages} />
+              </>
+            ) : (
+              <p>No data available.</p>
+            )}
+          </div>
+        ) : (
+          <TableLoadingSkeleton />
+        )}
       </div>
     </PageContainer>
   );
-};
-
-export default UserClient;
+}

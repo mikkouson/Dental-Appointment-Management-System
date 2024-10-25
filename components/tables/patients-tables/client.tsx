@@ -1,5 +1,5 @@
 "use client";
-import type { Address, Patient, PatientCol } from "@/app/schema";
+import type { Address, Patient } from "@/app/schema";
 import { useSetActive } from "@/app/store";
 import { Breadcrumbs } from "@/components/breadcrumb";
 import PatientCard from "@/components/cards/patientCard";
@@ -10,7 +10,7 @@ import { PaginationDemo } from "@/components/pagitnation";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/utils/supabase/client";
-import { Search, Table, File } from "lucide-react"; // Import File for CSV export
+import { Search, Table, File } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import useSWR, { preload } from "swr";
@@ -20,9 +20,9 @@ import { NewPatientForm } from "@/components/forms/patients/newPatientForm";
 import Skeleton from "@/components/skeleton/tableskeleton";
 import TableLoadingSkeleton from "@/components/skeleton/tableskeleton";
 import PatientCardSkeleton from "@/components/skeleton/patientCardSkeleton";
-import { CSVLink } from "react-csv"; // Import CSVLink for exporting
+import { CSVLink } from "react-csv";
 import { Button } from "@/components/ui/button";
-
+import { usePatients } from "@/components/hooks/usePatient";
 
 const fetcher = async (
   url: string
@@ -31,25 +31,24 @@ const fetcher = async (
   count: number;
 }> => fetch(url).then((res) => res.json());
 
-preload(`/api/patients`, fetcher);
-
 export default function UserClient() {
   const [open, setOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = useState<string>(
     useSearchParams().get("query") || ""
   );
   const activePatient = useSetActive((state) => state.selectedPatient);
+  const [usePagination, setUsePagination] = useState(true); // state for pagination
 
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
   const page = parseInt(searchParams.get("page") || "1", 10);
   const query = searchParams.get("query") || "";
-  const { data, error, isLoading, mutate } = useSWR<{
-    data: (Patient & { address?: Address | null })[];
-    count: number;
-  }>(`/api/patients?page=${page}&query=${query}`, fetcher);
-  
+  const { patients, patientError, patientLoading, mutate } = usePatients(
+    page,
+    query,
+    usePagination
+  );
 
   const supabase = createClient();
 
@@ -97,7 +96,7 @@ export default function UserClient() {
     { title: "Patients", link: "/patients" },
   ];
 
-  const totalPages = data ? Math.ceil(data.count / 10) : 1;
+  const totalPages = patients ? Math.ceil(patients.count / 10) : 1;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -105,7 +104,13 @@ export default function UserClient() {
     handleSearch(value);
   };
 
-  
+  const handleCSVExport = () => {
+    setUsePagination(false); // disable pagination for export
+    setTimeout(() => {
+      setUsePagination(true); // re-enable pagination after export
+    }, 2000); // delay to simulate export completion (adjust as needed)
+  };
+
   return (
     <PageContainer>
       <div className="space-y-4">
@@ -113,7 +118,7 @@ export default function UserClient() {
 
         <div className="flex flex-col 2xl:flex-row lg:items-start lg:justify-between">
           <Heading
-            title={`Total Patients (${data ? data.count : "loading"})`}
+            title={`Total Patients (${patients ? patients.count : "loading"})`}
             description="Manage patients (Server side table functionalities.)"
           />
 
@@ -128,25 +133,30 @@ export default function UserClient() {
                 value={searchQuery}
               />
             </div>
-            
+
             {/* CSV Export Button */}
             <CSVLink
-              data={(data?.data || []).map((patient: Patient & { address?: Address | null }) => ({
-                name: patient.name || "null", 
-                email: patient.email || "null",
-                sex: patient.sex || "null",
-                age: patient.age || "null",
-                address: patient.address?.address || "null",
-                phone: patient.phone_number || "null",    
-                birthdate: patient.dob || "null", 
-                status: patient.status || "null",
-                created_at: patient.created_at || "null",
-                updated_at: patient.updated_at || "null",
-                
-              }))}
+              data={(patients?.data || []).map(
+                (patient: Patient & { address?: Address | null }) => ({
+                  name: patient.name || "null",
+                  email: patient.email || "null",
+                  sex: patient.sex || "null",
+                  age: patient.age || "null",
+                  address: patient.address?.address || "null",
+                  phone: patient.phone_number || "null",
+                  birthdate: patient.dob || "null",
+                  status: patient.status || "null",
+                  created_at: patient.created_at || "null",
+                  updated_at: patient.updated_at || "null",
+                })
+              )}
               filename={"patients.csv"}
+              onClick={handleCSVExport} // trigger pagination off for export
             >
-              <Button variant="outline" className="text-xs sm:text-sm px-2 sm:px-4 mr-2">
+              <Button
+                variant="outline"
+                className="text-xs sm:text-sm px-2 sm:px-4 mr-2"
+              >
                 <File className="h-3.5 w-3.5 mr-2" />
                 <span className="sr-only sm:not-sr-only">Export</span>
               </Button>
@@ -164,35 +174,31 @@ export default function UserClient() {
         <Separator />
         <div className="flex flex-col  2xl:flex-row">
           <div className="flex-1">
-            {isLoading ? (
+            {patientLoading ? (
               <TableLoadingSkeleton />
-            ) : data && data.data && data.data.length > 0 ? (
+            ) : patients && patients.data && patients.data.length > 0 ? (
               <>
                 <DataTableDemo
                   columns={columns}
-                  data={data.data}
+                  data={patients.data}
                   activePatient={
                     activePatient === 0
-                      ? data.data[0].id
+                      ? patients.data[0].id
                       : activePatient || undefined
                   }
                   mutate={mutate}
                 />
-                <PaginationDemo
-                  currentPage={page}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
+                <PaginationDemo totalPages={totalPages} />
               </>
             ) : (
               <p>No data available</p>
             )}
           </div>
           <div className="w-full mt-5 2xl:w-1/5 2xl:ml-5 2xl:mt-0">
-            {data && data.data && data.data.length > 0 ? (
+            {patients && patients.data && patients.data.length > 0 ? (
               <PatientCard
                 activePatient={
-                  activePatient === 0 ? data.data[0].id : activePatient
+                  activePatient === 0 ? patients.data[0].id : activePatient
                 }
               />
             ) : (

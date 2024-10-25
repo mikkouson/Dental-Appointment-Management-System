@@ -19,6 +19,7 @@ import { PaginationDemo } from "@/components/pagitnation";
 import TableLoadingSkeleton from "@/components/skeleton/tableskeleton";
 import { CSVLink } from "react-csv"; // Import CSVLink for exporting
 import { Button } from "@/components/ui/button";
+import { useService } from "@/components/hooks/useService";
 
 const fetcher = async (
   url: string
@@ -38,10 +39,11 @@ export default function UserClient() {
   const { replace } = useRouter();
   const page = parseInt(searchParams.get("page") || "1", 10);
   const query = searchParams.get("query") || "";
-  const { data, error, isLoading, mutate } = useSWR<{
-    data: Service[] | [];
-    count: number;
-  }>(`/api/service?page=${page}&query=${query}`, fetcher);
+
+  const { services, serviceError, serviceLoading, mutate } = useService(
+    page,
+    query
+  );
 
   const supabase = createClient();
 
@@ -97,7 +99,7 @@ export default function UserClient() {
   ];
 
   // Calculate total pages for pagination
-  const totalPages = data ? Math.ceil(data.count / 10) : 1;
+  const totalPages = services ? Math.ceil(services.count / 10) : 1;
 
   return (
     <PageContainer>
@@ -106,7 +108,7 @@ export default function UserClient() {
 
         <div className="flex flex-col 2xl:flex-row lg:items-start lg:justify-between">
           <Heading
-            title={`Total Services (${data ? data.count : "loading"})`}
+            title={`Total Services (${services ? services.count : "loading"})`}
             description="Manage Services (Server side table functionalities.)"
           />
           <div className="flex justify-end max-w-full w-full mt-2 sm:ml-0 sm:max-w-full 2xl:max-w-[730px] ">
@@ -123,7 +125,7 @@ export default function UserClient() {
 
             {/* CSV Export Button */}
             <CSVLink
-              data={(data?.data || []).map((service) => ({
+              data={(services?.data || []).map((service) => ({
                 name: service.name || "null",
                 description: service.description || "null",
                 price: service.price || "null",
@@ -132,7 +134,10 @@ export default function UserClient() {
               }))}
               filename={"services.csv"}
             >
-              <Button variant="outline" className="text-xs sm:text-sm px-2 sm:px-4 mr-2">
+              <Button
+                variant="outline"
+                className="text-xs sm:text-sm px-2 sm:px-4 mr-2"
+              >
                 <File className="h-3.5 w-3.5 mr-2" />
                 <span className="sr-only sm:not-sr-only">Export</span>
               </Button>
@@ -150,22 +155,18 @@ export default function UserClient() {
         <Separator />
         <div>
           <div>
-            {isLoading ? (
+            {serviceLoading ? (
               <TableLoadingSkeleton />
-            ) : data && data.data ? (
+            ) : services && services.data ? (
               <>
                 <DataTableDemo
                   columns={columns}
-                  data={data.data}
+                  data={services.data}
                   mutate={mutate}
                   activePatient={undefined}
                 />
 
-                <PaginationDemo
-                  currentPage={page}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
+                <PaginationDemo totalPages={totalPages} />
               </>
             ) : (
               <p>No data available</p>
