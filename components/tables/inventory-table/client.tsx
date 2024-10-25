@@ -17,9 +17,9 @@ import { DataTableDemo } from "./dataTable";
 import { PaginationDemo } from "@/components/pagitnation";
 import { NewInventoryForm } from "@/components/forms/inventory/newInventoryForm";
 import TableLoadingSkeleton from "@/components/skeleton/tableskeleton";
-import { CSVLink } from "react-csv"; // Import CSVLink for exporting
+import { CSVLink } from "react-csv";
 import { Button } from "@/components/ui/button";
-
+import SelectBranch from "@/components/buttons/selectBranch"; 
 const fetcher = async (
   url: string
 ): Promise<{
@@ -38,10 +38,12 @@ export default function UserClient() {
   const { replace } = useRouter();
   const page = parseInt(searchParams.get("page") || "1", 10);
   const query = searchParams.get("query") || "";
+  const branches = searchParams.get("branches") || ""; 
+
   const { data, error, isLoading, mutate } = useSWR<{
     data: Inventory[] | [];
     count: number;
-  }>(`/api/inventory?page=${page}&query=${query}`, fetcher);
+  }>(`/api/inventory?page=${page}&query=${query}&branches=${branches}`, fetcher);
 
   const supabase = createClient();
 
@@ -120,6 +122,8 @@ export default function UserClient() {
                 onChange={handleInputChange}
               />
             </div>
+
+            <SelectBranch /> {/* Add branch selection component */}
 
             {/* CSV Export Button */}
             <CSVLink
