@@ -26,7 +26,7 @@ export default function page() {
   return (
     <SidebarDemo>
       <main className=" overflow-auto   rounded-tl-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 flex flex-col gap-2 flex-1 w-full h-full">
-        <Header />
+        {/* <Header /> */}
         <PageContainer>
           <div className="space-y-2">
             <div className="flex items-center justify-between space-y-2">
