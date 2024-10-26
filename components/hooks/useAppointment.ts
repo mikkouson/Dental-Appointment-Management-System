@@ -19,30 +19,40 @@ const fetcher = async (
 };
 
 export function useAppointments(
-  page?: number,
+  page?: number | null,
   query?: string,
-  branches?: string | null, // Expect branches as a string from useSearchParams
-  status?: string | null // Expect branches as a string from useSearchParams
+  branches?: string | null,
+  status?: string | null,
+  date?: string | null,
+  limit?: number | null
 ) {
   const queryString = new URLSearchParams();
 
-  if (query !== undefined) {
+  if (query) {
     queryString.append("query", query);
   }
 
-  // Handle branches as an array
   if (branches) {
     const branchArray = branches.split(",");
-    queryString.append("branch", branchArray.join(",")); // Append branches as comma-separated values
+    queryString.append("branch", branchArray.join(","));
   }
 
   if (status) {
-    const branchArray = status.split(",");
-    queryString.append("statuses", branchArray.join(",")); // Append branches as comma-separated values
+    const statusArray = status.split(",");
+    queryString.append("statuses", statusArray.join(","));
   }
 
-  if (page !== undefined) {
+  if (page) {
     queryString.append("page", String(page));
+  }
+
+  // Add date filter as equality
+  if (date) {
+    queryString.append("date", date);
+  }
+
+  if (limit) {
+    queryString.append("limit", String(limit)); // Add limit to query string
   }
 
   const {
