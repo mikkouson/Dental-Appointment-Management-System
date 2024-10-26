@@ -8,8 +8,8 @@ export async function GET(req: NextRequest) {
   const pageParam = req.nextUrl.searchParams.get("page");
   const statusParam = req.nextUrl.searchParams.get("statuses");
   const branchParam = req.nextUrl.searchParams.get("branch"); // Fixed variable name
-
-  const pageSize = 10; // Define your desired page size
+  const limitParam = req.nextUrl.searchParams.get("limit");
+  const limit = limitParam ? parseInt(limitParam, 10) : 10; // Default to 10 if no limit is provided
 
   // Default to page 1 if no page parameter is provided
   const page = pageParam ? parseInt(pageParam, 10) : 1;
@@ -62,9 +62,11 @@ export async function GET(req: NextRequest) {
     query = query.eq("date", date);
   }
 
+  // Retrieve and convert the limit parameter
+
   // Apply pagination if page parameter is present
   if (pageParam) {
-    query = query.range((page - 1) * pageSize, page * pageSize - 1);
+    query = query.range((page - 1) * limit, page * limit - 1);
   }
 
   // Execute the query
