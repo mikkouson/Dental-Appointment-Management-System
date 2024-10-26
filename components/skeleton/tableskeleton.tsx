@@ -14,7 +14,7 @@ const TableLoadingSkeleton = () => {
         <Skeleton className="h-4 w-full col-span-1" />
         <Skeleton className="h-4 w-full col-span-1" />
       </div>
-      {Array.from({ length: 10 }).map((_, idx) => (
+      {Array.from({ length: 14 }).map((_, idx) => (
         <div key={idx} className="grid grid-cols-7 gap-4 p-4 border-t ">
           <Skeleton className="h-4 w-full col-span-1" />
           <Skeleton className="h-4 w-full col-span-1" />

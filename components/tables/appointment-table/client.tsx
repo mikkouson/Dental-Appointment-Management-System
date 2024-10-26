@@ -1,34 +1,32 @@
 "use client";
-import Loading from "@/app/(admin)/appointments/loading";
-import { useGetDate } from "@/app/store";
-import { CheckboxReactHookFormMultiple } from "@/components/buttons/comboBoxSelect";
+import AppointmentCalendar from "@/components/appointment";
 import AppointmentExport from "@/components/buttons/exportButtons/appointmentExport";
+import SelectBranch from "@/components/buttons/selectBranch";
+import SelectStatus from "@/components/buttons/selectStatus";
 import { NewAppointmentForm } from "@/components/forms/appointment/new-appointment-form";
-import { Heading } from "@/components/heading";
 import { useAppointments } from "@/components/hooks/useAppointment";
-import { useStatuses } from "@/components/hooks/useStatuses";
 import PageContainer from "@/components/layout/page-container";
 import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
-import { PaginationDemo } from "@/components/pagitnation";
 import TableLoadingSkeleton from "@/components/skeleton/tableskeleton";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Search } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calendar, Search, Table2 } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ChangeEvent, useMemo, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
-import { useBranches } from "@/components/hooks/useBranches";
-import FilterSelect from "@/components/buttons/filterSelect";
-import SelectBranch from "@/components/buttons/selectBranch";
-import SelectStatus from "@/components/buttons/selectStatus";
+import { PaginationDemo } from "@/components/pagination";
+import { Button } from "@/components/ui/button";
+import { Heading } from "@/components/heading";
+import BurgerMenu from "@/components/buttons/burgerMenu";
 
 export default function UserClient() {
-  // State Management
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>(
     useSearchParams().get("query") || ""
   );
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   // Routing and URL Management
   const searchParams = useSearchParams();
@@ -38,16 +36,13 @@ export default function UserClient() {
   const query = searchParams.get("query") || "";
   const branch = searchParams.get("branches");
   const status = searchParams.get("statuses");
-
-  // Data Fetching
-  const { statuses, statusLoading } = useStatuses();
-  const { branches, branchLoading } = useBranches();
-
+  const limit = parseInt(searchParams.get("limit") || "10", 10);
   const {
     appointments: data,
     appointmentsLoading: isLoading,
     mutate,
-  } = useAppointments(page, query, branch, status);
+  } = useAppointments(page, query, branch, status, null, limit);
+
   // Handlers
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -67,49 +62,25 @@ export default function UserClient() {
     router.replace(`${pathname}?${params.toString()}`);
   };
 
-  const totalPages = data ? Math.ceil(data.count / 10) : 1;
-  if (statusLoading || branchLoading) return <Loading />;
-  // if (isLoading) return <Loading />;
+  const totalPages = data ? Math.ceil(data.count / limit) : 1;
 
-  const statusOptions = statuses.map(
-    (status: { id: number; name: string }) => ({
-      id: status.id,
-      name: status.name,
-    })
-  );
   return (
     <PageContainer>
-      <div className="space-y-4 h-[calc(100vh-144px)]">
-        {/* Header Section */}
-        <div className="flex flex-col 2xl:flex-row lg:items-start lg:justify-between">
-          <Heading
-            title={`Total Appointments (${data ? data.count : "Loading"})`}
-            description="Manage Appointments (Server side table functionalities.)"
-          />
-
-          {/* Search and Actions */}
-          <div className="flex justify-end max-w-full flex-col md:flex-row w-full sm:max-w-full 2xl:max-w-[830px]">
-            {/* Search Input */}
-            <div className="mr-0 mt-2 sm:mr-2 sm:mt-0 relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search Patient Name ..."
-                className="w-full rounded-lg bg-background pl-8"
-                value={searchQuery}
-                onChange={handleInputChange}
+      <div className="flex flex-col h-[calc(100svh-20px)] ">
+        <Tabs defaultValue="table" className="flex-grow">
+          <div className="flex justify-between items-center mt-0 sm:mt-4">
+            <div className="flex items-center">
+              <BurgerMenu />
+              <h4 className="scroll-m-20 text-md font-semibold tracking-tight sm:hidden">
+                Total Appointments ({data ? data.count : "Loading"})
+              </h4>
+              <Heading
+                title={`Total Appointments (${data ? data.count : "Loading"})`}
+                description="Manage Appointments (Server side table functionalities.)"
               />
             </div>
-
-            {/* Action Buttons */}
-            <div className="flex justify-end mt-2 sm:mt-0">
-              {/* Export Button */}
+            <div className="flex items-center ">
               <AppointmentExport />
-
-              <SelectBranch />
-              <SelectStatus />
-
-              {/* New Appointment Drawer */}
               <DrawerDialogDemo
                 open={open}
                 setOpen={setOpen}
@@ -119,29 +90,103 @@ export default function UserClient() {
               </DrawerDialogDemo>
             </div>
           </div>
-        </div>
-
-        <Separator />
-
-        {/* Data Table and Pagination */}
-        {!isLoading ? (
-          <div>
-            {data && data.data.length ? (
-              <>
-                <DataTableDemo
-                  columns={columns}
-                  data={data.data}
-                  mutate={mutate}
-                />
-                <PaginationDemo totalPages={totalPages} />
-              </>
-            ) : (
-              <p>No data available.</p>
+          <Separator className="my-2" />
+          <div className="flex justify-between items-center">
+            {/* Hide branch and status selectors on smaller screens only when search is focused */}
+            {!isSearchFocused && (
+              <div className="flex justify-end items-center">
+                <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0 mr-2">
+                  <TabsTrigger
+                    value="table"
+                    className="relative rounded-none border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-none focus-visible:ring-0 data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:dark:bg-neutral-800"
+                  >
+                    <Table2
+                      className="md:hidden text-muted-foreground"
+                      size={20}
+                    />
+                    <span className=" hidden md:block"> Table Mode</span>
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="calendar"
+                    className="relative rounded-none border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-none focus-visible:ring-0 data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:dark:bg-neutral-800"
+                  >
+                    <Calendar
+                      className="md:hidden text-muted-foreground"
+                      size={20}
+                    />
+                    <span className=" hidden md:block"> Calendar Mode</span>
+                  </TabsTrigger>
+                </TabsList>
+                <SelectBranch />
+                <SelectStatus />
+              </div>
             )}
+            <div
+              className={`mr-0  relative ${
+                isSearchFocused ? "w-full" : "w-auto"
+              }`}
+            >
+              <div className="hidden md:block">
+                <Search className="absolute left-2.5 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder="Search Patient Name ..."
+                  className="w-full rounded-lg bg-background pl-8"
+                  value={searchQuery}
+                  onChange={handleInputChange}
+                />
+              </div>
+              {!isSearchFocused ? (
+                <Button variant={"outline"} className="block md:hidden p-2">
+                  <Search
+                    size={14}
+                    className="cursor-pointer text-muted-foreground"
+                    onClick={() => setIsSearchFocused(true)}
+                  />
+                </Button>
+              ) : (
+                <div className="relative w-full">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="search"
+                    placeholder="Search Patient Name ..."
+                    className="w-full rounded-lg bg-background pl-8"
+                    value={searchQuery}
+                    onChange={handleInputChange}
+                    onBlur={() => setIsSearchFocused(false)}
+                    autoFocus
+                  />
+                </div>
+              )}
+            </div>
           </div>
-        ) : (
-          <TableLoadingSkeleton />
-        )}
+          <TabsContent value="table">
+            <div>
+              {!isLoading ? (
+                <div>
+                  {data && data.data.length ? (
+                    <>
+                      <DataTableDemo
+                        columns={columns}
+                        data={data.data}
+                        mutate={mutate}
+                      />
+                      <PaginationDemo totalPages={totalPages} />
+                    </>
+                  ) : (
+                    <p>No data available.</p>
+                  )}
+                </div>
+              ) : (
+                <TableLoadingSkeleton />
+              )}
+            </div>
+          </TabsContent>
+          <TabsContent value="calendar">
+            <AppointmentCalendar />
+          </TabsContent>
+        </Tabs>
+        {/* Pagination now at the very end */}
       </div>
     </PageContainer>
   );

@@ -8,7 +8,6 @@ import { Heading } from "@/components/heading";
 import { useInventory } from "@/components/hooks/useInventory";
 import PageContainer from "@/components/layout/page-container";
 import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
-import { PaginationDemo } from "@/components/pagitnation";
 import TableLoadingSkeleton from "@/components/skeleton/tableskeleton";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -17,8 +16,9 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ChangeEvent, useState } from "react";
 import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
-import { useBranches } from "@/components/hooks/useBranches"; 
-import SelectBranch from "@/components/buttons/selectBranch"; 
+import { useBranches } from "@/components/hooks/useBranches";
+import SelectBranch from "@/components/buttons/selectBranch";
+import { PaginationDemo } from "@/components/pagination";
 
 export default function InventoryClient() {
   const [open, setOpen] = useState(false);
@@ -31,14 +31,14 @@ export default function InventoryClient() {
   const router = useRouter();
   const page = parseInt(searchParams.get("page") || "1", 10);
   const query = searchParams.get("query") || "";
-  const branch = searchParams.get("branches") || ""; 
+  const branch = searchParams.get("branches") || "";
 
   const { branches, branchLoading } = useBranches();
   const {
     inventory: data,
     inventoryLoading: isLoading,
     mutate,
-  } = useInventory(page, query, branch); 
+  } = useInventory(page, query, branch);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -83,7 +83,7 @@ export default function InventoryClient() {
             </div>
             <div className="flex justify-end mt-2 sm:mt-0">
               <InventoryExport />
-              <SelectBranch /> 
+              <SelectBranch />
               <DrawerDialogDemo
                 open={open}
                 setOpen={setOpen}
@@ -103,6 +103,7 @@ export default function InventoryClient() {
                   columns={columns}
                   data={data.data}
                   mutate={mutate}
+                  activePatient={undefined}
                 />
                 <PaginationDemo totalPages={totalPages} />
               </>

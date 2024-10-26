@@ -3,33 +3,24 @@ import type { Address, Patient } from "@/app/schema";
 import { useSetActive } from "@/app/store";
 import { Breadcrumbs } from "@/components/breadcrumb";
 import PatientCard from "@/components/cards/patientCard";
+import { NewPatientForm } from "@/components/forms/patients/newPatientForm";
 import { Heading } from "@/components/heading";
+import { usePatients } from "@/components/hooks/usePatient";
 import PageContainer from "@/components/layout/page-container";
 import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
-import { PaginationDemo } from "@/components/pagitnation";
+import { PaginationDemo } from "@/components/pagination";
+import PatientCardSkeleton from "@/components/skeleton/patientCardSkeleton";
+import TableLoadingSkeleton from "@/components/skeleton/tableskeleton";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/utils/supabase/client";
-import { Search, Table, File } from "lucide-react";
+import { File, Search } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import useSWR, { preload } from "swr";
+import { CSVLink } from "react-csv";
 import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
-import { NewPatientForm } from "@/components/forms/patients/newPatientForm";
-import Skeleton from "@/components/skeleton/tableskeleton";
-import TableLoadingSkeleton from "@/components/skeleton/tableskeleton";
-import PatientCardSkeleton from "@/components/skeleton/patientCardSkeleton";
-import { CSVLink } from "react-csv";
-import { Button } from "@/components/ui/button";
-import { usePatients } from "@/components/hooks/usePatient";
-
-const fetcher = async (
-  url: string
-): Promise<{
-  data: (Patient & { address?: Address | null })[];
-  count: number;
-}> => fetch(url).then((res) => res.json());
 
 export default function UserClient() {
   const [open, setOpen] = React.useState(false);

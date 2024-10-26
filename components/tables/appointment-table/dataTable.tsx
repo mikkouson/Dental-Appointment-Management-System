@@ -110,7 +110,7 @@ export function DataTableDemo({
 
   return (
     <>
-      <ScrollArea className=" rounded-md border">
+      <ScrollArea className="h-[calc(80vh-20px)]   border">
         <Table className="relative">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

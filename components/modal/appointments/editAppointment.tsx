@@ -13,11 +13,13 @@ import { z } from "zod";
 import { CalendarForm } from "../../buttons/selectDate";
 import TimeSlot from "../../buttons/selectTime";
 
-const fetcher = (url: string): Promise<any[]> =>
-  fetch(url).then((res) => res.json());
-
 import { rescheduleAppointment } from "@/app/(admin)/action";
 import { useGetDate } from "@/app/store";
+import { useAppointments } from "@/components/hooks/useAppointment";
+import { useBranches } from "@/components/hooks/useBranches";
+import { usePatients } from "@/components/hooks/usePatient";
+import { useService } from "@/components/hooks/useService";
+import { useStatuses } from "@/components/hooks/useStatuses";
 import {
   Sheet,
   SheetContent,
@@ -28,15 +30,8 @@ import {
 } from "@/components/ui/sheet";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
-import useSWR from "swr";
 import Field from "../../forms/formField";
-import { toast } from "../../hooks/use-toast";
 import { Input } from "../../ui/input";
-import { useAppointments } from "@/components/hooks/useAppointment";
-import { useBranches } from "@/components/hooks/useBranches";
-import { usePatients } from "@/components/hooks/usePatient";
-import { useService } from "@/components/hooks/useService";
-import { useStatuses } from "@/components/hooks/useStatuses";
 
 interface Appointment {
   branch: number;

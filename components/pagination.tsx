@@ -6,6 +6,13 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { useQueryState } from "nuqs";
 
@@ -14,10 +21,16 @@ interface PaginationDemoProps {
 }
 
 export function PaginationDemo({ totalPages }: PaginationDemoProps) {
-  // Use nuqs to sync the current page with the URL
+  // Use nuqs to sync the current page and limit with the URL
   const [currentPage, setCurrentPage] = useQueryState("page", {
     defaultValue: 1,
     parse: (value) => parseInt(value, 10) || 1,
+    serialize: (value) => value.toString(),
+  });
+
+  const [limit, setLimit] = useQueryState("limit", {
+    defaultValue: 10,
+    parse: (value) => parseInt(value, 10) || 10,
     serialize: (value) => value.toString(),
   });
 
@@ -55,13 +68,35 @@ export function PaginationDemo({ totalPages }: PaginationDemoProps) {
 
     return pages;
   };
-
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-center mt-4">
-      <div className="flex w-[100px] items-center justify-center text-sm font-medium text-gray-400 mb-2 sm:mb-0">
+    <div className="flex  items-center mt-2 sm:mt-4 justify-between">
+      <div className="flex w-[100px] items-center justify-center text-sm font-medium text-gray-400 ">
         Page {currentPage} of {totalPages}
       </div>
 
+      {/* Centered Limit Selector */}
+      <div className="flex justify-center order-last sm:order-none sm:mx-auto">
+        <Select
+          value={limit.toString()}
+          onValueChange={(value) => {
+            setLimit(parseInt(value, 10));
+            setCurrentPage(null);
+          }}
+        >
+          <SelectTrigger className="w-[80px] h-[30px] rounded-2xl">
+            <SelectValue placeholder="Limit" />
+          </SelectTrigger>
+          <SelectContent>
+            {[10, 20, 30, 40, 50].map((option) => (
+              <SelectItem key={option} value={option.toString()}>
+                {option}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Pagination on end */}
       <Pagination>
         <PaginationContent>
           {/* Previous Button */}
@@ -82,7 +117,7 @@ export function PaginationDemo({ totalPages }: PaginationDemoProps) {
 
           {/* Page Numbers */}
           {getPageNumbers().map((page) => (
-            <PaginationItem key={page}>
+            <PaginationItem key={page} className="hidden sm:block">
               <PaginationLink
                 href="#"
                 isActive={currentPage === page}

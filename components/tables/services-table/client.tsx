@@ -15,7 +15,7 @@ import React, { useState } from "react";
 import useSWR from "swr";
 import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
-import { PaginationDemo } from "@/components/pagitnation";
+import { PaginationDemo } from "@/components/pagination";
 import TableLoadingSkeleton from "@/components/skeleton/tableskeleton";
 import { CSVLink } from "react-csv"; // Import CSVLink for exporting
 import { Button } from "@/components/ui/button";
@@ -82,13 +82,6 @@ export default function UserClient() {
       params.delete("query");
       params.delete("page");
     }
-    replace(`${pathname}?${params.toString()}`);
-  };
-
-  // Handle page change and update URL page parameter
-  const handlePageChange = (newPage: number) => {
-    const params = new URLSearchParams(searchParams);
-    params.set("page", newPage.toString());
     replace(`${pathname}?${params.toString()}`);
   };
 

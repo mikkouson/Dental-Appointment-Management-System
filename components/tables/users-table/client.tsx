@@ -15,7 +15,7 @@ import React, { useState } from "react";
 import useSWR from "swr";
 import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
-import { PaginationDemo } from "@/components/pagitnation";
+import { PaginationDemo } from "@/components/pagination";
 import TableLoadingSkeleton from "@/components/skeleton/tableskeleton";
 import { NewUserForm } from "@/components/forms/users/newUserForm";
 import { CSVLink } from "react-csv";

@@ -142,21 +142,23 @@ export const MultiSelect = React.forwardRef<
             {...props}
             onClick={handleTogglePopover}
             variant="outline"
-            className="text-xs sm:text-sm flex w-full items-center p-0    mr-2"
+            className="text-xs sm:text-sm flex w-full items-center p-0 border-2 mr-2 dark:bg-neutral-800"
           >
             {selectedValues.length > 0 ? (
               <div className="flex w-full items-center justify-between">
                 <div className="flex flex-row items-center">
-                  <p className="text-foreground px-2 ">{placeholder} </p>
+                  <p className="text-foreground px-2">{placeholder}</p>
                   <Separator
                     orientation="vertical"
                     className="flex h-full min-h-6"
                   />
-                  {selectedValues.length === maxCount ? (
+
+                  {/* Show only the count if the number of selected values is greater than or equal to 3 */}
+                  {selectedValues.length >= 3 ? (
                     <Badge className={multiSelectVariants({ variant })}>
-                      {`${selectedValues.length}`}
+                      {`${selectedValues.length} `}
                       <XCircle
-                        className="ml-2 h-4 w-4 cursor-pointer"
+                        className="ml-2 h-4 w-4 cursor-pointer hidden md:block"
                         onClick={(event) => {
                           event.stopPropagation();
                           handleClear();
@@ -165,44 +167,53 @@ export const MultiSelect = React.forwardRef<
                     </Badge>
                   ) : (
                     <>
-                      {selectedValues.slice(0, maxCount).map((id) => {
+                      <Badge
+                        className={cn(
+                          multiSelectVariants({ variant }),
+                          "flex xl:hidden"
+                        )}
+                      >
+                        {`${selectedValues.length} `}
+                        <XCircle
+                          className="ml-2 h-4 w-4 cursor-pointer hidden md:block"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            handleClear();
+                          }}
+                        />
+                      </Badge>
+                      {/* Show individual selected items if count is less than 3 */}
+                      {selectedValues.map((id) => {
                         const option = options.find((o) => o.id === id);
                         return (
-                          <Badge
-                            key={id}
-                            className={multiSelectVariants({ variant })}
-                          >
-                            {option?.name}
-                            <XCircle
-                              className="ml-2 h-4 w-4 cursor-pointer"
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                toggleOption(id);
-                              }}
-                            />
-                          </Badge>
+                          <>
+                            <Badge
+                              key={id}
+                              className={cn(
+                                multiSelectVariants({ variant }),
+                                "hidden xl:flex"
+                              )}
+                            >
+                              {option?.name}
+                              <XCircle
+                                className="ml-2 h-4 w-4 cursor-pointer"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  toggleOption(id);
+                                }}
+                              />
+                            </Badge>
+                          </>
                         );
                       })}
-                      {selectedValues.length > maxCount && (
-                        <Badge className={multiSelectVariants({ variant })}>
-                          {`+ ${selectedValues.length - maxCount} more`}
-                          <XCircle
-                            className="ml-2 h-4 w-4 cursor-pointer"
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              clearExtraOptions();
-                            }}
-                          />
-                        </Badge>
-                      )}
                     </>
                   )}
                 </div>
               </div>
             ) : (
               <div className="mx-auto flex w-full items-center justify-between">
-                <span className="mx-3 text-sm ">{placeholder}</span>
-                <ChevronDown className="mx-2 h-4 cursor-pointer " />
+                <span className="mx-3 text-sm">{placeholder}</span>
+                <ChevronDown className="mx-2 h-4 cursor-pointer hidden md:block" />
               </div>
             )}
           </Button>

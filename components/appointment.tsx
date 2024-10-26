@@ -1,21 +1,12 @@
 "use client";
-import { useGetDate } from "@/app/store";
 import AppointmentsMap from "@/components/appointmentsList";
-import { CheckboxReactHookFormMultiple } from "@/components/buttons/comboBoxSelect";
-import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
 import { Calendar } from "@/components/ui/calendar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { createClient } from "@/utils/supabase/client";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
-import useSWR, { preload } from "swr";
-import { NewAppointmentForm } from "./forms/appointment/new-appointment-form";
+import { useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { useAppointments } from "./hooks/useAppointment";
 import PageContainer from "./layout/page-container";
-import { useBranches } from "./hooks/useBranches";
-import { useStatuses } from "./hooks/useStatuses";
-import SelectBranch from "./buttons/selectBranch";
-const fetcher = (url: string): Promise<any[]> =>
-  fetch(url).then((res) => res.json());
 
 const timeSlots = [
   { id: 1, time: "8:00 AM" },
@@ -31,58 +22,22 @@ const timeSlots = [
 
 export default function AppointmentCalendar() {
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [open, setOpen] = React.useState(false);
-  const { statuses, statusLoading, statusError } = useStatuses();
-  const { branches, branchLoading, branchError } = useBranches();
 
-  const { status: storeStatus } = useGetDate((state) => ({
-    status: state.status,
-  }));
-
-  const statusIds = storeStatus.map((stat) => stat.id);
-  const branch = useGetDate((state) => state.branch);
+  // const branch = useGetDate((state) => state.branch);
   const formatDate = moment(date).format("MM/DD/YYYY");
-  const statusList = React.useMemo(
-    () => statuses?.map((s: { id: number }) => s.id) || [],
-    [statuses]
-  );
+
+  const searchParams = useSearchParams();
+
+  const page = parseInt(searchParams.get("page") || "1", 10);
+  const query = searchParams.get("query") || "";
+  const branch = searchParams.get("branches");
+  const status = searchParams.get("statuses");
 
   const {
-    data: appointments = [],
-    error: appointmentsError,
-    isLoading,
+    appointments,
+    appointmentsLoading: isLoading,
     mutate,
-  } = useSWR(
-    `/api/appointments?date=${formatDate}&branch=${
-      branches && branch !== 0 ? branch : branches ? branches[0]?.id : branch
-    }&status=${statusIds.length === 0 ? statusList.join(",") : statusIds}`,
-    fetcher
-  );
-
-  const supabase = createClient();
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("realtime appointments")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "appointments" },
-        () => {
-          mutate();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [supabase, mutate]);
-
-  if (statusLoading || branchLoading) return <>Loading ...</>;
-  if (statusError || branchError) return <>Error loading data</>;
-
-  if (appointmentsError) return <div>Error loading appointments</div>;
-
+  } = useAppointments(page, query, branch, status, formatDate);
   return (
     <PageContainer>
       <div className=" flex flex-col lg:flex-row gap-4 ">
@@ -98,17 +53,6 @@ export default function AppointmentCalendar() {
 
         {/* Right Column */}
         <div className="flex flex-col flex-1">
-          <div className="flex justify-end mb-4 ">
-            <CheckboxReactHookFormMultiple items={statuses} label="Status" />
-            <SelectBranch />
-            <DrawerDialogDemo
-              open={open}
-              setOpen={setOpen}
-              label={"New Appointment"}
-            >
-              <NewAppointmentForm setOpen={setOpen} mutate={mutate} />
-            </DrawerDialogDemo>
-          </div>
           {isLoading ? (
             <div className="flex flex-col">
               {timeSlots.map((time) => (
@@ -125,7 +69,7 @@ export default function AppointmentCalendar() {
           ) : (
             <AppointmentsMap
               timeSlots={timeSlots}
-              appointments={appointments}
+              appointments={appointments?.data ?? []}
               mutate={mutate}
             />
           )}
