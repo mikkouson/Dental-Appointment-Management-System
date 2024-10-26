@@ -18,7 +18,7 @@ const SelectStatus = () => {
       >
         <div className="mx-auto flex w-full items-center justify-between">
           <span className="mx-3 text-sm ">Status</span>
-          <ChevronDown className="mx-2 h-4 cursor-pointer " />
+          <ChevronDown className="mx-2 h-4 cursor-pointer hidden md:block" />
         </div>
       </Button>
     );
