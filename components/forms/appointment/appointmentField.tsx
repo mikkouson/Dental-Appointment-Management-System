@@ -11,11 +11,7 @@ import { CalendarForm } from "../../buttons/selectDate";
 import TimeSlot from "../../buttons/selectTime";
 import { UseFormReturn } from "react-hook-form";
 
-const fetcher = (url: string): Promise<any[]> =>
-  fetch(url).then((res) => res.json());
-
 import { useGetDate } from "@/app/store";
-import useSWR from "swr";
 import Field from "../../forms/formField";
 import { Input } from "../../ui/input";
 import { AppointmentSchemaType } from "@/app/types";
