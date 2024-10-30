@@ -14,7 +14,12 @@ export type Address = Database["public"]["Tables"]["addresses"]["Row"];
 export type Inventory = Database["public"]["Tables"]["inventory"]["Row"];
 
 export type PatientCol = Tables<"patients"> & {
-  address: Tables<"addresses"> | null;
+  name: string | null; 
+  email: string | null; 
+  address: number | null; 
+  dob: string | null; 
+  age: number | null; 
+  phone_number: number | null; 
 };
 export type AppointmentsCol = Tables<"appointments"> & {
   branch: Tables<"branch"> | null; // Example: Relationship to branch table
@@ -29,6 +34,7 @@ export type InventoryCol = Tables<"inventory"> & {
   quantity: number | null;          
   description: string | null;      
 };
+
 export type Database = {
   public: {
     Tables: {

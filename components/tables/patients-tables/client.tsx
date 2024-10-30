@@ -1,6 +1,7 @@
 "use client";
 import { useSetActive } from "@/app/store";
 import BurgerMenu from "@/components/buttons/burgerMenu";
+import PatientExport from "@/components/buttons/exportButtons/patientExport"; 
 import PatientCard from "@/components/cards/patientCard";
 import { NewPatientForm } from "@/components/forms/patients/newPatientForm";
 import { Heading } from "@/components/heading";
@@ -19,7 +20,6 @@ import { DataTableDemo } from "./dataTable";
 
 export default function UserClient() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-
   const [open, setOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = useState<string>(
     useSearchParams().get("query") || ""
@@ -70,8 +70,7 @@ export default function UserClient() {
             />
           </div>
           <div className="flex items-center ">
-            {/* </CSVLink> */}
-
+            <PatientExport /> 
             <DrawerDialogDemo
               open={open}
               setOpen={setOpen}
@@ -98,7 +97,7 @@ export default function UserClient() {
           />
         </div>
         <Separator />
-        <div className="flex flex-col  2xl:flex-row">
+        <div className="flex flex-col 2xl:flex-row">
           <div className="flex-1">
             {patientLoading ? (
               <TableLoadingSkeleton />
