@@ -1,8 +1,8 @@
 "use client";
 
-import * as React from "react";
+import React from "react";
 import { TrendingUp } from "lucide-react";
-import { Label, Pie, PieChart, Cell } from "recharts";
+import { Bar, BarChart, Cell, XAxis, YAxis } from "recharts";
 
 import {
   Card,
@@ -18,146 +18,113 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { useAppointments } from "../hooks/useAppointment";
 
-// Define types for appointment and statusCounts
-interface Appointment {
-  status: string;
+interface ServiceUsage {
+  name: string;
+  count: number;
+  totalPrice: number;
 }
 
-interface StatusCounts {
-  [key: string]: number;
-}
-
-// Sample appointment data
-const appointments: Appointment[] = [
-  { status: "Canceled" },
-  { status: "Reject" },
-  { status: "Accepted" },
-  { status: "Canceled" },
-  { status: "Canceled" },
-  { status: "Pending" },
-  { status: "Canceled" },
-  { status: "Accepted" },
-  { status: "Canceled" },
-  { status: "Canceled" },
-];
-
-// Initialize and populate statusCounts with type annotations
-const statusCounts: StatusCounts = appointments.reduce(
-  (acc: StatusCounts, appointment) => {
-    const { status } = appointment;
-    if (!acc[status]) {
-      acc[status] = 0;
-    }
-    acc[status]++;
-    return acc;
-  },
-  {}
-);
-
-// Create data for pie chart with specific colors
-const chartData = Object.keys(statusCounts).map((status) => ({
-  status,
-  count: statusCounts[status],
-  fill:
-    status === "Accepted"
-      ? "#4caf50"
-      : status === "Canceled"
-      ? "#f44336"
-      : status === "Reject"
-      ? "#ff9800"
-      : "#2196f3", // Custom colors
-}));
-
-const chartConfig = {
-  visitors: {
-    label: "Appointments",
-  },
-  Canceled: {
-    label: "Canceled",
+const chartConfig: ChartConfig = {
+  desktop: {
+    label: "Desktop",
     color: "hsl(var(--chart-1))",
   },
-  Reject: {
-    label: "Reject",
+  mobile: {
+    label: "Mobile",
     color: "hsl(var(--chart-2))",
   },
-  Accepted: {
-    label: "Accepted",
-    color: "hsl(var(--chart-3))",
+  label: {
+    color: "hsl(var(--background))",
   },
-  Pending: {
-    label: "Pending",
-    color: "hsl(var(--chart-4))",
-  },
-} satisfies ChartConfig;
+};
+
+// Define an array of colors for the bars
+const barColors = [
+  chartConfig.desktop.color, // Desktop color
+  chartConfig.mobile.color, // Mobile color
+  "hsl(var(--chart-3))", // Additional color for the third service
+  "hsl(var(--chart-4))", // Additional color for the fourth service
+  "hsl(var(--chart-5))", // Additional color for the fifth service
+];
 
 export function PieGraph() {
-  const totalAppointments = React.useMemo(() => {
-    return chartData.reduce((acc, curr) => acc + curr.count, 0);
-  }, []);
+  const { appointments, appointmentsLoading } = useAppointments();
+
+  if (appointmentsLoading) return <>loading</>;
+
+  const serviceUsage: Record<string, ServiceUsage> = {};
+
+  appointments?.data.forEach((appointment) => {
+    const service = appointment.services;
+    if (service) {
+      const serviceId = service.id;
+      const serviceName = service.name || "";
+      const servicePrice = service.price || 0;
+
+      if (!serviceUsage[serviceId]) {
+        serviceUsage[serviceId] = {
+          name: serviceName,
+          count: 0,
+          totalPrice: 0,
+        };
+      }
+
+      serviceUsage[serviceId].count += 1;
+      serviceUsage[serviceId].totalPrice += servicePrice;
+    }
+  });
+
+  const chartData: ServiceUsage[] = Object.values(serviceUsage);
+
+  const top5Services = chartData.sort((a, b) => b.count - a.count).slice(0, 5);
 
   return (
-    <Card className="flex flex-col">
-      <CardHeader className="items-center pb-0">
-        <CardTitle>Pie Chart - Appointment Status</CardTitle>
-        <CardDescription>October 2024</CardDescription>
+    <Card>
+      <CardHeader>
+        <CardTitle>Bar Chart - Top 5 Services</CardTitle>
+        <CardDescription>Usage of top 5 services</CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 pb-0">
+      <CardContent>
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-[360px]"
+          className="aspect-auto h-[270px] w-full"
         >
-          <PieChart>
+          <BarChart
+            accessibilityLayer
+            data={top5Services}
+            layout="vertical"
+            margin={{
+              left: 0,
+            }}
+          >
+            <YAxis
+              dataKey="name"
+              type="category"
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+            />
+            <XAxis dataKey="count" type="number" hide />
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent hideLabel />}
             />
-            <Pie
-              data={chartData}
-              dataKey="count"
-              nameKey="status"
-              innerRadius={60}
-              strokeWidth={5}
-            >
-              {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.fill} />
+            <Bar dataKey="count" layout="vertical" radius={5}>
+              {top5Services.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={barColors[index]} />
               ))}
-              <Label
-                content={({ viewBox }) => {
-                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                    return (
-                      <text
-                        x={viewBox.cx}
-                        y={viewBox.cy}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                      >
-                        <tspan
-                          x={viewBox.cx}
-                          y={viewBox.cy}
-                          className="fill-foreground text-3xl font-bold"
-                        >
-                          {totalAppointments.toLocaleString()}
-                        </tspan>
-                        <tspan
-                          x={viewBox.cx}
-                          y={(viewBox.cy || 0) + 24}
-                          className="fill-muted-foreground"
-                        >
-                          Appointments
-                        </tspan>
-                      </text>
-                    );
-                  }
-                }}
-              />
-            </Pie>
-          </PieChart>
+            </Bar>
+          </BarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex items-center gap-2 font-medium leading-none">
-          Showing status distribution for October 2024
+      <CardFooter className="flex-col items-start gap-2 text-sm">
+        <div className="flex gap-2 font-medium leading-none">
+          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+        </div>
+        <div className="leading-none text-muted-foreground">
+          Showing usage of the top 5 services
         </div>
       </CardFooter>
     </Card>

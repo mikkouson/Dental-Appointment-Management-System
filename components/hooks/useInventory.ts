@@ -20,7 +20,7 @@ const fetcher = async (
 export function useInventory(
   page?: number,
   query?: string,
-  branches?: string | null 
+  branches?: string | null
 ) {
   const queryString = new URLSearchParams();
 
@@ -28,10 +28,9 @@ export function useInventory(
     queryString.append("query", query);
   }
 
-
-  if (branches) {
+  if (query !== undefined) {
     const branchArray = branches.split(",");
-    queryString.append("branch", branchArray.join(",")); 
+    queryString.append("branch", branchArray.join(","));
   }
 
   if (page !== undefined) {
