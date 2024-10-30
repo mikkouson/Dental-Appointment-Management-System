@@ -12,19 +12,23 @@ const fetcher = async (
 }> => fetch(url).then((res) => res.json());
 
 export function usePatients(
-  page?: number,
+  page?: number | null,
   query?: string,
-  usePagination = true
+
+  limit?: number | null
 ) {
   const queryString = new URLSearchParams();
 
-  if (page !== undefined) {
+  if (page) {
     queryString.append("page", String(page));
   }
   if (query !== undefined) {
     queryString.append("query", query);
   }
-  queryString.append("usePagination", String(usePagination));
+
+  if (limit) {
+    queryString.append("limit", String(limit)); // Add limit to query string
+  }
 
   const {
     data: patients,

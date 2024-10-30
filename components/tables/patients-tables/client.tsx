@@ -1,7 +1,6 @@
 "use client";
-import type { Address, Patient } from "@/app/schema";
 import { useSetActive } from "@/app/store";
-import { Breadcrumbs } from "@/components/breadcrumb";
+import BurgerMenu from "@/components/buttons/burgerMenu";
 import PatientCard from "@/components/cards/patientCard";
 import { NewPatientForm } from "@/components/forms/patients/newPatientForm";
 import { Heading } from "@/components/heading";
@@ -9,60 +8,36 @@ import { usePatients } from "@/components/hooks/usePatient";
 import PageContainer from "@/components/layout/page-container";
 import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
 import { PaginationDemo } from "@/components/pagination";
+import SearchInput from "@/components/searchInput";
 import PatientCardSkeleton from "@/components/skeleton/patientCardSkeleton";
 import TableLoadingSkeleton from "@/components/skeleton/tableskeleton";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { createClient } from "@/utils/supabase/client";
-import { File, Search } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
-import { CSVLink } from "react-csv";
+import React, { useState } from "react";
 import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
 
 export default function UserClient() {
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+
   const [open, setOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = useState<string>(
     useSearchParams().get("query") || ""
   );
   const activePatient = useSetActive((state) => state.selectedPatient);
-  const [usePagination, setUsePagination] = useState(true); // state for pagination
 
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
   const page = parseInt(searchParams.get("page") || "1", 10);
   const query = searchParams.get("query") || "";
+  const limit = parseInt(searchParams.get("limit") || "10", 10);
+
   const { patients, patientError, patientLoading, mutate } = usePatients(
     page,
     query,
-    usePagination
+    limit
   );
-
-  const supabase = createClient();
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("realtime patients")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "patients" },
-        () => {
-          mutate();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [supabase, mutate]);
-
-  useEffect(() => {
-    setSearchQuery(query);
-  }, [query]);
 
   function handleSearch(term: string) {
     const params = new URLSearchParams(searchParams);
@@ -76,82 +51,26 @@ export default function UserClient() {
     replace(`${pathname}?${params.toString()}`);
   }
 
-  function handlePageChange(newPage: number) {
-    const params = new URLSearchParams(searchParams);
-    params.set("page", newPage.toString());
-    replace(`${pathname}?${params.toString()}`);
-  }
-
-  const breadcrumbItems = [
-    { title: "Dashboard", link: "/" },
-    { title: "Patients", link: "/patients" },
-  ];
-
-  const totalPages = patients ? Math.ceil(patients.count / 10) : 1;
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchQuery(value);
-    handleSearch(value);
-  };
-
-  const handleCSVExport = () => {
-    setUsePagination(false); // disable pagination for export
-    setTimeout(() => {
-      setUsePagination(true); // re-enable pagination after export
-    }, 2000); // delay to simulate export completion (adjust as needed)
-  };
+  const totalPages = patients ? Math.ceil(patients.count / limit) : 1;
 
   return (
     <PageContainer>
-      <div className="space-y-4">
-        <Breadcrumbs items={breadcrumbItems} />
-
-        <div className="flex flex-col 2xl:flex-row lg:items-start lg:justify-between">
-          <Heading
-            title={`Total Patients (${patients ? patients.count : "loading"})`}
-            description="Manage patients (Server side table functionalities.)"
-          />
-
-          <div className="flex justify-end max-w-full w-full mt-2 sm:ml-0 sm:max-w-full 2xl:max-w-[730px] ">
-            <div className="mr-2 relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search Patient Name ..."
-                className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px]"
-                onChange={handleInputChange}
-                value={searchQuery}
-              />
-            </div>
-
-            {/* CSV Export Button */}
-            <CSVLink
-              data={(patients?.data || []).map(
-                (patient: Patient & { address?: Address | null }) => ({
-                  name: patient.name || "null",
-                  email: patient.email || "null",
-                  sex: patient.sex || "null",
-                  age: patient.age || "null",
-                  address: patient.address?.address || "null",
-                  phone: patient.phone_number || "null",
-                  birthdate: patient.dob || "null",
-                  status: patient.status || "null",
-                  created_at: patient.created_at || "null",
-                  updated_at: patient.updated_at || "null",
-                })
-              )}
-              filename={"patients.csv"}
-              onClick={handleCSVExport} // trigger pagination off for export
-            >
-              <Button
-                variant="outline"
-                className="text-xs sm:text-sm px-2 sm:px-4 mr-2"
-              >
-                <File className="h-3.5 w-3.5 mr-2" />
-                <span className="sr-only sm:not-sr-only">Export</span>
-              </Button>
-            </CSVLink>
+      <div className="flex flex-col h-[calc(100svh-20px)] ">
+        <div className="flex justify-between items-center mt-0 sm:mt-4">
+          <div className="flex items-center">
+            <BurgerMenu />
+            <h4 className="scroll-m-20 text-md font-semibold tracking-tight sm:hidden">
+              Total Appointments ({patients ? patients.count : "Loading"})
+            </h4>
+            <Heading
+              title={`Total Patients (${
+                patients ? patients.count : "loading"
+              })`}
+              description="Manage Appointments (Server side table functionalities.)"
+            />
+          </div>
+          <div className="flex items-center ">
+            {/* </CSVLink> */}
 
             <DrawerDialogDemo
               open={open}
@@ -161,6 +80,22 @@ export default function UserClient() {
               <NewPatientForm setOpen={setOpen} mutate={mutate} />
             </DrawerDialogDemo>
           </div>
+        </div>
+        <Separator className="my-2" />
+        <div className="flex justify-between items-center">
+          {!isSearchFocused && (
+            <div className="flex justify-end items-center">
+              {/* <SelectBranch /> */}
+              {/* <SelectStatus /> */}
+            </div>
+          )}
+          <SearchInput
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            isSearchFocused={isSearchFocused}
+            setIsSearchFocused={setIsSearchFocused}
+            handleSearch={handleSearch}
+          />
         </div>
         <Separator />
         <div className="flex flex-col  2xl:flex-row">
