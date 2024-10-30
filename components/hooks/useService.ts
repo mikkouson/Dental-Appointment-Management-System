@@ -11,7 +11,11 @@ const fetcher = async (
   count: number;
 }> => fetch(url).then((res) => res.json());
 
-export function useService(page?: number, query?: string) {
+export function useService(
+  page?: number,
+  query?: string,
+  limit?: number | null
+) {
   const queryString = new URLSearchParams();
 
   if (page !== undefined) {
@@ -21,6 +25,9 @@ export function useService(page?: number, query?: string) {
     queryString.append("query", query);
   }
 
+  if (limit) {
+    queryString.append("limit", String(limit)); // Add limit to query string
+  }
   const {
     data: services,
     error: serviceError,
