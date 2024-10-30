@@ -20,6 +20,7 @@ import { PaginationDemo } from "@/components/pagination";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/heading";
 import BurgerMenu from "@/components/buttons/burgerMenu";
+import SearchInput from "@/components/searchInput";
 
 export default function UserClient() {
   const [open, setOpen] = useState(false);
@@ -42,13 +43,6 @@ export default function UserClient() {
     appointmentsLoading: isLoading,
     mutate,
   } = useAppointments(page, query, branch, status, null, limit);
-
-  // Handlers
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchQuery(value);
-    handleSearch(value);
-  };
 
   const handleSearch = (term: string) => {
     const params = new URLSearchParams(searchParams);
@@ -121,44 +115,13 @@ export default function UserClient() {
                 <SelectStatus />
               </div>
             )}
-            <div
-              className={`mr-0  relative ${
-                isSearchFocused ? "w-full" : "w-auto"
-              }`}
-            >
-              <div className="hidden md:block">
-                <Search className="absolute left-2.5 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search Patient Name ..."
-                  className="w-full rounded-lg bg-background pl-8"
-                  value={searchQuery}
-                  onChange={handleInputChange}
-                />
-              </div>
-              {!isSearchFocused ? (
-                <Button variant={"outline"} className="block md:hidden p-2">
-                  <Search
-                    size={14}
-                    className="cursor-pointer text-muted-foreground"
-                    onClick={() => setIsSearchFocused(true)}
-                  />
-                </Button>
-              ) : (
-                <div className="relative w-full">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="search"
-                    placeholder="Search Patient Name ..."
-                    className="w-full rounded-lg bg-background pl-8"
-                    value={searchQuery}
-                    onChange={handleInputChange}
-                    onBlur={() => setIsSearchFocused(false)}
-                    autoFocus
-                  />
-                </div>
-              )}
-            </div>
+            <SearchInput
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              isSearchFocused={isSearchFocused}
+              setIsSearchFocused={setIsSearchFocused}
+              handleSearch={handleSearch}
+            />
           </div>
           <TabsContent value="table">
             <div>
