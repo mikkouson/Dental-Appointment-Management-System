@@ -28,7 +28,7 @@ export function useInventory(
     queryString.append("query", query);
   }
 
-  if (query !== undefined) {
+  if (branches) {
     const branchArray = branches.split(",");
     queryString.append("branch", branchArray.join(","));
   }
