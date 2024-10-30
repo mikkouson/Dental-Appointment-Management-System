@@ -4,14 +4,17 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(req: NextRequest) {
   const supabase = createClient();
   const pageParam = req.nextUrl.searchParams.get("page");
-  const branchParam = req.nextUrl.searchParams.get("branch"); 
-  const filterParam = req.nextUrl.searchParams.get("query") || ""; 
+  const branchParam = req.nextUrl.searchParams.get("branch");
+  const filterParam = req.nextUrl.searchParams.get("query") || "";
 
-  const sortBy = req.nextUrl.searchParams.get("sortBy") || "updated_at"; 
+  const sortBy = req.nextUrl.searchParams.get("sortBy") || "updated_at";
   const sortOrder =
-    req.nextUrl.searchParams.get("sortOrder") === "asc" ? true : false; 
+    req.nextUrl.searchParams.get("sortOrder") === "asc" ? true : false;
 
-  const pageSize = 10; 
+  const limitParam = req.nextUrl.searchParams.get("limit");
+  const limit = limitParam ? parseInt(limitParam, 10) : 10; // Default to 10 if no limit is provided
+
+  // Default to page 1 if no page parameter is provided
   const page = pageParam ? parseInt(pageParam, 10) : 1;
 
   let query = supabase
@@ -25,17 +28,17 @@ export async function GET(req: NextRequest) {
       `,
       { count: "exact" }
     )
-    .ilike("name", `%${filterParam}%`) 
+    .ilike("name", `%${filterParam}%`)
     .order(sortBy, { ascending: sortOrder })
-    .range((page - 1) * pageSize, page * pageSize - 1)
-    .is("deleteOn", null); 
+    .is("deleteOn", null);
 
   if (branchParam) {
-    const branchList = branchParam.split(",").map((id) => parseInt(id, 10)); 
+    const branchList = branchParam.split(",").map((id) => parseInt(id, 10));
     query = query.in("branch", branchList);
   }
-
-  query = query.range((page - 1) * pageSize, page * pageSize - 1);
+  if (pageParam) {
+    query.range((page - 1) * limit, page * limit - 1);
+  }
 
   const { data, error, count } = await query;
 

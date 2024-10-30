@@ -20,7 +20,8 @@ const fetcher = async (
 export function useInventory(
   page?: number,
   query?: string,
-  branches?: string | null
+  branches?: string | null,
+  limit?: number | null
 ) {
   const queryString = new URLSearchParams();
 
@@ -37,6 +38,9 @@ export function useInventory(
     queryString.append("page", String(page));
   }
 
+  if (limit) {
+    queryString.append("limit", String(limit)); // Add limit to query string
+  }
   const {
     data: inventory,
     error: inventoryError,
