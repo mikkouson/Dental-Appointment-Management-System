@@ -12,14 +12,15 @@ export type Status = Database["public"]["Tables"]["status"]["Row"];
 export type Patient = Database["public"]["Tables"]["patients"]["Row"];
 export type Address = Database["public"]["Tables"]["addresses"]["Row"];
 export type Inventory = Database["public"]["Tables"]["inventory"]["Row"];
+export type Profiles = Database["public"]["Tables"]["profiles"]["Row"];
 
 export type PatientCol = Tables<"patients"> & {
-  name: string | null; 
-  email: string | null; 
-  address: number | null; 
-  dob: string | null; 
-  age: number | null; 
-  phone_number: number | null; 
+  name: string | null;
+  email: string | null;
+  address: number | null;
+  dob: string | null;
+  age: number | null;
+  phone_number: number | null;
 };
 export type AppointmentsCol = Tables<"appointments"> & {
   branch: Tables<"branch"> | null; // Example: Relationship to branch table
@@ -29,10 +30,10 @@ export type AppointmentsCol = Tables<"appointments"> & {
   time_slots: Tables<"time_slots"> | null; // Example: Relationship to time_slots table
 };
 export type InventoryCol = Tables<"inventory"> & {
-  branch: Tables<"branch"> | null; 
-  name: string | null;              
-  quantity: number | null;          
-  description: string | null;      
+  branch: Tables<"branch"> | null;
+  name: string | null;
+  quantity: number | null;
+  description: string | null;
 };
 
 export type Database = {
@@ -212,7 +213,6 @@ export type Database = {
           quantity?: number;
           updated_at?: string | null;
           branch?: number | null;
-          
         };
         Relationships: [
           {
@@ -221,7 +221,7 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "branch";
             referencedColumns: ["id"];
-          },
+          }
         ];
       };
       patients: {

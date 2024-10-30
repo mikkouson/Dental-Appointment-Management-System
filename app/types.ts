@@ -83,8 +83,8 @@ export const UserSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
   password: z
     .string()
-    .min(1, { message: "Password must be at least 6 characters" }),
-  name: z.string().min(1, { message: "name" }),
+    .min(6, { message: "Password must be at least 6 characters" }),
+  name: z.string().min(3, { message: "name must be at least 3 characters" }),
 });
 
 export type UserForm = z.infer<typeof UserSchema>;
