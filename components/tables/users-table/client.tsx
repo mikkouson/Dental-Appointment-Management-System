@@ -13,6 +13,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
+import UserExport from "@/components/buttons/exportButtons/userExport";
 
 export default function UserClient() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -67,23 +68,7 @@ export default function UserClient() {
             />
           </div>
           <div className="flex items-center ">
-            {/* <InventoryExport /> */}
-            {/* <CSVLink
-              data={(data?.data || []).map((user) => ({
-                name: user.name || "null",
-                email: user.email || "null",
-                updated_at: user.updated_at || "null",
-              }))}
-              filename={"users.csv"}
-            >
-              <Button
-                variant="outline"
-                className="text-xs sm:text-sm px-2 sm:px-4 mr-2"
-              >
-                <File className="h-3.5 w-3.5 mr-2" />
-                <span className="sr-only sm:not-sr-only">Export</span>
-              </Button>
-            </CSVLink> */}
+            <UserExport />
             <DrawerDialogDemo open={open} setOpen={setOpen} label={"New User"}>
               <NewUserForm setOpen={setOpen} mutate={mutate} />
             </DrawerDialogDemo>
