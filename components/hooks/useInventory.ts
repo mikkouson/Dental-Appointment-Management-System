@@ -49,7 +49,7 @@ export function useInventory(
   } = useSWR<{
     data: InventoryCol[] | [];
     count: number;
-  }>(`/api/inventorybranch?${queryString.toString()}`, fetcher);
+  }>(`/api/inventory?${queryString.toString()}`, fetcher);
 
   const supabase = createClient();
 

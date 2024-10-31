@@ -1,22 +1,21 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextRequest, res: NextResponse) {
+export async function GET(req: NextRequest) {
   const supabase = createClient();
+  
+  // Get query parameters
   const pageParam = req.nextUrl.searchParams.get("page");
-  const pageSize = 10; // Define your page size
-
-  // Default to page 1 if no page parameter is provided
-  const page = pageParam ? parseInt(pageParam, 10) : 1;
-
-  // Get the filter parameter from the query
+  const limitParam = req.nextUrl.searchParams.get("limit");
+  const branchParam = req.nextUrl.searchParams.get("branch");
   const filterParam = req.nextUrl.searchParams.get("query") || "";
+  const sortBy = req.nextUrl.searchParams.get("sortBy") || "updated_at";
+  const sortOrder = req.nextUrl.searchParams.get("sortOrder") === "asc";
 
-  // Get sorting parameters
-  const sortBy = req.nextUrl.searchParams.get("sortBy") || "updated_at"; // Default sort column
-  const sortOrder =
-    req.nextUrl.searchParams.get("sortOrder") === "asc" ? true : false; // true for ascending, false for descending
-
+  // Set defaults
+  const limit = limitParam ? parseInt(limitParam, 10) : 10; // Default limit
+  const page = pageParam ? parseInt(pageParam, 10) : 1; // Default to page 1
+  
   // Validate sortBy to prevent SQL injection or invalid columns
   const validSortColumns = ["name", "created_at", "updated_at"]; // Add other valid columns as needed
   if (!validSortColumns.includes(sortBy)) {
@@ -26,15 +25,37 @@ export async function GET(req: NextRequest, res: NextResponse) {
     );
   }
 
-  // Perform the query with dynamic sorting
-  const { data, error, count } = await supabase
+  // Build the query
+  let query = supabase
     .from("inventory")
-    .select("*", { count: "exact" })
+    .select(
+      `
+      *,
+      branch (
+        *
+      )
+      `,
+      { count: "exact" }
+    )
     .ilike("name", `%${filterParam}%`) // Filter based on 'name' column
     .order(sortBy, { ascending: sortOrder })
-    .range((page - 1) * pageSize, page * pageSize - 1)
     .is("deleteOn", null); // Exclude soft-deleted items
 
+  // Apply branch filtering if provided
+  if (branchParam) {
+    const branchList = branchParam.split(",").map((id) => parseInt(id, 10));
+    query = query.in("branch", branchList);
+  }
+
+  // Apply pagination
+  if (pageParam) {
+    query.range((page - 1) * limit, page * limit - 1);
+  }
+
+  // Execute the query
+  const { data, error, count } = await query;
+
+  // Handle errors
   if (error) {
     console.error("Supabase error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });

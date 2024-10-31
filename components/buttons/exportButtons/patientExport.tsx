@@ -12,6 +12,7 @@ export default function PatientExport() {
 
   const mappedData = (data?.data || []).map((patient: PatientCol) => ({
     name: patient.name || "null",
+    sex: patient.sex || "null",
     email: patient.email || "null",
     address: patient.address?.address || "null", 
     birthdate: patient.dob || "null",

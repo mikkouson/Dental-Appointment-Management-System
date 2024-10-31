@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { useService } from "@/components/hooks/useService";
 import BurgerMenu from "@/components/buttons/burgerMenu";
 import SearchInput from "@/components/searchInput";
+import ServicesExport from "@/components/buttons/exportButtons/servicesExport";
 
 export default function UserClient() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -75,7 +76,8 @@ export default function UserClient() {
             />
           </div>
           <div className="flex items-center ">
-            {/* <InventoryExport /> */}
+          <ServicesExport /> 
+
 
             <DrawerDialogDemo
               open={open}

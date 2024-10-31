@@ -5,36 +5,46 @@ export type Json =
   | null
   | { [key: string]: Json | undefined }
   | Json[];
-export type TimeSlot = Database["public"]["Tables"]["time_slots"]["Row"];
-export type Appointment = Database["public"]["Tables"]["appointments"]["Row"];
-export type Service = Database["public"]["Tables"]["services"]["Row"];
-export type Status = Database["public"]["Tables"]["status"]["Row"];
-export type Patient = Database["public"]["Tables"]["patients"]["Row"];
-export type Address = Database["public"]["Tables"]["addresses"]["Row"];
-export type Inventory = Database["public"]["Tables"]["inventory"]["Row"];
-export type Profiles = Database["public"]["Tables"]["profiles"]["Row"];
-
-export type PatientCol = Tables<"patients"> & {
-  name: string | null;
-  email: string | null;
-  address: number | null;
-  dob: string | null;
-  age: number | null;
-  phone_number: number | null;
-};
-export type AppointmentsCol = Tables<"appointments"> & {
-  branch: Tables<"branch"> | null; // Example: Relationship to branch table
-  patients: Tables<"patients"> | null; // Example: Relationship to patients table
-  services: Tables<"services"> | null; // Example: Relationship to services table
-  status: Tables<"status"> | null; // Example: Relationship to status table
-  time_slots: Tables<"time_slots"> | null; // Example: Relationship to time_slots table
-};
-export type InventoryCol = Tables<"inventory"> & {
-  branch: Tables<"branch"> | null;
-  name: string | null;
-  quantity: number | null;
-  description: string | null;
-};
+  export type TimeSlot = Database["public"]["Tables"]["time_slots"]["Row"];
+  export type Appointment = Database["public"]["Tables"]["appointments"]["Row"];
+  export type Service = Database["public"]["Tables"]["services"]["Row"];
+  export type Status = Database["public"]["Tables"]["status"]["Row"];
+  export type Patient = Database["public"]["Tables"]["patients"]["Row"];
+  export type Address = Database["public"]["Tables"]["addresses"]["Row"];
+  export type Inventory = Database["public"]["Tables"]["inventory"]["Row"];
+  export type User = Database["public"]["Tables"]["profiles"]["Row"];
+  
+  export type PatientCol = Tables<"patients"> & {
+    name: string | null; 
+    sex: string | null; 
+    email: string | null; 
+    address: number | null; 
+    dob: string | null; 
+    age: number | null; 
+    phone_number: number | null; 
+  };
+  export type AppointmentsCol = Tables<"appointments"> & {
+    branch: Tables<"branch"> | null; // Example: Relationship to branch table
+    patients: Tables<"patients"> | null; // Example: Relationship to patients table
+    services: Tables<"services"> | null; // Example: Relationship to services table
+    status: Tables<"status"> | null; // Example: Relationship to status table
+    time_slots: Tables<"time_slots"> | null; // Example: Relationship to time_slots table
+  };
+  export type InventoryCol = Tables<"inventory"> & {
+    branch: Tables<"branch"> | null; 
+    name: string | null;              
+    quantity: number | null;          
+    description: string | null;      
+  };
+  export type ServicesCol = Tables<"services"> & {
+    name: string | null; 
+    description: string | null; 
+    price: number | null;  
+  };
+  export type UserCol = Tables<"profiles"> & {
+    name: string | null; 
+    email: string | null; 
+  };
 
 export type Database = {
   public: {
