@@ -5,6 +5,8 @@ import {
   PatientSchema,
   ServiceFormValues,
   ServiceSchema,
+  UpdateUser,
+  UpdateUserForm,
   UserForm,
 } from "@/app/types";
 import DentalAppointmentCancellationEmail from "@/components/emailTemplates/cancelAppointment";
@@ -751,8 +753,8 @@ export async function deleteUser(id: number) {
   }
 }
 
-export async function updateUser(formData: UserForm) {
-  const result = FormSchema.safeParse(formData);
+export async function updateUser(formData: UpdateUserForm) {
+  const result = UpdateUser.safeParse(formData);
   if (!result.success) {
     console.log("Validation errors:", result.error.format());
     return;
@@ -764,15 +766,36 @@ export async function updateUser(formData: UserForm) {
   }
 
   const supabase = createAdminClient();
+
+  // Update authentication details (email and password if provided)
+  const updateData: { email: string; password?: string } = {
+    email: formData.email,
+  };
+
+  if (formData.newPassword && formData.newPassword.length > 0) {
+    updateData.password = formData.newPassword;
+  }
+
   const { data: user, error } = await supabase.auth.admin.updateUserById(
-    formData.id, // Ensure formData.id is not undefined
-    {
-      email: formData.email,
-      password: formData.password,
-    }
+    formData.id,
+    updateData
   );
 
   if (error) {
-    console.log("Error deleting patient", error.message);
+    console.log("Error updating user:", error.message);
+    return;
+  }
+
+  // Update the profiles table with name and email after successful auth update
+  const { error: profileError } = await supabase
+    .from("profiles")
+    .update({
+      email: formData.email,
+      name: formData.name,
+    })
+    .eq("id", formData.id);
+
+  if (profileError) {
+    console.log("Error updating profile:", profileError.message);
   }
 }

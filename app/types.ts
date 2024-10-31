@@ -88,3 +88,15 @@ export const UserSchema = z.object({
 });
 
 export type UserForm = z.infer<typeof UserSchema>;
+
+export const UpdateUser = z.object({
+  id: z.string().optional(),
+  email: z.string().email({ message: "Invalid email address" }),
+  name: z.string().min(3, { message: "name must be at least 3 characters" }),
+  newPassword: z
+    .string()
+    .min(6, { message: "Password must be at least 6 characters" })
+    .optional(),
+});
+
+export type UpdateUserForm = z.infer<typeof UpdateUser>;

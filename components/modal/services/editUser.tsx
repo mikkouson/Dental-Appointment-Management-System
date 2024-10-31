@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { updateUser } from "@/app/(admin)/action";
-import { UserSchema } from "@/app/types";
+import { UpdateUser } from "@/app/types";
 import UserField from "@/components/forms/users/userField";
 import { toast } from "@/components/hooks/use-toast";
 import {
@@ -19,6 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 import { SquarePen } from "lucide-react";
 import { useEffect, useState } from "react";
+import UpdateUserField from "@/components/forms/users/updateUserField";
 
 const fetcher = (url: string): Promise<any> =>
   fetch(url).then((res) => res.json());
@@ -34,18 +35,17 @@ export function EditUser({ data, mutate }: EditUserProps) {
   });
 
   // Use z.infer to derive the type from UserSchema
-  const form = useForm<z.infer<typeof UserSchema>>({
-    resolver: zodResolver(UserSchema),
+  const form = useForm<z.infer<typeof UpdateUser>>({
+    resolver: zodResolver(UpdateUser),
   });
 
   const set = () => {
     form.setValue("id", data.id || "");
     form.setValue("name", data.name || "");
     form.setValue("email", data.email || "");
-    form.setValue("password", data.password || "");
   };
 
-  // async function onSubmit(data: z.infer<typeof UserSchema>) {
+  // async function onSubmit(data: z.infer<typeof UpdateUser>) {
   //   const nameExists = await validateName(data.name);
 
   //   if (nameExists) {
@@ -69,7 +69,7 @@ export function EditUser({ data, mutate }: EditUserProps) {
   // }
   // Inside your EditUser component
 
-  async function onSubmit(formData: z.infer<typeof UserSchema>) {
+  async function onSubmit(formData: z.infer<typeof UpdateUser>) {
     // Prepare the updated inventory item
     const updatedItem: any = {
       ...data,
@@ -162,7 +162,7 @@ export function EditUser({ data, mutate }: EditUserProps) {
             Make changes to your profile here. Click save when you’re done.
           </SheetDescription>
         </SheetHeader>
-        <UserField form={form} onSubmit={onSubmit} />
+        <UpdateUserField form={form} onSubmit={onSubmit} />
       </SheetContent>
     </Sheet>
   );

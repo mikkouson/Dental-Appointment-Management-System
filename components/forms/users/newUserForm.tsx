@@ -1,7 +1,7 @@
 "use client";
 
 import { createNewUser } from "@/app/(admin)/action";
-import { Profiles } from "@/app/schema";
+import { User } from "@/app/schema";
 import { UserSchema } from "@/app/types";
 import { toast } from "@/components/hooks/use-toast";
 import { useUser } from "@/components/hooks/useUser";
@@ -52,7 +52,7 @@ export function NewUserForm({ setOpen, mutate }: NewUserFormProps) {
     const newItem = data;
 
     interface UserData {
-      data: Profiles[];
+      data: User[];
       count: number;
     }
 

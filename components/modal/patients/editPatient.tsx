@@ -4,11 +4,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { toast } from "@/components/hooks/use-toast";
 import { updatePatient } from "@/app/(admin)/action";
-import { Patient, PatientCol } from "@/app/schema";
-import { PatientFormValues, PatientSchema } from "@/app/types";
+import { PatientCol } from "@/app/schema";
+import { PatientSchema } from "@/app/types";
 import PatientFields from "@/components/forms/patients/patientFields";
+import { toast } from "@/components/hooks/use-toast";
+import { usePatients } from "@/components/hooks/usePatient";
 import {
   Sheet,
   SheetContent,
@@ -17,14 +18,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
 import { SquarePen } from "lucide-react";
 import { useEffect, useState } from "react";
-import useSWR from "swr";
-import { cn } from "@/lib/utils";
-import { usePatients } from "@/components/hooks/usePatient";
 
-const fetcher = (url: string): Promise<any> =>
-  fetch(url).then((res) => res.json());
 type EditPatientProps = {
   patient: PatientCol;
   mutate: any;
@@ -50,19 +47,18 @@ export function EditPatient({ patient, mutate }: EditPatientProps) {
   });
 
   const set = () => {
-    form.setValue("id", patient.id || 0);
-    form.setValue("name", patient.name || "");
-    form.setValue("email", patient.email || "");
-    form.setValue("sex", patient.sex || "");
-    form.setValue("status", patient.status || "");
+    form.setValue("id", patient.id ?? 0);
+    form.setValue("name", patient.name ?? "");
+    form.setValue("email", patient.email ?? "");
+    form.setValue("sex", patient.sex ?? "");
+    form.setValue("status", patient.status ?? "");
     form.setValue("dob", patient.dob ? new Date(patient.dob) : new Date());
-    form.setValue("phoneNumber", patient.phone_number || 0);
-    form.setValue("address.id", patient.address?.id || 0);
-    form.setValue("address.address", patient.address?.address || "");
+    form.setValue("phoneNumber", patient.phone_number ?? 0);
+    form.setValue("address.id", patient.address?.id ?? 0);
+    form.setValue("address.address", patient.address?.address ?? "");
     form.setValue("address.latitude", patient.address?.latitude ?? 0);
     form.setValue("address.longitude", patient.address?.longitude ?? 0);
   };
-
   async function checkEmailExists(email: string): Promise<boolean> {
     // Filter out the current patient from patients array
     const filteredPatients = patients.filter(

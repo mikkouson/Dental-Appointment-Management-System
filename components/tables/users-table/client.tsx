@@ -1,29 +1,18 @@
 "use client";
-import { Service } from "@/app/schema";
-import { Breadcrumbs } from "@/components/breadcrumb";
-import { NewServiceForm } from "@/components/forms/services/newServicesForm";
+import BurgerMenu from "@/components/buttons/burgerMenu";
+import { NewUserForm } from "@/components/forms/users/newUserForm";
 import { Heading } from "@/components/heading";
+import { useUser } from "@/components/hooks/useUser";
 import PageContainer from "@/components/layout/page-container";
 import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
-import { Input } from "@/components/ui/input";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { PaginationDemo } from "@/components/pagination";
+import SearchInput from "@/components/searchInput";
+import TableLoadingSkeleton from "@/components/skeleton/tableskeleton";
 import { Separator } from "@/components/ui/separator";
-import { createClient } from "@/utils/supabase/client";
-import { Search, File } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import React, { useState } from "react";
-import useSWR from "swr";
+import { useState } from "react";
 import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
-import { PaginationDemo } from "@/components/pagination";
-import TableLoadingSkeleton from "@/components/skeleton/tableskeleton";
-import { NewUserForm } from "@/components/forms/users/newUserForm";
-import { CSVLink } from "react-csv";
-import { Button } from "@/components/ui/button";
-import BurgerMenu from "@/components/buttons/burgerMenu";
-import SearchInput from "@/components/searchInput";
-import { useUser } from "@/components/hooks/useUser";
-import UserExport from "@/components/buttons/exportButtons/userExport";
 
 export default function UserClient() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -61,7 +50,7 @@ export default function UserClient() {
   };
 
   // Calculate total pages for pagination
-  const totalPages = data ? Math.ceil(data.count / 10) : 1;
+  const totalPages = data ? Math.ceil(data.count / limit) : 1;
 
   return (
     <PageContainer>
@@ -78,12 +67,24 @@ export default function UserClient() {
             />
           </div>
           <div className="flex items-center ">
-          <UserExport /> 
-            <DrawerDialogDemo
-              open={open}
-              setOpen={setOpen}
-              label={"New Inventory Item"}
+            {/* <InventoryExport /> */}
+            {/* <CSVLink
+              data={(data?.data || []).map((user) => ({
+                name: user.name || "null",
+                email: user.email || "null",
+                updated_at: user.updated_at || "null",
+              }))}
+              filename={"users.csv"}
             >
+              <Button
+                variant="outline"
+                className="text-xs sm:text-sm px-2 sm:px-4 mr-2"
+              >
+                <File className="h-3.5 w-3.5 mr-2" />
+                <span className="sr-only sm:not-sr-only">Export</span>
+              </Button>
+            </CSVLink> */}
+            <DrawerDialogDemo open={open} setOpen={setOpen} label={"New User"}>
               <NewUserForm setOpen={setOpen} mutate={mutate} />
             </DrawerDialogDemo>
           </div>
