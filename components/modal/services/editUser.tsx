@@ -99,17 +99,16 @@ export function EditUser({ data, mutate }: EditUserProps) {
 
     setOpen(false); // Close the modal
 
-    toast({
-      className: cn(
-        "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
-      ),
-      variant: "success",
-      description: "Inventory item updated successfully.",
-      duration: 2000,
-    });
-
     try {
       await updateUser(formData); // Make sure this function returns a promise
+      toast({
+        className: cn(
+          "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
+        ),
+        variant: "success",
+        description: "Inventory item updated successfully.",
+        duration: 2000,
+      });
 
       mutate(); // Revalidate to ensure data consistency
     } catch (error: any) {
@@ -121,7 +120,7 @@ export function EditUser({ data, mutate }: EditUserProps) {
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         variant: "destructive",
-        description: `Failed to update service item: ${error.message}`,
+        description: `Error: ${error.message}`,
         duration: 2000,
       });
     }

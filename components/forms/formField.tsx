@@ -7,13 +7,16 @@ interface FieldProps {
   form: any;
   name: string;
   label: string;
-  data?: readonly any[]; // Mark data as optional
+  data?: readonly any[];
   erase?: boolean;
   defValue?: string;
   num?: boolean;
   age?: boolean;
   textarea?: boolean;
+  disabled?: boolean; // Add disabled here
+
   search?: boolean;
+  // Remove disabled from here since it will be included in ...props
 }
 
 export default function Field({
@@ -23,8 +26,10 @@ export default function Field({
   data = [],
   erase = false,
   num = false,
-  textarea = false, // Default to false if not provided
+  textarea = false,
   search = false,
+  disabled = false, // Add disabled here
+  ...props
 }: FieldProps) {
   return (
     <FormField
@@ -41,26 +46,31 @@ export default function Field({
               timeclear={erase}
               num={num}
               text={search}
+              {...props}
             />
-          ) : textarea ? ( // Render Textarea if textarea prop is true
+          ) : textarea ? (
             <Textarea
               placeholder={`Tell us a little bit about ${name}`}
               className="resize-none"
+              disabled={disabled} // Pass disabled here
               {...field}
+              {...props}
             />
           ) : (
             <Input
               type={!num ? "text" : "number"}
               placeholder={`Input ${name} here`}
+              disabled={disabled} // Pass disabled here
               {...field}
-              value={num ? field.value : field.value} // Ensure num is treated as a number
+              value={num ? field.value : field.value}
               onChange={(e) => {
                 if (num) {
-                  field.onChange(Number(e.target.value)); // Convert value to number
+                  field.onChange(Number(e.target.value));
                 } else {
                   field.onChange(e);
                 }
               }}
+              {...props}
             />
           )}
           <FormMessage>{fieldState.error?.message}</FormMessage>

@@ -88,24 +88,26 @@ export function NewPatientForm({ setOpen, mutate }: NewPatientFormProps) {
       false // Do not revalidate yet
     );
 
-    setOpen(false); // Close the modal
-
-    toast({
-      className: cn(
-        "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
-      ),
-      variant: "success",
-      description: "Patient added successfully.",
-      duration: 2000,
-    });
+    // setOpen(false); // Close the modal
 
     try {
       await newPatient(data); // Ensure this function returns a promise
+      // Show success toast immediately
+      toast({
+        className: cn(
+          "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
+        ),
+        variant: "success",
+        description: "Patient added successfully.",
+        duration: 2000,
+      });
 
       mutate(); // Revalidate to ensure data consistency
     } catch (error: any) {
       // Revert the optimistic update in case of an error
       mutate();
+
+      // Show error toast below the success message
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"

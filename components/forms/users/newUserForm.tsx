@@ -63,24 +63,22 @@ export function NewUserForm({ setOpen, mutate }: NewUserFormProps) {
       }),
       false
     );
-
-    setOpen(false); // Close the modal
-
-    toast({
-      className: cn(
-        "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
-      ),
-      variant: "success",
-      description: "User added successfully.",
-      duration: 2000,
-    });
+    setOpen(false);
 
     try {
-      await createNewUser(data);
+      await createNewUser(data); // Attempt to create a new user
+      mutate(); // Revalidate data
+      toast({
+        className: cn(
+          "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
+        ),
+        variant: "success",
+        description: "User added successfully.",
+        duration: 2000,
+      });
 
-      mutate();
+      // setOpen(false); // Close the modal after successful creation
     } catch (error: any) {
-      mutate();
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
