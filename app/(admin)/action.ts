@@ -451,8 +451,9 @@ export async function newPatient(data: patientInput) {
   const result = PatientSchema.safeParse(data);
 
   if (!result.success) {
-    console.log("Validation errors:", result.error.format());
-    return;
+    const validationErrors = result.error.format();
+    console.log("Validation errors:", validationErrors); // Optional: Keep logging if needed
+    throw new Error("Validation errors occurred."); // Throw error for validation issues
   }
 
   const supabase = createClient();
@@ -471,8 +472,10 @@ export async function newPatient(data: patientInput) {
     .single();
 
   if (addressError || !addressData) {
-    console.error("Error inserting address:", addressError?.message);
-    return;
+    const errorMessage = addressError
+      ? addressError.message
+      : "Failed to insert address.";
+    throw new Error(`Error inserting address: ${errorMessage}`); // Throw error for address insert failure
   }
 
   const addressId = addressData.id;
@@ -491,10 +494,14 @@ export async function newPatient(data: patientInput) {
   ]);
 
   if (patientError) {
-    console.error("Error inserting patient:", patientError.message);
+    throw new Error(`Error inserting patient: ${patientError.message}`); // Throw error for patient insert failure
   } else {
     console.log("Patient data inserted successfully");
   }
+
+  // if (error) {
+  //   throw new Error(`Error creating user: ${error.message}`); // Throw error for user creation failure
+  // }
 }
 
 export async function deletePatient(id: number) {
@@ -706,38 +713,20 @@ export async function createNewUser(formData: UserForm) {
 
   if (!result.success) {
     console.log("Validation errors:", result.error.format());
-    return;
+    throw new Error("Validation failed");
   }
 
-  const supabase = createClient();
+  const supabase = createAdminClient();
 
-  // Sign up the user
-  const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+  const { error } = await supabase.auth.admin.createUser({
     email: formData.email,
     password: formData.password,
+    user_metadata: { name: formData.name },
+    email_confirm: true, // This confirms the email without needing a timestamp
+    role: "authenticated",
   });
 
-  if (signUpError) {
-    console.error("Error creating user:", signUpError.message);
-    return;
-  }
-
-  // Insert user profile into 'profiles' table after successful sign-up
-  const userId = signUpData.user?.id;
-
-  if (userId) {
-    const { error: profileError } = await supabase
-      .from("profiles")
-      .update({
-        id: userId, // Assuming 'id' in profiles table is the same as the user's ID
-        name: formData.name,
-      })
-      .eq("id", userId);
-
-    if (profileError) {
-      console.error("Error inserting profile:", profileError.message);
-    }
-  }
+  if (error) throw error; // Throw error to be caught in onSubmit
 
   // Optionally, you can revalidate and redirect after everything is successful
   revalidatePath("/", "layout");
@@ -767,9 +756,13 @@ export async function updateUser(formData: UpdateUserForm) {
 
   const supabase = createAdminClient();
 
-  // Update authentication details (email and password if provided)
-  const updateData: { email: string; password?: string } = {
+  const updateData: {
+    email: string;
+    password?: string;
+    user_metadata?: { name: string };
+  } = {
     email: formData.email,
+    user_metadata: { name: formData.name },
   };
 
   if (formData.newPassword && formData.newPassword.length > 0) {
@@ -782,15 +775,30 @@ export async function updateUser(formData: UpdateUserForm) {
   );
 
   if (error) {
-    console.log("Error updating user:", error.message);
+    throw new Error(`${error.message}`);
+  }
+
+  return user;
+}
+
+export async function updateProfile(formData: UpdateUserForm) {
+  const result = UpdateUser.safeParse(formData);
+  if (!result.success) {
+    console.log("Validation errors:", result.error.format());
     return;
   }
 
-  // Update the profiles table with name and email after successful auth update
+  if (!formData?.id) {
+    console.log("User ID is missing.");
+    return;
+  }
+
+  const supabase = createClient();
+
+  // Update the profiles table with name and email
   const { error: profileError } = await supabase
     .from("profiles")
     .update({
-      email: formData.email,
       name: formData.name,
     })
     .eq("id", formData.id);
