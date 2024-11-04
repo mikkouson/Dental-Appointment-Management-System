@@ -83,6 +83,7 @@ const PatientFields = ({ form, onSubmit }: PatientFieldsProps) => {
                       const selectedDate = new Date(e.target.value);
                       field.onChange(selectedDate);
                     }}
+                    max={new Date().toISOString().split("T")[0]}
                   />
                 </FormControl>
                 <FormMessage />
