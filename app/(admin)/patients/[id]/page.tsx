@@ -27,6 +27,7 @@ import moment from "moment";
 import Link from "next/link";
 import { columns } from "@/components/tables/patient-slug-table/column";
 import { DataTableDemo } from "@/components/tables/patient-slug-table/dataTable";
+import PatientAppointmentExport from "@/components/buttons/exportButtons/patientAppointmentExport";
 
 const fetcher = async (url: any): Promise<any> => {
   const res = await fetch(url);
@@ -48,7 +49,6 @@ export default function Page({ params }: PageProps) {
     fetcher
   );
 
-  console.log();
   const active = useSetActiveAppointments((state) => state.selectedAppointment);
 
   if (isLoading) return <>Loading</>;
@@ -201,15 +201,8 @@ export default function Page({ params }: PageProps) {
 
             <div>
               <div className="flex items-center">
-                <div className="ml-auto flex items-center gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-7 gap-1 text-sm"
-                  >
-                    <File className="h-3.5 w-3.5" />
-                    <span className="sr-only sm:not-sr-only">Export</span>
-                  </Button>
+                <div className="ml-auto flex items-center gap-2 mb-2">
+                  <PatientAppointmentExport data={data.appointments} />
                 </div>
               </div>
               <Card x-chunk="dashboard-05-chunk-3">
