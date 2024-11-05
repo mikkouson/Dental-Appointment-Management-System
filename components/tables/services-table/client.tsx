@@ -71,13 +71,14 @@ export default function UserClient() {
               Total Appointments ({services ? services.count : "Loading"})
             </h4>
             <Heading
-              title={`Total Items (${services ? services.count : "loading"})`}
-              description="Manage Appointments (Server side table functionalities.)"
+              title={`Total Services (${
+                services ? services.count : "loading"
+              })`}
+              description="Manage Services (Server side table functionalities.)"
             />
           </div>
           <div className="flex items-center ">
-          <ServicesExport /> 
-
+            <ServicesExport />
 
             <DrawerDialogDemo
               open={open}

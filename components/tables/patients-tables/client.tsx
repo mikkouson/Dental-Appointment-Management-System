@@ -1,7 +1,7 @@
 "use client";
 import { useSetActive } from "@/app/store";
 import BurgerMenu from "@/components/buttons/burgerMenu";
-import PatientExport from "@/components/buttons/exportButtons/patientExport"; 
+import PatientExport from "@/components/buttons/exportButtons/patientExport";
 import PatientCard from "@/components/cards/patientCard";
 import { NewPatientForm } from "@/components/forms/patients/newPatientForm";
 import { Heading } from "@/components/heading";
@@ -66,11 +66,11 @@ export default function UserClient() {
               title={`Total Patients (${
                 patients ? patients.count : "loading"
               })`}
-              description="Manage Appointments (Server side table functionalities.)"
+              description="Manage Patients (Server side table functionalities.)"
             />
           </div>
           <div className="flex items-center ">
-            <PatientExport /> 
+            <PatientExport />
             <DrawerDialogDemo
               open={open}
               setOpen={setOpen}

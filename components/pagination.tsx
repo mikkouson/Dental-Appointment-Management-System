@@ -75,7 +75,7 @@ export function PaginationDemo({ totalPages }: PaginationDemoProps) {
       </div>
 
       {/* Centered Limit Selector */}
-      <div className="flex justify-center order-last sm:order-none sm:mx-auto">
+      <div className="flex justify-center  sm:order-none sm:mx-auto">
         <Select
           value={limit.toString()}
           onValueChange={(value) => {

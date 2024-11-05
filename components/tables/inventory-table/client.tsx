@@ -67,7 +67,7 @@ export default function InventoryClient() {
             </h4>
             <Heading
               title={`Total Items (${data ? data.count : "loading"})`}
-              description="Manage Appointments (Server side table functionalities.)"
+              description="Manage Inventory (Server side table functionalities.)"
             />
           </div>
           <div className="flex items-center ">
