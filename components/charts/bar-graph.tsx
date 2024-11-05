@@ -1,6 +1,6 @@
 import React from "react";
 import { TrendingUp } from "lucide-react";
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
+import { CartesianGrid, Area, AreaChart, XAxis } from "recharts";
 import {
   Card,
   CardContent,
@@ -65,7 +65,7 @@ export function BarGraph() {
           config={chartConfig}
           className="aspect-auto h-[280px] w-full"
         >
-          <LineChart
+          <AreaChart
             accessibilityLayer
             data={chartData}
             margin={{
@@ -87,14 +87,14 @@ export function BarGraph() {
               cursor={false}
               content={<ChartTooltipContent hideLabel />}
             />
-            <Line
+            <Area
               dataKey="income"
               type="natural"
+              fill="var(--color-desktop)"
+              fillOpacity={0.4}
               stroke="var(--color-desktop)"
-              strokeWidth={2}
-              dot={false}
             />
-          </LineChart>
+          </AreaChart>
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col items-start gap-1 text-sm">

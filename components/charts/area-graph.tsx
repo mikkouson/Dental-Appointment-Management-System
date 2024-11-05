@@ -1,15 +1,5 @@
 "use client";
 
-import useSWR from "swr";
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
 import {
   Card,
   CardContent,
@@ -17,14 +7,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "../ui/chart";
+import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis } from "recharts";
+import useSWR from "swr";
+import { ChartConfig, ChartContainer, ChartTooltipContent } from "../ui/chart";
 
-// Define interfaces for the data structures
 interface ApiResponse {
   data: PatientRecord[];
 }
@@ -32,7 +18,6 @@ interface ApiResponse {
 interface PatientRecord {
   date: string;
   patient_id: string;
-  // Add other fields from your API response if needed
 }
 
 interface AggregatedDataPoint {
@@ -60,7 +45,7 @@ const chartConfig = {
   },
   returneePatient: {
     label: "Returnee",
-    color: "hsl(var(--chart-2))",
+    color: "hsl(var(--chart-4))",
   },
 } satisfies ChartConfig;
 
@@ -70,7 +55,6 @@ export function AreaGraph() {
   if (error) return <div>Failed to load</div>;
   if (!data) return <div>Loading...</div>;
 
-  // Aggregating data by day
   const aggregatedData: AggregatedData = {};
 
   data.data.forEach((item) => {
@@ -92,17 +76,14 @@ export function AreaGraph() {
     }
   });
 
-  // Convert aggregated data into an array and sort by date
   const chartData = Object.values(aggregatedData).sort((a, b) => {
     return new Date(a.day).getTime() - new Date(b.day).getTime();
   });
 
-  // Calculate totals
   const totalNew = chartData.reduce((sum, item) => sum + item.New, 0);
   const totalReturnee = chartData.reduce((sum, item) => sum + item.Returnee, 0);
   const total = totalNew + totalReturnee;
 
-  // Calculate percentages, handling division by zero
   const newPercentage =
     total > 0 ? ((totalNew / total) * 100).toFixed(1) : "0.0";
   const returneePercentage =
@@ -133,7 +114,7 @@ export function AreaGraph() {
           <div className="flex items-center space-x-2">
             <span
               className="inline-block w-4 h-4 rounded-full"
-              style={{ backgroundColor: "hsl(var(--chart-2))" }}
+              style={{ backgroundColor: "hsl(var(--chart-4))" }}
             ></span>
             <div className="flex">
               <h2 className="text-lg font-semibold leading-none mr-2">
@@ -162,7 +143,7 @@ export function AreaGraph() {
           config={chartConfig}
           className="aspect-auto h-[310px] w-full"
         >
-          <AreaChart
+          <BarChart
             data={chartData}
             margin={{
               left: 12,
@@ -171,32 +152,6 @@ export function AreaGraph() {
               bottom: 20,
             }}
           >
-            <defs>
-              <linearGradient id="colorNew" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor={chartConfig.newPatient.color}
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor={chartConfig.newPatient.color}
-                  stopOpacity={0}
-                />
-              </linearGradient>
-              <linearGradient id="colorReturnee" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor={chartConfig.returneePatient.color}
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor={chartConfig.returneePatient.color}
-                  stopOpacity={0}
-                />
-              </linearGradient>
-            </defs>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="day"
@@ -222,23 +177,19 @@ export function AreaGraph() {
               content={<ChartTooltipContent indicator="dot" />}
               cursor={{ stroke: "#ccc", strokeWidth: 1 }}
             />
-            <Area
-              type="monotone"
+            <Bar
               dataKey="New"
-              stroke={chartConfig.newPatient.color}
-              fillOpacity={1}
-              fill="url(#colorNew)"
+              fill={chartConfig.newPatient.color}
               name={chartConfig.newPatient.label}
+              radius={[4, 4, 0, 0]}
             />
-            <Area
-              type="monotone"
+            <Bar
               dataKey="Returnee"
-              stroke={chartConfig.returneePatient.color}
-              fillOpacity={1}
-              fill="url(#colorReturnee)"
+              fill={chartConfig.returneePatient.color}
               name={chartConfig.returneePatient.label}
+              radius={[4, 4, 0, 0]}
             />
-          </AreaChart>
+          </BarChart>
         </ChartContainer>
       </CardContent>
     </Card>
