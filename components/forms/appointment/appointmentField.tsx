@@ -60,16 +60,18 @@ export function AppointmentField({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          <FormField
-            control={form.control}
-            name="patient"
-            render={() => (
-              <FormItem>
-                <FormLabel>Patients Name</FormLabel>
-                <Input disabled defaultValue={appointment?.patients?.name} />
-              </FormItem>
-            )}
-          />
+          {appointment?.patients?.name && (
+            <FormField
+              control={form.control}
+              name="patient"
+              render={() => (
+                <FormItem>
+                  <FormLabel>Patients Name</FormLabel>
+                  <Input disabled defaultValue={appointment?.patients?.name} />
+                </FormItem>
+              )}
+            />
+          )}
           <Field
             form={form}
             name={"branch"}
