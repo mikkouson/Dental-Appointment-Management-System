@@ -1,13 +1,12 @@
 "use client";
-import { AreaGraph } from "@/components/charts/area-graph";
-import { BarGraph } from "@/components/charts/bar-graph";
+import { PatientChart } from "@/components/charts/area-graph";
+import { RevenueGraph } from "@/components/charts/bar-graph";
 import { PieGraph } from "@/components/charts/pie-graph";
 import { CalendarDateRangePicker } from "@/components/date-range-picker";
 import { useAppointments } from "@/components/hooks/useAppointment";
 import { usePatients } from "@/components/hooks/usePatient";
 import PageContainer from "@/components/layout/page-container";
 import { RecentSales } from "@/components/recent-sales";
-import { SidebarDemo } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -17,86 +16,171 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import moment from "moment";
+import { useSearchParams } from "next/navigation";
 
 export default function Page() {
+  const searchParams = useSearchParams();
+  const dates = searchParams.get("date")?.split(",") || [];
+
+  let dateRangeStart;
+  let dateRangeEnd;
+
+  if (
+    dates.length === 2 &&
+    moment(dates[0]).isValid() &&
+    moment(dates[1]).isValid()
+  ) {
+    dateRangeStart = moment(dates[0]).format("YYYY-MM-DD");
+    dateRangeEnd = moment(dates[1]).format("YYYY-MM-DD");
+  } else {
+    dateRangeStart = moment().startOf("month").format("YYYY-MM-DD");
+    dateRangeEnd = moment().endOf("month").format("YYYY-MM-DD");
+  }
+
   const { appointments, appointmentsLoading } = useAppointments();
   const { patients, patientLoading } = usePatients();
 
   if (patientLoading || appointmentsLoading) return <> Loading</>;
 
   const calculateMetrics = () => {
-    if (!appointments?.data?.length || !patients?.count)
-      return { rate: 0, change: 0, revenueChange: 0, patientChange: 0 };
+    if (!appointments?.data?.length || !patients?.data?.length)
+      return {
+        revenue: 0,
+        revenueChange: 0,
+        newPatients: 0,
+        newPatientsChange: 0,
+        appointmentCompletionRate: 0,
+        appointmentCompletionRateChange: 0,
+        periodLength: 0,
+        activePatients: 0,
+        activePatientsChange: 0,
+        totalAppointments: 0,
+      };
 
-    const currentDate = new Date();
-    const currentMonth = currentDate.getMonth(); // 0-indexed (0 = January)
-    const currentYear = currentDate.getFullYear();
+    const endDate = moment(dateRangeEnd);
+    const startDate = moment(dateRangeStart);
+    const daysDiff = endDate.diff(startDate, "days") + 1;
 
-    const currentMonthAppointments = appointments.data.filter((appointment) => {
-      if (!appointment.date) return false;
-      const appointmentDate = new Date(appointment.date);
-      return (
-        appointmentDate.getMonth() === currentMonth &&
-        appointmentDate.getFullYear() === currentYear
-      );
-    });
-
-    const previousMonthAppointments = appointments.data.filter(
+    // Current period calculations
+    const currentPeriodAppointments = appointments.data.filter(
       (appointment) => {
         if (!appointment.date) return false;
-        const appointmentDate = new Date(appointment.date);
-        return (
-          appointmentDate.getMonth() === currentMonth - 1 &&
-          appointmentDate.getFullYear() === currentYear
+        const appointmentDate = moment(appointment.date);
+        return appointmentDate.isBetween(startDate, endDate, "day", "[]");
+      }
+    );
+
+    // Get unique patient IDs with appointments in the period
+    const currentActivePatientIds = new Set(
+      currentPeriodAppointments.map((appointment) => appointment.patient_id)
+    );
+
+    // New patients are those created within the period
+    const currentNewPatients = patients.data.filter((patient) => {
+      if (!patient.created_at) return false;
+      const patientDate = moment(patient.created_at);
+      return patientDate.isBetween(startDate, endDate, "day", "[]");
+    });
+
+    // Calculate completion rate (completed appointments / total appointments)
+    const currentCompletedAppointments = currentPeriodAppointments.filter(
+      (appointment) => appointment.status?.id === 3 // Assuming 3 is the status ID for completed appointments
+    ).length;
+
+    const currentCompletionRate =
+      currentPeriodAppointments.length > 0
+        ? (currentCompletedAppointments / currentPeriodAppointments.length) *
+          100
+        : 0;
+
+    const revenueCurrentPeriod = currentPeriodAppointments.reduce(
+      (total, appointment) => total + (appointment?.services?.price || 0),
+      0
+    );
+
+    // Previous period calculations
+    const previousStartDate = startDate.clone().subtract(daysDiff, "days");
+    const previousEndDate = endDate.clone().subtract(daysDiff, "days");
+
+    const previousPeriodAppointments = appointments.data.filter(
+      (appointment) => {
+        if (!appointment.date) return false;
+        const appointmentDate = moment(appointment.date);
+        return appointmentDate.isBetween(
+          previousStartDate,
+          previousEndDate,
+          "day",
+          "[]"
         );
       }
     );
 
-    const totalCurrentMonth = currentMonthAppointments.length;
-    const completedCurrentMonth = currentMonthAppointments.filter(
-      (appointment) => appointment.status?.id === 4 // Completed status
-    ).length;
-
-    const totalPreviousMonth = previousMonthAppointments.length;
-    const completedPreviousMonth = previousMonthAppointments.filter(
-      (appointment) => appointment.status?.id === 4
-    ).length;
-
-    const revenueCurrentMonth = currentMonthAppointments.reduce(
-      (total, appointment) => total + (appointment?.services?.price || 0),
-      0
+    const previousActivePatientIds = new Set(
+      previousPeriodAppointments.map((appointment) => appointment.patient_id)
     );
 
-    const revenuePreviousMonth = previousMonthAppointments.reduce(
-      (total, appointment) => total + (appointment?.services?.price || 0),
-      0
-    );
+    const previousNewPatients = patients.data.filter((patient) => {
+      if (!patient.created_at) return false;
+      const patientDate = moment(patient.created_at);
+      return patientDate.isBetween(
+        previousStartDate,
+        previousEndDate,
+        "day",
+        "[]"
+      );
+    });
 
-    const rate = (completedCurrentMonth / totalCurrentMonth) * 100;
-    const formattedRate = Number(rate.toFixed(1));
+    const previousCompletedAppointments = previousPeriodAppointments.filter(
+      (appointment) => appointment.status?.id === 3
+    ).length;
 
-    const previousRate =
-      totalPreviousMonth > 0
-        ? (completedPreviousMonth / totalPreviousMonth) * 100
+    const previousCompletionRate =
+      previousPeriodAppointments.length > 0
+        ? (previousCompletedAppointments / previousPeriodAppointments.length) *
+          100
         : 0;
-    const formattedPreviousRate = Number(previousRate.toFixed(1));
 
-    const revenueChange =
-      ((revenueCurrentMonth - revenuePreviousMonth) /
-        (revenuePreviousMonth || 1)) *
-      100;
-    const patientChange =
-      ((patients.count - previousMonthAppointments.length) /
-        (previousMonthAppointments.length || 1)) *
-      100;
-    const change = ((rate - previousRate) / (previousRate || 1)) * 100;
+    const revenuePreviousPeriod = previousPeriodAppointments.reduce(
+      (total, appointment) => total + (appointment?.services?.price || 0),
+      0
+    );
+
+    // Calculate percentage changes
+    const revenueChange = calculatePercentageChange(
+      revenuePreviousPeriod,
+      revenueCurrentPeriod
+    );
+    const newPatientsChange = calculatePercentageChange(
+      previousNewPatients.length,
+      currentNewPatients.length
+    );
+    const activePatientsChange = calculatePercentageChange(
+      previousActivePatientIds.size,
+      currentActivePatientIds.size
+    );
+    const completionRateChange = calculatePercentageChange(
+      previousCompletionRate,
+      currentCompletionRate
+    );
 
     return {
-      rate: formattedRate,
-      change: Number(change.toFixed(1)),
-      revenueChange: Number(revenueChange.toFixed(1)),
-      patientChange: Number(patientChange.toFixed(1)),
+      revenue: Number(revenueCurrentPeriod.toFixed(2)),
+      revenueChange: Number(revenueChange.toFixed(2)),
+      newPatients: currentNewPatients.length,
+      newPatientsChange: Number(newPatientsChange.toFixed(2)),
+      activePatients: currentActivePatientIds.size,
+      activePatientsChange: Number(activePatientsChange.toFixed(2)),
+      appointmentCompletionRate: Number(currentCompletionRate.toFixed(1)),
+      appointmentCompletionRateChange: Number(completionRateChange.toFixed(1)),
+      totalAppointments: currentPeriodAppointments.length,
+      periodLength: daysDiff,
     };
+  };
+
+  const calculatePercentageChange = (previous: number, current: number) => {
+    if (previous === 0) return current > 0 ? 100 : 0;
+    return ((current - previous) / previous) * 100;
   };
 
   const metrics = calculateMetrics();
@@ -124,66 +208,61 @@ export default function Page() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  ₱
-                  {appointments?.data
-                    .reduce(
-                      (total, appointment) =>
-                        total + (appointment?.services?.price || 0),
-                      0
-                    )
-                    .toFixed(2)}
+                  ₱{metrics.revenue.toFixed(2)}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   {metrics.revenueChange > 0 ? "+" : ""}
-                  {metrics.revenueChange}% from last month
+                  {metrics.revenueChange}% from previous {metrics.periodLength}{" "}
+                  days
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Total Patients
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">+{patients?.count}</div>
-                <p className="text-xs text-muted-foreground">
-                  {metrics.patientChange > 0 ? "+" : ""}
-                  {metrics.patientChange}% from last month
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Pending Appointments
+                  Active Patients
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {
-                    appointments?.data.filter(
-                      (appointment) => appointment.status?.id === 1
-                    ).length
-                  }
+                  {metrics.activePatients}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Pending appointments this month
+                  {metrics.activePatientsChange > 0 ? "+" : ""}
+                  {metrics.activePatientsChange}% from previous{" "}
+                  {metrics.periodLength} days
                 </p>
               </CardContent>
             </Card>
-
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Appointment Rate
+                  New Patients
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{metrics.rate}%</div>
+                <div className="text-2xl font-bold">{metrics.newPatients}</div>
                 <p className="text-xs text-muted-foreground">
-                  {metrics.change > 0 ? "+" : ""}
-                  {metrics.change}% from last period
+                  {metrics.newPatientsChange > 0 ? "+" : ""}
+                  {metrics.newPatientsChange}% from previous{" "}
+                  {metrics.periodLength} days
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Appointment Completion Rate
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {metrics.appointmentCompletionRate}%
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {metrics.appointmentCompletionRateChange > 0 ? "+" : ""}
+                  {metrics.appointmentCompletionRateChange}% from previous
+                  period
                 </p>
               </CardContent>
             </Card>
@@ -191,23 +270,17 @@ export default function Page() {
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7">
             <div className="col-span-4">
-              <BarGraph />
+              <RevenueGraph
+                range={{ start: dateRangeStart, end: dateRangeEnd }}
+                metrics={metrics}
+              />
             </div>
-
-            <Card className="col-span-4 md:col-span-3">
-              <CardHeader>
-                <CardTitle>Latest appointments</CardTitle>
-                <CardDescription>
-                  You made {appointments?.data.length} appointments this month.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <RecentSales />
-              </CardContent>
-            </Card>
+            <RecentSales />
 
             <div className="col-span-4">
-              <AreaGraph />
+              <PatientChart
+                range={{ start: dateRangeStart, end: dateRangeEnd }}
+              />
             </div>
 
             <div className="col-span-4 md:col-span-3">

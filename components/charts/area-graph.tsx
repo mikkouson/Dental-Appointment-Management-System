@@ -30,6 +30,11 @@ interface AggregatedData {
   [key: string]: AggregatedDataPoint;
 }
 
+interface DateRange {
+  start: string; // Format: 'YYYY-MM-DD'
+  end: string; // Format: 'YYYY-MM-DD'
+}
+
 const fetcher = async (url: string): Promise<ApiResponse> => {
   const res = await fetch(url);
   if (!res.ok) {
@@ -49,7 +54,11 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function AreaGraph() {
+interface AreaGraphProps {
+  range: DateRange; // Accept range prop
+}
+
+export function PatientChart({ range }: AreaGraphProps) {
   const { data, error } = useSWR<ApiResponse>("/api/apt", fetcher);
 
   if (error) return <div>Failed to load</div>;
@@ -61,18 +70,21 @@ export function AreaGraph() {
     const date = new Date(item.date);
     const day = date.toISOString().split("T")[0];
 
-    if (!aggregatedData[day]) {
-      aggregatedData[day] = { day, New: 0, Returnee: 0 };
-    }
+    // Check if the date is within the specified range
+    if (day >= range.start && day <= range.end) {
+      if (!aggregatedData[day]) {
+        aggregatedData[day] = { day, New: 0, Returnee: 0 };
+      }
 
-    const patientOccurrences = data.data.filter(
-      (p) => p.patient_id === item.patient_id
-    ).length;
+      const patientOccurrences = data.data.filter(
+        (p) => p.patient_id === item.patient_id
+      ).length;
 
-    if (patientOccurrences === 1) {
-      aggregatedData[day].New += 1;
-    } else {
-      aggregatedData[day].Returnee += 1;
+      if (patientOccurrences === 1) {
+        aggregatedData[day].New += 1;
+      } else {
+        aggregatedData[day].Returnee += 1;
+      }
     }
   });
 
@@ -94,7 +106,8 @@ export function AreaGraph() {
       <CardHeader>
         <CardTitle>Patient Types - New vs Returnee</CardTitle>
         <CardDescription>
-          Showing the number of new and returnee patients per day.
+          Showing the number of new and returnee patients from {range.start} to{" "}
+          {range.end}.
         </CardDescription>
 
         <div className="mt-4 flex space-x-12 items-center">

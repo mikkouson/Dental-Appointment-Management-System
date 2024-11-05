@@ -83,7 +83,7 @@ export function PieGraph() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Bar Chart - Top 5 Services</CardTitle>
+        <CardTitle>Top 5 Services</CardTitle>
         <CardDescription>Usage of top 5 services</CardDescription>
       </CardHeader>
       <CardContent>
@@ -120,9 +120,9 @@ export function PieGraph() {
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 font-medium leading-none">
+        {/* <div className="flex gap-2 font-medium leading-none">
           Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-        </div>
+        </div> */}
         <div className="leading-none text-muted-foreground">
           Showing usage of the top 5 services
         </div>

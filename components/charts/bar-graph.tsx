@@ -1,5 +1,5 @@
 import React from "react";
-import { TrendingUp } from "lucide-react";
+import { TrendingDown, TrendingUp } from "lucide-react";
 import { CartesianGrid, Area, AreaChart, XAxis } from "recharts";
 import {
   Card,
@@ -18,47 +18,66 @@ import {
 import { useAppointments } from "../hooks/useAppointment";
 import moment from "moment";
 
-interface IncomeData {
+interface revenueData {
   date: string;
-  income: number;
+  revenue: number;
 }
 
 const chartConfig: ChartConfig = {
   desktop: {
-    label: "Income",
+    label: "revenue",
     color: "hsl(var(--chart-1))",
   },
 };
+interface DateRange {
+  start: string;
+  end: string;
+}
 
-export function BarGraph() {
+interface RevenueGraphProps {
+  range: DateRange;
+  metrics: any; // Replace 'any' with the appropriate type
+}
+export function RevenueGraph({ range, metrics }: RevenueGraphProps) {
   const { appointments, appointmentsLoading } = useAppointments();
 
   if (appointmentsLoading) return <>loading</>;
 
-  const incomeData: Record<string, number> = {};
+  const revenueData: Record<string, number> = {};
 
-  appointments?.data.forEach((appointment) => {
-    const date = moment(appointment.date).format("YYYY-MM-DD");
-    const price = appointment?.services?.price || 0;
+  appointments?.data
+    .filter((appointment) => {
+      const date = moment(appointment.date);
+      const startDate = moment(range.start);
+      const endDate = moment(range.end);
+      return date.isBetween(startDate, endDate, "day", "[]");
+    })
+    .forEach((appointment) => {
+      const date = moment(appointment.date).format("YYYY-MM-DD");
+      const price = appointment?.services?.price || 0;
 
-    if (!incomeData[date]) {
-      incomeData[date] = 0;
-    }
-    incomeData[date] += price;
-  });
+      if (!revenueData[date]) {
+        revenueData[date] = 0;
+      }
+      revenueData[date] += price;
+    });
 
-  const chartData: IncomeData[] = Object.entries(incomeData)
-    .map(([date, income]) => ({
+  const chartData: revenueData[] = Object.entries(revenueData)
+    .map(([date, revenue]) => ({
       date,
-      income,
+      revenue,
     }))
     .sort((a, b) => moment(a.date).diff(moment(b.date)));
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Income Chart</CardTitle>
-        <CardDescription>Income by day</CardDescription>
+        <CardTitle>
+          Total Revenue Over {moment(range.start).format("MMMM D")} to{" "}
+          {moment(range.end).format("MMMM D")}
+        </CardTitle>
+
+        <CardDescription>Revenue by day</CardDescription>
       </CardHeader>
       <CardContent className="p-2">
         <ChartContainer
@@ -69,8 +88,8 @@ export function BarGraph() {
             accessibilityLayer
             data={chartData}
             margin={{
-              top: 0,
-              bottom: 4,
+              top: 40,
+              bottom: 0,
               left: 12,
               right: 12,
             }}
@@ -88,7 +107,7 @@ export function BarGraph() {
               content={<ChartTooltipContent hideLabel />}
             />
             <Area
-              dataKey="income"
+              dataKey="revenue"
               type="natural"
               fill="var(--color-desktop)"
               fillOpacity={0.4}
@@ -99,10 +118,22 @@ export function BarGraph() {
       </CardContent>
       <CardFooter className="flex-col items-start gap-1 text-sm">
         <div className="flex gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+          {metrics.revenueChange > 0 ? (
+            <>
+              Trending up by {metrics.revenueChange > 0 ? "+" : ""}
+              {metrics.revenueChange}% from previous {metrics.periodLength} days{" "}
+              <TrendingUp className="h-4 w-4" />
+            </>
+          ) : (
+            <>
+              Trending down by {Math.abs(metrics.revenueChange)}% from previous{" "}
+              {metrics.periodLength} days <TrendingDown className="h-4 w-4" />
+            </>
+          )}
         </div>
         <div className="leading-none text-muted-foreground">
-          Showing total income for the last 6 days
+          Showing total revenue from {moment(range.start).format("MMMM D")} to{" "}
+          {moment(range.end).format("MMMM D")}
         </div>
       </CardFooter>
     </Card>

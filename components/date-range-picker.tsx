@@ -1,4 +1,3 @@
-"use client";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -8,17 +7,42 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { CalendarIcon } from "@radix-ui/react-icons";
-import { addDays, format } from "date-fns";
+import { format, startOfMonth, endOfMonth } from "date-fns";
 import * as React from "react";
 import { DateRange } from "react-day-picker";
+import { useQueryState } from "nuqs";
 
 export function CalendarDateRangePicker({
   className,
 }: React.HTMLAttributes<HTMLDivElement>) {
-  const [date, setDate] = React.useState<DateRange | undefined>({
-    from: new Date(2023, 0, 20),
-    to: addDays(new Date(2023, 0, 20), 20),
+  const [date, setDate] = useQueryState<DateRange | null>("date", {
+    defaultValue: {
+      from: startOfMonth(new Date()),
+      to: endOfMonth(new Date()),
+    },
+    parse: (value) => {
+      if (!value) return null;
+      const [fromStr, toStr] = value.split(",");
+      const from = new Date(fromStr);
+      const to = new Date(toStr);
+      // Check if both dates are valid
+      if (!isNaN(from.getTime()) && !isNaN(to.getTime())) {
+        return { from, to };
+      }
+      return null; // Return null if dates are invalid
+    },
+    serialize: (value) => {
+      if (!value || !value.from) return "";
+      return `${value.from.toISOString()},${value.to?.toISOString()}`;
+    },
   });
+
+  const handleDateSelect = React.useCallback(
+    (range: DateRange | undefined) => {
+      setDate(range ?? null); // Convert undefined to null
+    },
+    [setDate]
+  );
 
   return (
     <div className={cn("grid gap-2", className)}>
@@ -34,26 +58,26 @@ export function CalendarDateRangePicker({
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
             {date?.from ? (
-              date.to ? (
+              date?.to ? (
                 <>
-                  {format(date.from, "LLL dd, y")} -{" "}
-                  {format(date.to, "LLL dd, y")}
+                  {format(date.from, "MMM dd, yyyy")} -{" "}
+                  {format(date.to, "MMM dd, yyyy")}
                 </>
               ) : (
-                format(date.from, "LLL dd, y")
+                format(date.from, "MMM dd, yyyy")
               )
             ) : (
               <span>Pick a date</span>
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0 " align="end">
+        <PopoverContent className="w-auto p-0" align="end">
           <Calendar
             initialFocus
             mode="range"
             defaultMonth={date?.from}
-            selected={date}
-            onSelect={setDate}
+            selected={date || undefined}
+            onSelect={handleDateSelect}
             numberOfMonths={2}
           />
         </PopoverContent>

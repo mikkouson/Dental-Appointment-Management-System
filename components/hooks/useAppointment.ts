@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import useSWR from "swr";
 import { createClient } from "@/utils/supabase/client";
 import { AppointmentsCol } from "@/app/schema";
@@ -24,7 +24,9 @@ export function useAppointments(
   branches?: string | null,
   status?: string | null,
   date?: string | null,
-  limit?: number | null
+  limit?: number | null,
+  dateRangeStart?: string | null,
+  dateRangeEnd?: string | null
 ) {
   const queryString = new URLSearchParams();
 
@@ -46,13 +48,20 @@ export function useAppointments(
     queryString.append("page", String(page));
   }
 
-  // Add date filter as equality
   if (date) {
     queryString.append("date", date);
   }
 
   if (limit) {
-    queryString.append("limit", String(limit)); // Add limit to query string
+    queryString.append("limit", String(limit));
+  }
+
+  // Add date range to query string if provided
+  if (dateRangeStart) {
+    queryString.append("dateRangeStart", dateRangeStart);
+  }
+  if (dateRangeEnd) {
+    queryString.append("dateRangeEnd", dateRangeEnd);
   }
 
   const {
