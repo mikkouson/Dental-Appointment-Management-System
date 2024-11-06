@@ -10,6 +10,7 @@ import { useState } from "react";
 import { Button } from "./ui/button"; // Assuming this is where Button is located
 import { toast } from "./hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { CompleteAppointment } from "./modal/appointment/mark-as-completed";
 
 interface AppointmentsMapProps {
   timeSlots: TimeSlot[];
@@ -99,22 +100,29 @@ export default function AppointmentsMap({
 
                     <div className="flex flex-wrap items-center space-x-2 mt-3 md:mt-0">
                       {apt.status?.id === 1 && (
-                        <Button
-                          type="button"
-                          className="bg-red-500 text-white px-3 py-1 rounded"
-                          disabled={loading === apt.id}
-                          onClick={() =>
-                            handleAction(
-                              () => cancelAppointment({ aptId: apt.id }),
-                              apt.id,
-                              "cancelled"
-                            )
-                          }
-                        >
-                          {loading === apt.id && loadingType === "cancelled"
-                            ? "Cancelling..."
-                            : "Cancel"}
-                        </Button>
+                        <>
+                          <Button
+                            type="button"
+                            className="bg-red-500 text-white px-3 py-1 rounded"
+                            disabled={loading === apt.id}
+                            onClick={() =>
+                              handleAction(
+                                () => cancelAppointment({ aptId: apt.id }),
+                                apt.id,
+                                "cancelled"
+                              )
+                            }
+                          >
+                            {loading === apt.id && loadingType === "cancelled"
+                              ? "Cancelling..."
+                              : "Cancel"}
+                          </Button>
+                          <CompleteAppointment
+                            appointmentId={apt.id}
+                            text={false}
+                            disabled={false}
+                          />
+                        </>
                       )}
 
                       {apt.status?.id === 2 && (

@@ -50,7 +50,7 @@ export function NavUser({
     };
   };
 }) {
-  const initial = user.user_metadata?.name?.slice(0, 1) || "CN"; // Default to 'CN'
+  const initial = user?.user_metadata?.name?.slice(0, 1) || "CN"; // Default to 'CN'
   const fallbackColor = getColorFromInitial(initial);
 
   return (
@@ -59,16 +59,18 @@ export function NavUser({
         <div className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex items-center p-2 rounded-md cursor-pointer">
           <Avatar className="h-8 w-8 rounded-lg mr-2">
             <AvatarImage
-              src={user.user_metadata?.avatar_url}
-              alt={user.user_metadata?.name}
+              src={user?.user_metadata?.avatar_url}
+              alt={user?.user_metadata?.name}
             />
             <AvatarFallback className={`rounded-lg ${fallbackColor}`}>
               {initial}
             </AvatarFallback>
           </Avatar>
           <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-semibold">{user.email}</span>
-            <span className="truncate text-xs">{user.user_metadata?.name}</span>
+            <span className="truncate font-semibold">{user?.email}</span>
+            <span className="truncate text-xs">
+              {user?.user_metadata?.name}
+            </span>
           </div>
           <ChevronsUpDown className="ml-auto size-4" />
         </div>
@@ -83,17 +85,17 @@ export function NavUser({
           <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
             <Avatar className="h-8 w-8 rounded-lg">
               <AvatarImage
-                src={user.user_metadata?.avatar_url}
-                alt={user.user_metadata?.name}
+                src={user?.user_metadata?.avatar_url}
+                alt={user?.user_metadata?.name}
               />
               <AvatarFallback className={`rounded-lg ${fallbackColor}`}>
                 {initial}
               </AvatarFallback>
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-semibold">{user.email}</span>
+              <span className="truncate font-semibold">{user?.email}</span>
               <span className="truncate text-xs">
-                {user.user_metadata?.name}
+                {user?.user_metadata?.name}
               </span>
             </div>
           </div>
