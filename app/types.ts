@@ -73,10 +73,23 @@ export const InventorySchema = z.object({
   id: z.number().optional(),
   description: z.string().min(1, { message: "Description is required." }),
   name: z.string().min(1, { message: "Name is required." }),
-  quantity: z.number().min(1, { message: "Quantity is required." }),
+  quantity: z.number(),
 });
 
 export type InventoryFormValues = z.infer<typeof InventorySchema>;
+
+export const UpdateInventorySchema = z.object({
+  id: z.number().optional(),
+
+  selectedItems: z.array(
+    z.object({
+      id: z.number(), // Item ID (required)
+      quantity: z.number().min(1), // Quantity (must be 1 or more)
+    })
+  ),
+});
+
+export type UpdateInventoryFormValues = z.infer<typeof UpdateInventorySchema>;
 
 export const UserSchema = z.object({
   id: z.string().optional(),

@@ -5,6 +5,8 @@ import {
   PatientSchema,
   ServiceFormValues,
   ServiceSchema,
+  UpdateInventoryFormValues,
+  UpdateInventorySchema,
   UpdateUser,
   UpdateUserForm,
   UserForm,
@@ -806,4 +808,54 @@ export async function updateProfile(formData: UpdateUserForm) {
   if (profileError) {
     console.log("Error updating profile:", profileError.message);
   }
+}
+
+// Complete Appointment Action
+export async function completeAppoinment(formData: UpdateInventoryFormValues) {
+  // Validate form data
+  const validationResult = UpdateInventorySchema.safeParse(formData);
+  if (!validationResult.success) {
+    throw new Error("Invalid form data.");
+  }
+
+  const supabase = createClient();
+  const { id, selectedItems } = formData;
+
+  // Start a transaction to update the appointment and insert items
+  const { data: appointmentData, error: updateError } = await supabase
+    .from("appointments")
+    .update({ status: 4 })
+    .eq("id", id)
+    .select(
+      `
+      *,
+      patients (*)
+    `
+    )
+    .single();
+
+  if (updateError) {
+    throw new Error(`Error updating appointment: ${updateError.message}`);
+  }
+
+  // Prepare data for bulk insert into the inventory
+  const insertData = selectedItems.map((item) => ({
+    appointment_id: id,
+    item_id: item.id,
+    quantity: item.quantity,
+  }));
+
+  const { error: insertError } = await supabase
+    .from("items_used")
+    .insert(insertData);
+
+  if (insertError) {
+    throw new Error(`Error inserting inventory data: ${insertError.message}`);
+  }
+
+  // Revalidate the path to update the cache
+  revalidatePath("/");
+
+  // Redirect after all async operations are complete
+  redirect("/appointments");
 }

@@ -24,7 +24,17 @@ export async function GET(req: NextRequest) {
       services (*),
       time_slots (*),
       status (*),
-      branch (*)
+      branch (*),
+ items_used!left (
+      id,
+      item_id,
+      quantity,
+      inventory!inner (
+        id,
+        name,  
+        description 
+      )
+    )
       `,
       { count: "exact" }
     )
