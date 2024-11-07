@@ -14,13 +14,15 @@ export const columns: Column[] = [
     enableSorting: true,
     enableHiding: false,
   },
-  // {
-  //   accessorKey: "id",
-  //   header: "id",
-  // },
   {
     accessorKey: "name",
     header: "NAME",
+    cell: ({ row }) => {
+      const name = row.original.name;
+      return name
+        ? name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
+        : "N/A";
+    },
   },
   {
     accessorKey: "email",
@@ -30,28 +32,24 @@ export const columns: Column[] = [
     accessorFn: (row) => row.address?.address || "N/A",
     id: "address",
     header: "ADDRESS",
+    cell: ({ row }) => {
+      const address = row.original.address?.address;
+      if (!address) return "N/A";
+
+      const firstCommaIndex = address.indexOf(",");
+      if (firstCommaIndex === -1) return address;
+
+      return address.substring(firstCommaIndex + 1).trim();
+    },
   },
   {
     accessorKey: "sex",
     header: "SEX",
+    cell: ({ row }) => {
+      const sex = row.original.sex;
+      return sex
+        ? sex.charAt(0).toUpperCase() + sex.slice(1).toLowerCase()
+        : "N/A";
+    },
   },
-  // {
-  //   id: "actions",
-  //   enableHiding: false,
-  //   header: "Actions",
-  //   cell: ({ row }) => {
-  //     const id = row.original.id;
-  //     const patient = row.original;
-  //     const handleDelete = () => {
-  //       deletePatient(Number(id));
-  //     };
-
-  //     return (
-  //       <div className="flex px-2">
-  //         <DeleteModal formAction={handleDelete} />
-  //         <EditPatient patient={patient} />
-  //       </div>
-  //     );
-  //   },
-  // },
 ];

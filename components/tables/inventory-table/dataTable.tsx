@@ -1,5 +1,5 @@
 "use client";
-import { deletePatient } from "@/app/(admin)/action";
+import { deleteInventory } from "@/app/(admin)/action";
 import type { Inventory } from "@/app/schema";
 import { useSetActive } from "@/app/store";
 import { toast } from "@/components/hooks/use-toast";
@@ -62,16 +62,16 @@ export function DataTableDemo({
     data,
     columns,
     onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    manualPagination: true,
+    manualFiltering: true,
     state: {
       sorting,
-      columnFilters,
       columnVisibility,
       rowSelection,
     },
@@ -87,13 +87,14 @@ export function DataTableDemo({
       // Optimistically update the UI
       const filteredPatients = data.filter((patient) => patient.id !== id);
       mutate({ data: filteredPatients }, false);
-      deletePatient(id);
+      deleteInventory(id);
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         variant: "success",
         description: "Patient deleted successfully.",
+        duration: 2000,
       });
     } catch (error: any) {
       toast({
@@ -101,12 +102,13 @@ export function DataTableDemo({
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         description: `Failed to delete the patient: ${error.message}`,
+        duration: 2000,
       });
     }
   };
 
   return (
-    <ScrollArea className="md:h-[calc(80vh-220px)] rounded-md border">
+    <ScrollArea className="h-[calc(80vh-20px)]   border">
       <Table className="relative">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -153,7 +155,7 @@ export function DataTableDemo({
                     <DeleteModal
                       formAction={() => handleDelete(row.original.id)}
                     />
-                    <EditInventory data={row.original} />
+                    <EditInventory data={row.original} mutate={mutate} />
                   </div>
                 </TableCell>
               </TableRow>

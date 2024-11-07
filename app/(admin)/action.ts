@@ -5,12 +5,17 @@ import {
   PatientSchema,
   ServiceFormValues,
   ServiceSchema,
+  UpdateInventoryFormValues,
+  UpdateInventorySchema,
+  UpdateUser,
+  UpdateUserForm,
+  UserForm,
 } from "@/app/types";
 import DentalAppointmentCancellationEmail from "@/components/emailTemplates/cancelAppointment";
 import DentalAppointmentEmail from "@/components/emailTemplates/newAppointment";
 import DentalAppointmentPendingEmail from "@/components/emailTemplates/pendingAppointment";
 import DentalAppointmentRejectionEmail from "@/components/emailTemplates/rejectAppointment";
-import { createClient } from "@/utils/supabase/server";
+import { createAdminClient, createClient } from "@/utils/supabase/server";
 import moment from "moment";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -415,22 +420,32 @@ export async function newApp(data: Inputs) {
 
   const supabase = createClient();
 
-  const { error } = await supabase.from("appointments").insert([
-    {
-      patient_id: data.id,
-      service: data.service,
-      branch: data.branch,
-      date: moment(data.date).format("MM/DD/YYYY"),
-      time: data.time,
-      status: data.status,
-      type: data.type,
-    },
-  ]);
+  const { error, data: newAppointmentData } = await supabase
+    .from("appointments")
+    .insert([
+      {
+        patient_id: data.id,
+        service: data.service,
+        branch: data.branch,
+        date: moment(data.date).format("MM/DD/YYYY"),
+        time: data.time,
+        status: data.status,
+        type: data.type,
+      },
+    ])
+    .select("id")
+    .single(); // Fetch the inserted appointment data with its ID
 
   if (error) {
     console.error("Error inserting data:", error.message);
-  } else {
-    console.log("Data inserted successfully");
+    return;
+  }
+
+  console.log("Data inserted successfully");
+
+  // If the status is 2 (pending), call the pendingAppointment function
+  if (data.status === 2 && newAppointmentData) {
+    await pendingAppointment({ aptId: newAppointmentData.id });
   }
 }
 
@@ -438,8 +453,9 @@ export async function newPatient(data: patientInput) {
   const result = PatientSchema.safeParse(data);
 
   if (!result.success) {
-    console.log("Validation errors:", result.error.format());
-    return;
+    const validationErrors = result.error.format();
+    console.log("Validation errors:", validationErrors); // Optional: Keep logging if needed
+    throw new Error("Validation errors occurred."); // Throw error for validation issues
   }
 
   const supabase = createClient();
@@ -458,8 +474,10 @@ export async function newPatient(data: patientInput) {
     .single();
 
   if (addressError || !addressData) {
-    console.error("Error inserting address:", addressError?.message);
-    return;
+    const errorMessage = addressError
+      ? addressError.message
+      : "Failed to insert address.";
+    throw new Error(`Error inserting address: ${errorMessage}`); // Throw error for address insert failure
   }
 
   const addressId = addressData.id;
@@ -478,10 +496,14 @@ export async function newPatient(data: patientInput) {
   ]);
 
   if (patientError) {
-    console.error("Error inserting patient:", patientError.message);
+    throw new Error(`Error inserting patient: ${patientError.message}`); // Throw error for patient insert failure
   } else {
     console.log("Patient data inserted successfully");
   }
+
+  // if (error) {
+  //   throw new Error(`Error creating user: ${error.message}`); // Throw error for user creation failure
+  // }
 }
 
 export async function deletePatient(id: number) {
@@ -666,4 +688,174 @@ export async function updateInventory(data: InventoryFormValues) {
   } else {
     console.log("Patient data updated successfully");
   }
+}
+
+export async function deleteInventory(id: number) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("inventory")
+    .update({
+      deleteOn: new Date().toISOString(),
+    })
+    .eq("id", id);
+  if (error) {
+    console.log("Error deleting patient", error.message);
+  }
+}
+
+const FormSchema = z.object({
+  email: z.string().email({ message: "Invalid email address." }),
+  password: z.string().min(6, {
+    message: "Password must be at least 6 characters.",
+  }),
+});
+
+export async function createNewUser(formData: UserForm) {
+  const result = FormSchema.safeParse(formData);
+
+  if (!result.success) {
+    console.log("Validation errors:", result.error.format());
+    throw new Error("Validation failed");
+  }
+
+  const supabase = createAdminClient();
+
+  const { error } = await supabase.auth.admin.createUser({
+    email: formData.email,
+    password: formData.password,
+    user_metadata: { name: formData.name },
+    email_confirm: true, // This confirms the email without needing a timestamp
+    role: "authenticated",
+  });
+
+  if (error) throw error; // Throw error to be caught in onSubmit
+
+  // Optionally, you can revalidate and redirect after everything is successful
+  revalidatePath("/", "layout");
+  redirect("/users");
+}
+
+export async function deleteUser(id: number) {
+  const supabase = createAdminClient();
+  const { error } = await supabase.auth.admin.deleteUser(id.toString());
+
+  if (error) {
+    console.log("Error deleting patient", error.message);
+  }
+}
+
+export async function updateUser(formData: UpdateUserForm) {
+  const result = UpdateUser.safeParse(formData);
+  if (!result.success) {
+    console.log("Validation errors:", result.error.format());
+    return;
+  }
+
+  if (!formData?.id) {
+    console.log("User ID is missing.");
+    return;
+  }
+
+  const supabase = createAdminClient();
+
+  const updateData: {
+    email: string;
+    password?: string;
+    user_metadata?: { name: string };
+  } = {
+    email: formData.email,
+    user_metadata: { name: formData.name },
+  };
+
+  if (formData.newPassword && formData.newPassword.length > 0) {
+    updateData.password = formData.newPassword;
+  }
+
+  const { data: user, error } = await supabase.auth.admin.updateUserById(
+    formData.id,
+    updateData
+  );
+
+  if (error) {
+    throw new Error(`${error.message}`);
+  }
+
+  return user;
+}
+
+export async function updateProfile(formData: UpdateUserForm) {
+  const result = UpdateUser.safeParse(formData);
+  if (!result.success) {
+    console.log("Validation errors:", result.error.format());
+    return;
+  }
+
+  if (!formData?.id) {
+    console.log("User ID is missing.");
+    return;
+  }
+
+  const supabase = createClient();
+
+  // Update the profiles table with name and email
+  const { error: profileError } = await supabase
+    .from("profiles")
+    .update({
+      name: formData.name,
+    })
+    .eq("id", formData.id);
+
+  if (profileError) {
+    console.log("Error updating profile:", profileError.message);
+  }
+}
+
+// Complete Appointment Action
+export async function completeAppoinment(formData: UpdateInventoryFormValues) {
+  // Validate form data
+  const validationResult = UpdateInventorySchema.safeParse(formData);
+  if (!validationResult.success) {
+    throw new Error("Invalid form data.");
+  }
+
+  const supabase = createClient();
+  const { id, selectedItems } = formData;
+
+  // Start a transaction to update the appointment and insert items
+  const { data: appointmentData, error: updateError } = await supabase
+    .from("appointments")
+    .update({ status: 4 })
+    .eq("id", id)
+    .select(
+      `
+      *,
+      patients (*)
+    `
+    )
+    .single();
+
+  if (updateError) {
+    throw new Error(`Error updating appointment: ${updateError.message}`);
+  }
+
+  // Prepare data for bulk insert into the inventory
+  const insertData = selectedItems.map((item) => ({
+    appointment_id: id,
+    item_id: item.id,
+    quantity: item.quantity,
+  }));
+
+  const { error: insertError } = await supabase
+    .from("items_used")
+    .insert(insertData);
+
+  if (insertError) {
+    throw new Error(`Error inserting inventory data: ${insertError.message}`);
+  }
+
+  // Revalidate the path to update the cache
+  revalidatePath("/");
+
+  // Redirect after all async operations are complete
+  redirect("/appointments");
 }

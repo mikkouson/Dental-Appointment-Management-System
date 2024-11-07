@@ -133,9 +133,9 @@ const PatientCard = ({ activePatient }: { activePatient: Number }) => {
               </dl>
             </div>
           ) : (
-            <>no appointments</>
+            <> No appointments</>
           )}
-          <Link href={`/patients/${data.id}`}>
+          <Link href={`/patients/${data?.id}`}>
             <Button variant="outline" className="h-8 w-full gap-1 mt-2 flex">
               <Expand className="h-3.5 w-3.5 mr-2" />
               <span className="lg:sr-only xl:not-sr-only xl:whitespace-nowrap">

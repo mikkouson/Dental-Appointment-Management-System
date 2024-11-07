@@ -1,11 +1,11 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { Button } from "@/components/ui/button";
+import { rescheduleAppointment } from "@/app/(admin)/action";
 import { AppointmentsCol } from "@/app/schema";
 import { AppointmentSchema } from "@/app/types";
+import { AppointmentField } from "@/components/forms/appointment/appointmentField";
+import { toast } from "@/components/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
@@ -14,27 +14,26 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { SquarePen } from "lucide-react";
 import { useEffect, useState } from "react";
-import useSWR from "swr";
-import { rescheduleAppointment } from "@/app/(admin)/action";
-import { toast } from "@/components/hooks/use-toast";
-import { AppointmentField } from "@/components/forms/appointment/appointmentField";
-
-const fetcher = (url: string): Promise<any> =>
-  fetch(url).then((res) => res.json());
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 export function EditAppointment({
   appointment,
   text,
+  disabled,
+  mutate,
 }: {
   appointment: AppointmentsCol;
   text: boolean;
+  disabled: boolean;
+  mutate: any;
 }) {
   const [open, setOpen] = useState(false);
   // Fetch patient data
-  const { data: responseData, error } = useSWR("/api/apt/", fetcher);
-
   useEffect(() => {
     setTimeout(() => (document.body.style.pointerEvents = ""), 0);
   });
@@ -54,37 +53,38 @@ export function EditAppointment({
       appointment?.branch?.id || appointment?.branch || 0
     );
     form.setValue("status", appointment?.status?.id || 0);
-    form.setValue("service", appointment?.service || 0);
+    form.setValue("service", appointment?.service || 0); // Adjust here if `service` is directly accessible
     form.setValue("type", appointment?.type || "");
     form.setValue("patient", appointment?.patients?.name || "");
   };
 
-  const date = form.watch("date");
+  async function onSubmit(formData: z.infer<typeof AppointmentSchema>) {
+    mutate();
 
-  //   const checkEmailExists = async (email: string): Promise<boolean> => {
-  //     return patients.some((patient: PatientCol) => patient.email === email);
-  //   };
-  async function onSubmit(data: z.infer<typeof AppointmentSchema>) {
-    // const emailExists = await checkEmailExists(data.email);
-    // if (emailExists) {
-    //   form.setError("email", {
-    //     type: "manual",
-    //     message: "Email already exists",
-    //   });
-    //   return;
-    // }
-    rescheduleAppointment(data);
-    setOpen(false);
-    console.log(data);
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
-    form.reset();
+    try {
+      await rescheduleAppointment(formData); // Make sure this function returns a promise
+      setOpen(false); // Close the modal
+
+      toast({
+        className: cn(
+          "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
+        ),
+        variant: "success",
+        description: "Service added successfully.",
+        duration: 2000,
+      });
+      mutate(); // Revalidate to ensure data consistency
+    } catch (error: any) {
+      // Revert the optimistic update in case of an error
+      mutate();
+      toast({
+        className: cn(
+          "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
+        ),
+        variant: "destructive",
+        description: `Failed to add service: ${error.message}`,
+      });
+    }
   }
 
   useEffect(() => {
@@ -95,10 +95,12 @@ export function EditAppointment({
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         {text ? (
-          <Button onClick={() => set()}>Edit</Button>
+          <Button disabled={disabled} onClick={() => set()}>
+            Edit
+          </Button>
         ) : (
           <SquarePen
-            className="text-sm w-5 text-[#fde68a] cursor-pointer"
+            className="text-sm w-5 text-muted-foreground  cursor-pointer"
             onClick={() => set()}
           />
         )}
@@ -121,9 +123,9 @@ export function EditAppointment({
         }}
       >
         <SheetHeader>
-          <SheetTitle>Edit profile</SheetTitle>
+          <SheetTitle>Edit appointment</SheetTitle>
           <SheetDescription>
-            Make changes to your profile here. Click save when you’re done.
+            Make changes to the appointment here. Click save when youre done.
           </SheetDescription>
         </SheetHeader>
         <AppointmentField

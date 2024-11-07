@@ -28,10 +28,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import * as React from "react";
-import { startTransition } from "react";
 import { ScrollArea, ScrollBar } from "../../ui/scroll-area";
-import { Button } from "@/components/ui/button";
-import { ToastAction } from "@/components/ui/toast";
 
 type Column = ColumnDef<PatientCol>;
 
@@ -59,21 +56,20 @@ export function DataTableDemo({
   const [rowSelection, setRowSelection] = React.useState<
     Record<string, boolean>
   >({});
-
   const table = useReactTable({
     data,
     columns,
     onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    manualPagination: true,
+    manualFiltering: true,
     state: {
       sorting,
-      columnFilters,
       columnVisibility,
       rowSelection,
     },
@@ -96,6 +92,7 @@ export function DataTableDemo({
         ),
         variant: "success",
         description: "Patient deleted successfully.",
+        duration: 2000,
       });
     } catch (error: any) {
       toast({
@@ -103,12 +100,13 @@ export function DataTableDemo({
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         description: `Failed to delete the patient: ${error.message}`,
+        duration: 2000,
       });
     }
   };
 
   return (
-    <ScrollArea className="md:h-[calc(80vh-220px)] rounded-md border">
+    <ScrollArea className="h-[calc(80vh-20px)]   border">
       <Table className="relative">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -153,7 +151,7 @@ export function DataTableDemo({
                     <DeleteModal
                       formAction={() => handleDelete(row.original.id)}
                     />
-                    <EditPatient patient={row.original} />
+                    <EditPatient patient={row.original} mutate={mutate} />
                   </div>
                 </TableCell>
               </TableRow>

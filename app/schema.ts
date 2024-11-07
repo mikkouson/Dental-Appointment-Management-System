@@ -12,9 +12,21 @@ export type Status = Database["public"]["Tables"]["status"]["Row"];
 export type Patient = Database["public"]["Tables"]["patients"]["Row"];
 export type Address = Database["public"]["Tables"]["addresses"]["Row"];
 export type Inventory = Database["public"]["Tables"]["inventory"]["Row"];
+export type User = Database["public"]["Tables"]["profiles"]["Row"];
 
 export type PatientCol = Tables<"patients"> & {
-  address: Tables<"addresses"> | null;
+  name: string | null;
+  sex: string | null;
+  email: string | null;
+  address: {
+    id?: number;
+    address: string;
+    latitude: number;
+    longitude: number;
+  } | null; // Ensure it's defined as an object
+  dob: string | null;
+  age: number | null;
+  phone_number: number | null;
 };
 export type AppointmentsCol = Tables<"appointments"> & {
   branch: Tables<"branch"> | null; // Example: Relationship to branch table
@@ -22,6 +34,21 @@ export type AppointmentsCol = Tables<"appointments"> & {
   services: Tables<"services"> | null; // Example: Relationship to services table
   status: Tables<"status"> | null; // Example: Relationship to status table
   time_slots: Tables<"time_slots"> | null; // Example: Relationship to time_slots table
+};
+export type InventoryCol = Tables<"inventory"> & {
+  branch: Tables<"branch"> | null;
+  name: string | null;
+  quantity: number | null;
+  description: string | null;
+};
+export type ServicesCol = Tables<"services"> & {
+  name: string | null;
+  description: string | null;
+  price: number | null;
+};
+export type UserCol = Tables<"profiles"> & {
+  name: string | null;
+  email: string | null;
 };
 
 export type Database = {
@@ -61,6 +88,7 @@ export type Database = {
           status: number | null;
           time: number | null;
           type: string | null;
+          updated_at: string | null;
         };
         Insert: {
           appointment_ticket?: string | null;
@@ -73,6 +101,7 @@ export type Database = {
           status?: number | null;
           time?: number | null;
           type?: string | null;
+          updated_at?: string | null;
         };
         Update: {
           appointment_ticket?: string | null;
@@ -85,6 +114,7 @@ export type Database = {
           status?: number | null;
           time?: number | null;
           type?: string | null;
+          updated_at?: string | null;
         };
         Relationships: [
           {
@@ -126,21 +156,32 @@ export type Database = {
       };
       branch: {
         Row: {
+          addr: number | null;
           address: string | null;
           id: number;
           name: string | null;
         };
         Insert: {
+          addr?: number | null;
           address?: string | null;
           id?: number;
           name?: string | null;
         };
         Update: {
+          addr?: number | null;
           address?: string | null;
           id?: number;
           name?: string | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "branch_addr_fkey";
+            columns: ["addr"];
+            isOneToOne: false;
+            referencedRelation: "addresses";
+            referencedColumns: ["id"];
+          }
+        ];
       };
       doctors: {
         Row: {
@@ -167,6 +208,8 @@ export type Database = {
           id: number;
           name: string;
           quantity: number;
+          updated_at: string | null;
+          branch: number | null;
         };
         Insert: {
           deleteOn?: string | null;
@@ -174,6 +217,8 @@ export type Database = {
           id?: number;
           name: string;
           quantity: number;
+          updated_at?: string | null;
+          branch?: number | null;
         };
         Update: {
           deleteOn?: string | null;
@@ -181,8 +226,18 @@ export type Database = {
           id?: number;
           name?: string;
           quantity?: number;
+          updated_at?: string | null;
+          branch?: number | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "inventory_branch_fkey";
+            columns: ["branch"];
+            isOneToOne: false;
+            referencedRelation: "branch";
+            referencedColumns: ["id"];
+          }
+        ];
       };
       patients: {
         Row: {
@@ -197,6 +252,7 @@ export type Database = {
           phone_number: number | null;
           sex: string | null;
           status: string | null;
+          updated_at: string | null;
         };
         Insert: {
           address?: number | null;
@@ -210,6 +266,7 @@ export type Database = {
           phone_number?: number | null;
           sex?: string | null;
           status?: string | null;
+          updated_at?: string | null;
         };
         Update: {
           address?: number | null;
@@ -223,6 +280,7 @@ export type Database = {
           phone_number?: number | null;
           sex?: string | null;
           status?: string | null;
+          updated_at?: string | null;
         };
         Relationships: [
           {
@@ -234,13 +292,45 @@ export type Database = {
           }
         ];
       };
+      profiles: {
+        Row: {
+          avatar_url: string | null;
+          email: string | null;
+          id: string;
+          name: string | null;
+          updated_at: string | null;
+          username: string | null;
+          website: string | null;
+        };
+        Insert: {
+          avatar_url?: string | null;
+          email?: string | null;
+          id: string;
+          name?: string | null;
+          updated_at?: string | null;
+          username?: string | null;
+          website?: string | null;
+        };
+        Update: {
+          avatar_url?: string | null;
+          email?: string | null;
+          id?: string;
+          name?: string | null;
+          updated_at?: string | null;
+          username?: string | null;
+          website?: string | null;
+        };
+        Relationships: [];
+      };
       services: {
         Row: {
+          email: string;
           deleteOn: string | null;
           description: string | null;
           id: number;
           name: string | null;
           price: number | null;
+          updated_at: string | null;
         };
         Insert: {
           deleteOn?: string | null;
@@ -248,6 +338,7 @@ export type Database = {
           id?: number;
           name?: string | null;
           price?: number | null;
+          updated_at?: string | null;
         };
         Update: {
           deleteOn?: string | null;
@@ -255,6 +346,7 @@ export type Database = {
           id?: number;
           name?: string | null;
           price?: number | null;
+          updated_at?: string | null;
         };
         Relationships: [];
       };
@@ -498,4 +590,19 @@ export type Enums<
   ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
   ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+  : never;
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof PublicSchema["CompositeTypes"]
+    | { schema: keyof Database },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof Database;
+  }
+    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
+  ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
   : never;

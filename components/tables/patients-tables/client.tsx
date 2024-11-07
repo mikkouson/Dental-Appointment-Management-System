@@ -1,34 +1,25 @@
 "use client";
-import type { Address, Patient, PatientCol } from "@/app/schema";
 import { useSetActive } from "@/app/store";
-import { Breadcrumbs } from "@/components/breadcrumb";
+import BurgerMenu from "@/components/buttons/burgerMenu";
+import PatientExport from "@/components/buttons/exportButtons/patientExport";
 import PatientCard from "@/components/cards/patientCard";
+import { NewPatientForm } from "@/components/forms/patients/newPatientForm";
 import { Heading } from "@/components/heading";
+import { usePatients } from "@/components/hooks/usePatient";
 import PageContainer from "@/components/layout/page-container";
 import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
-import { PaginationDemo } from "@/components/pagitnation";
-import { Input } from "@/components/ui/input";
+import { PaginationDemo } from "@/components/pagination";
+import SearchInput from "@/components/searchInput";
+import PatientCardSkeleton from "@/components/skeleton/patientCardSkeleton";
+import TableLoadingSkeleton from "@/components/skeleton/tableskeleton";
 import { Separator } from "@/components/ui/separator";
-import { createClient } from "@/utils/supabase/client";
-import { Search, Table } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect, useOptimistic, useState } from "react";
-import useSWR, { preload } from "swr";
+import React, { useState } from "react";
 import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
-import { NewPatientForm } from "@/components/forms/patients/newPatientForm";
-import Skeleton from "@/components/skeleton/tableskeleton";
-import TableLoadingSkeleton from "@/components/skeleton/tableskeleton";
-import PatientCardSkeleton from "@/components/skeleton/patientCardSkeleton";
-const fetcher = async (
-  url: string
-): Promise<{
-  data: (Patient & { address?: Address | null })[];
-  count: number;
-}> => fetch(url).then((res) => res.json());
 
-preload(`/api/patients`, fetcher);
 export default function UserClient() {
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [open, setOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = useState<string>(
     useSearchParams().get("query") || ""
@@ -40,33 +31,13 @@ export default function UserClient() {
   const { replace } = useRouter();
   const page = parseInt(searchParams.get("page") || "1", 10);
   const query = searchParams.get("query") || "";
-  const { data, error, isLoading, mutate } = useSWR<{
-    data: (Patient & { address?: Address | null })[];
-    count: number;
-  }>(`/api/patients?page=${page}&query=${query}`, fetcher);
+  const limit = parseInt(searchParams.get("limit") || "10", 10);
 
-  const supabase = createClient();
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("realtime patients")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "patients" },
-        () => {
-          mutate();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [supabase, mutate]);
-
-  useEffect(() => {
-    setSearchQuery(query);
-  }, [query]);
+  const { patients, patientError, patientLoading, mutate } = usePatients(
+    page,
+    query,
+    limit
+  );
 
   function handleSearch(term: string) {
     const params = new URLSearchParams(searchParams);
@@ -80,88 +51,79 @@ export default function UserClient() {
     replace(`${pathname}?${params.toString()}`);
   }
 
-  function handlePageChange(newPage: number) {
-    const params = new URLSearchParams(searchParams);
-    params.set("page", newPage.toString());
-    replace(`${pathname}?${params.toString()}`);
-  }
-
-  const breadcrumbItems = [
-    { title: "Dashboard", link: "/" },
-    { title: "Patients", link: "/patients" },
-  ];
-
-  const totalPages = data ? Math.ceil(data.count / 10) : 1;
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchQuery(value);
-    handleSearch(value);
-  };
+  const totalPages = patients ? Math.ceil(patients.count / limit) : 1;
 
   return (
     <PageContainer>
-      <div className="space-y-4">
-        <Breadcrumbs items={breadcrumbItems} />
-
-        <div className="flex flex-col 2xl:flex-row lg:items-start lg:justify-between">
-          <Heading
-            title={`Total Patients (${data ? data.count : "loading"})`}
-            description="Manage patients (Server side table functionalities.)"
-          />
-
-          <div className="flex justify-end  max-w-full  w-full mt-2 sm:ml-0  sm:max-w-full 2xl:max-w-[730px] ">
-            <div className="mr-2 relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search Patient Name ..."
-                className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px] "
-                onChange={handleInputChange}
-                value={searchQuery}
-              />
-            </div>
+      <div className="flex flex-col h-[calc(100svh-20px)] ">
+        <div className="flex justify-between items-center mt-0 sm:mt-4">
+          <div className="flex items-center">
+            <BurgerMenu />
+            <h4 className="scroll-m-20 text-md font-semibold tracking-tight sm:hidden">
+              Total Appointments ({patients ? patients.count : "Loading"})
+            </h4>
+            <Heading
+              title={`Total Patients (${
+                patients ? patients.count : "loading"
+              })`}
+              description="Manage Patients (Server side table functionalities.)"
+            />
+          </div>
+          <div className="flex items-center ">
+            <PatientExport />
             <DrawerDialogDemo
               open={open}
               setOpen={setOpen}
               label={"New Patient"}
             >
-              <NewPatientForm setOpen={setOpen} />
+              <NewPatientForm setOpen={setOpen} mutate={mutate} />
             </DrawerDialogDemo>
           </div>
         </div>
+        <Separator className="my-2" />
+        <div className="flex justify-between items-center">
+          {!isSearchFocused && (
+            <div className="flex justify-end items-center">
+              {/* <SelectBranch /> */}
+              {/* <SelectStatus /> */}
+            </div>
+          )}
+          <SearchInput
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            isSearchFocused={isSearchFocused}
+            setIsSearchFocused={setIsSearchFocused}
+            handleSearch={handleSearch}
+          />
+        </div>
         <Separator />
-        <div className="flex flex-col  xl:flex-row">
+        <div className="flex flex-col 2xl:flex-row">
           <div className="flex-1">
-            {isLoading ? (
+            {patientLoading ? (
               <TableLoadingSkeleton />
-            ) : data && data.data && data.data.length > 0 ? (
+            ) : patients && patients.data && patients.data.length > 0 ? (
               <>
                 <DataTableDemo
                   columns={columns}
-                  data={data.data}
+                  data={patients.data}
                   activePatient={
                     activePatient === 0
-                      ? data.data[0].id
+                      ? patients.data[0].id
                       : activePatient || undefined
                   }
                   mutate={mutate}
                 />
-                <PaginationDemo
-                  currentPage={page}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
+                <PaginationDemo totalPages={totalPages} />
               </>
             ) : (
               <p>No data available</p>
             )}
           </div>
-          <div className="w-full mt-5 xl:w-1/5 xl:ml-5 xl:mt-0">
-            {data && data.data && data.data.length > 0 ? (
+          <div className="w-full mt-5 2xl:w-1/5 2xl:ml-5 2xl:mt-0">
+            {patients && patients.data && patients.data.length > 0 ? (
               <PatientCard
                 activePatient={
-                  activePatient === 0 ? data.data[0].id : activePatient
+                  activePatient === 0 ? patients.data[0].id : activePatient
                 }
               />
             ) : (

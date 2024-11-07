@@ -110,7 +110,7 @@ export function RadioBtn({
           </Button>
         </FormControl>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
+      <PopoverContent className=" p-0 popover-content-width-same-as-its-trigger">
         <Command>
           {text && ( // Conditionally render search input based on `text` prop
             <CommandInput
@@ -135,6 +135,7 @@ export function RadioBtn({
                         item.id === field.value ? "opacity-100" : "opacity-0"
                       )}
                     />
+                    <span className="hidden">{item.id}</span>
                     {item.name}
                   </CommandItem>
                 ))}

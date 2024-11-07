@@ -82,7 +82,7 @@ export function DrawerDialogDemo({
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
         <Button className="bg-primary text-xs p-0  sm:text-sm px-2 sm:px-4">
-          {label}
+          <Plus size={14} />
         </Button>
       </DrawerTrigger>
 

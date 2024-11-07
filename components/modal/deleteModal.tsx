@@ -29,7 +29,7 @@ export function DeleteModal({ formAction }: DeleteModalProps) {
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
           <Trash2
-            className="text-sm w-5 text-red-500 mr-2 cursor-pointer"
+            className="text-sm w-5 text-muted-foreground  mr-2 cursor-pointer"
             onClick={() => setIsOpen(true)}
           />
         </DialogTrigger>

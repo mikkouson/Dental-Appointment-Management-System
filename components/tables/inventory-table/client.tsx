@@ -1,31 +1,26 @@
 "use client";
-import { Inventory } from "@/app/schema";
-import { Breadcrumbs } from "@/components/breadcrumb";
+import Loading from "@/app/(admin)/inventory/loading";
+import BurgerMenu from "@/components/buttons/burgerMenu";
+import InventoryExport from "@/components/buttons/exportButtons/inventoryExport";
+import SelectBranch from "@/components/buttons/selectBranch";
+import { NewInventoryForm } from "@/components/forms/inventory/newInventoryForm";
 import { Heading } from "@/components/heading";
+import { useBranches } from "@/components/hooks/useBranches";
+import { useInventory } from "@/components/hooks/useInventory";
 import PageContainer from "@/components/layout/page-container";
 import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
-import { Input } from "@/components/ui/input";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { PaginationDemo } from "@/components/pagination";
+import SearchInput from "@/components/searchInput";
+import TableLoadingSkeleton from "@/components/skeleton/tableskeleton";
 import { Separator } from "@/components/ui/separator";
-import { createClient } from "@/utils/supabase/client";
-import { Search } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import React, { useState } from "react";
-import useSWR from "swr";
+import { useState } from "react";
 import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
-import { PaginationDemo } from "@/components/pagitnation";
-import { NewInventoryForm } from "@/components/forms/inventory/newInventoryForm";
-import TableLoadingSkeleton from "@/components/skeleton/tableskeleton";
 
-const fetcher = async (
-  url: string
-): Promise<{
-  data: Inventory[] | [];
-  count: number;
-}> => fetch(url).then((res) => res.json());
+export default function InventoryClient() {
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
-export default function UserClient() {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>(
     useSearchParams().get("query") || ""
@@ -33,42 +28,18 @@ export default function UserClient() {
 
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const { replace } = useRouter();
+  const router = useRouter();
   const page = parseInt(searchParams.get("page") || "1", 10);
   const query = searchParams.get("query") || "";
-  const { data, error, isLoading, mutate } = useSWR<{
-    data: Inventory[] | [];
-    count: number;
-  }>(`/api/inventory?page=${page}&query=${query}`, fetcher);
+  const branch = searchParams.get("branches") || "";
+  const limit = parseInt(searchParams.get("limit") || "10", 10);
+  const { branches, branchLoading } = useBranches();
+  const {
+    inventory: data,
+    inventoryLoading: isLoading,
+    mutate,
+  } = useInventory(page, query, branch, limit);
 
-  const supabase = createClient();
-
-  // Subscribe to realtime updates
-  React.useEffect(() => {
-    const channel = supabase
-      .channel("realtime inventory")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "inventory" },
-        () => {
-          mutate();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [supabase, mutate]);
-
-  // Handle search input change
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchQuery(value);
-    handleSearch(value);
-  };
-
-  // Handle search and update URL query parameters
   const handleSearch = (term: string) => {
     const params = new URLSearchParams(searchParams);
     if (term) {
@@ -78,61 +49,58 @@ export default function UserClient() {
       params.delete("query");
       params.delete("page");
     }
-    replace(`${pathname}?${params.toString()}`);
+    router.replace(`${pathname}?${params.toString()}`);
   };
 
-  // Handle page change and update URL page parameter
-  const handlePageChange = (newPage: number) => {
-    const params = new URLSearchParams(searchParams);
-    params.set("page", newPage.toString());
-    replace(`${pathname}?${params.toString()}`);
-  };
+  const totalPages = data ? Math.ceil(data.count / limit) : 1;
 
-  // Breadcrumb items
-  const breadcrumbItems = [
-    { title: "Dashboard", link: "/" },
-    { title: "Inventory", link: "/inventory" },
-  ];
-
-  // Calculate total pages for pagination
-  const totalPages = data ? Math.ceil(data.count / 10) : 1;
+  if (branchLoading) return <Loading />;
 
   return (
     <PageContainer>
-      <div className="space-y-4">
-        <Breadcrumbs items={breadcrumbItems} />
+      <div className="flex flex-col h-[calc(100svh-20px)] ">
+        <div className="flex justify-between items-center mt-0 sm:mt-4">
+          <div className="flex items-center">
+            <BurgerMenu />
+            <h4 className="scroll-m-20 text-md font-semibold tracking-tight sm:hidden">
+              Total Appointments ({data ? data.count : "Loading"})
+            </h4>
+            <Heading
+              title={`Total Items (${data ? data.count : "loading"})`}
+              description="Manage Inventory (Server side table functionalities.)"
+            />
+          </div>
+          <div className="flex items-center ">
+            <InventoryExport />
 
-        <div className="flex flex-col 2xl:flex-row lg:items-start lg:justify-between">
-          <Heading
-            title={`Total Inventory (${data ? data.count : "loading"})`}
-            description="Manage Inventory (Server side table functionalities.)"
-          />
-          <div className="flex justify-end  max-w-full  w-full mt-2 sm:ml-0  sm:max-w-full 2xl:max-w-[730px] ">
-            <div className="mr-2 relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search Patient Name ..."
-                className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px]"
-                value={searchQuery}
-                onChange={handleInputChange}
-              />
-            </div>
             <DrawerDialogDemo
               open={open}
               setOpen={setOpen}
-              label={"New Service"}
+              label={"New Inventory Item"}
             >
-              <NewInventoryForm setOpen={setOpen} />
+              <NewInventoryForm setOpen={setOpen} mutate={mutate} />
             </DrawerDialogDemo>
           </div>
         </div>
+        <Separator className="my-2" />
+        <div className="flex justify-between items-center">
+          {!isSearchFocused && (
+            <div className="flex justify-end items-center">
+              <SelectBranch />
+            </div>
+          )}
+          <SearchInput
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            isSearchFocused={isSearchFocused}
+            setIsSearchFocused={setIsSearchFocused}
+            handleSearch={handleSearch}
+          />
+        </div>
         <Separator />
-        <div>
+        {!isLoading ? (
           <div>
-            {isLoading ? (
-              <TableLoadingSkeleton />
-            ) : data && data.data ? (
+            {data && data.data.length ? (
               <>
                 <DataTableDemo
                   columns={columns}
@@ -140,18 +108,15 @@ export default function UserClient() {
                   mutate={mutate}
                   activePatient={undefined}
                 />
-
-                <PaginationDemo
-                  currentPage={page}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
+                <PaginationDemo totalPages={totalPages} />
               </>
             ) : (
-              <p>No data available</p>
+              <p>No data available.</p>
             )}
           </div>
-        </div>
+        ) : (
+          <TableLoadingSkeleton />
+        )}
       </div>
     </PageContainer>
   );

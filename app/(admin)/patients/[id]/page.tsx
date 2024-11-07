@@ -2,10 +2,7 @@
 import useSWR from "swr";
 
 import { useSetActiveAppointments } from "@/app/store";
-import { TextareaForm } from "@/components/patientNote";
 import StaticMaps from "@/components/staticMap";
-import { columns } from "@/components/tables/appointment-table/column";
-import { DataTableDemo } from "@/components/tables/appointment-table/dataTable";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Breadcrumb,
@@ -24,19 +21,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { File, ListFilter } from "lucide-react";
+import { File } from "lucide-react";
 import moment from "moment";
 import Link from "next/link";
+import { columns } from "@/components/tables/patient-slug-table/column";
+import { DataTableDemo } from "@/components/tables/patient-slug-table/dataTable";
+import PatientAppointmentExport from "@/components/buttons/exportButtons/patientAppointmentExport";
+
 const fetcher = async (url: any): Promise<any> => {
   const res = await fetch(url);
   if (!res.ok) {
@@ -44,36 +36,38 @@ const fetcher = async (url: any): Promise<any> => {
   }
   return res.json();
 };
+
 interface PageProps {
   params: {
     id: string; // Assuming id is a string, adjust type accordingly if different
-    // Add other fields if params has more properties
   };
 }
+
 export default function Page({ params }: PageProps) {
   const { data, error, isLoading, mutate } = useSWR(
     `/api/patientdetails?id=${params.id}`,
     fetcher
   );
+
   const active = useSetActiveAppointments((state) => state.selectedAppointment);
 
   if (isLoading) return <>Loading</>;
 
   const acceptedAppointments = data.appointments.filter(
-    (appointment: { status: { id: number } }) => appointment.status.id === 1
+    (appointment: { status?: { id?: number } }) => appointment.status?.id === 1
   );
   const completedAppointments = data.appointments.filter(
-    (appointment: { status: { id: number } }) => appointment.status.id === 4
+    (appointment: { status?: { id?: number } }) => appointment.status?.id === 4
   );
   const activeAppointment = data.appointments.find(
     (appointment: { id: number }) => appointment.id === active
   );
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-muted/40">
+    <div className="flex min-h-screen w-full flex-col ">
       <div className="flex flex-col sm:gap-4 ">
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-          <Breadcrumb className="hidden md:flex">
+          <Breadcrumb className="hidden md:flex mt-4">
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
@@ -93,10 +87,9 @@ export default function Page({ params }: PageProps) {
             </BreadcrumbList>
           </Breadcrumb>
         </header>
-        <main className="grid flex-1 items-start gap-4  sm:px-6 sm:py-0 md:gap-8 lg:grid-cols-3 xl:grid-cols-3">
+        <main className="grid flex-1 items-start gap-4  sm:px-6 sm:py-0 md:gap-8 lg:grid-cols-2 xl:grid-cols-2">
           <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
             <div className="grid gap-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-3 xl:grid-cols-3">
-              {/* Card 1 - Personal Information */}
               <Card
                 className="sm:col-span-1 md:col-span-1 lg:col-span-1 xl:col-span-1"
                 x-chunk="dashboard-05-chunk-0"
@@ -137,7 +130,6 @@ export default function Page({ params }: PageProps) {
                 <CardFooter className="text-center"></CardFooter>
               </Card>
 
-              {/* Card 2 - Contact Information */}
               <Card
                 className="sm:col-span-1 md:col-span-1 lg:col-span-1 xl:col-span-1"
                 x-chunk="dashboard-05-chunk-9"
@@ -190,7 +182,6 @@ export default function Page({ params }: PageProps) {
                 </CardContent>
               </Card>
 
-              {/* Card 3 - Address Information */}
               <Card
                 className="sm:col-span-1 md:col-span-1 lg:col-span-1 xl:col-span-1"
                 x-chunk="dashboard-05-chunk-10"
@@ -208,82 +199,29 @@ export default function Page({ params }: PageProps) {
               </Card>
             </div>
 
-            <Tabs defaultValue="Upcoming">
+            <div>
               <div className="flex items-center">
-                <TabsList>
-                  <TabsTrigger value="Upcoming">Upcoming</TabsTrigger>
-                  <TabsTrigger value="Pending">Pending</TabsTrigger>
-                  <TabsTrigger value="Completed">Completed</TabsTrigger>
-                  <TabsTrigger value="Cancelled">Cancelled</TabsTrigger>
-                </TabsList>
-                <div className="ml-auto flex items-center gap-2">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-7 gap-1 text-sm"
-                      >
-                        <ListFilter className="h-3.5 w-3.5" />
-                        <span className="sr-only sm:not-sr-only">Filter</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Filter by</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuCheckboxItem checked>
-                        Fulfilled
-                      </DropdownMenuCheckboxItem>
-                      <DropdownMenuCheckboxItem>
-                        Declined
-                      </DropdownMenuCheckboxItem>
-                      <DropdownMenuCheckboxItem>
-                        Refunded
-                      </DropdownMenuCheckboxItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-7 gap-1 text-sm"
-                  >
-                    <File className="h-3.5 w-3.5" />
-                    <span className="sr-only sm:not-sr-only">Export</span>
-                  </Button>
+                <div className="ml-auto flex items-center gap-2 mb-2">
+                  <PatientAppointmentExport data={data.appointments} />
                 </div>
               </div>
-              <TabsContent value="Upcoming">
-                <Card x-chunk="dashboard-05-chunk-3">
-                  <CardHeader className="px-7">
-                    <CardTitle>Appointments</CardTitle>
-                    <CardDescription>
-                      Recent appointmets from your clinic.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <DataTableDemo
-                      columns={columns}
-                      data={data.appointments}
-                      activePatient={active}
-                      mutate={mutate}
-                    />
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-          </div>
-          <div>
-            <Card className="">
-              <CardHeader>
-                <CardTitle>Patient Notes</CardTitle>
-                {/* <CardDescription>
-                  Deploy your new project in one-click.
-                </CardDescription> */}
-              </CardHeader>
-              <CardContent>
-                <TextareaForm />
-              </CardContent>
-            </Card>
+              <Card x-chunk="dashboard-05-chunk-3">
+                <CardHeader className="px-7">
+                  <CardTitle>Appointments</CardTitle>
+                  <CardDescription>
+                    Recent appointments from your clinic.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <DataTableDemo
+                    columns={columns}
+                    data={data.appointments}
+                    // activePatient={active}
+                    mutate={mutate}
+                  />
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </main>
       </div>

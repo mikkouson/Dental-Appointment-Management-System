@@ -18,11 +18,18 @@ import {
 } from "@/components/ui/sheet";
 import { SquarePen } from "lucide-react";
 import InventoryField from "@/components/forms/inventory/inventoryField";
+import { toast } from "@/components/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 const fetcher = (url: string): Promise<any> =>
   fetch(url).then((res) => res.json());
 
-export function EditInventory({ data }: { data: Inventory }) {
+type EditInventoryProps = {
+  data: Inventory;
+  mutate: any;
+};
+
+export function EditInventory({ data, mutate }: EditInventoryProps) {
   const { data: responseData, error } = useSWR("/api/inventory/", fetcher);
 
   // Extract the array of inventory from the response data
@@ -30,23 +37,27 @@ export function EditInventory({ data }: { data: Inventory }) {
 
   const [open, setOpen] = useState(false);
 
+  // Initialize the form without defaultValues
   const form = useForm<z.infer<typeof InventorySchema>>({
     resolver: zodResolver(InventorySchema),
   });
 
-  const set = () => {
-    form.setValue("id", data.id || 0);
-    form.setValue("name", data.name || "");
-    form.setValue("description", data.description || "");
-    form.setValue("quantity", data.quantity || 0);
+  // Function to set form values when opening the modal
+  const setFormValues = () => {
+    form.setValue("id", data.id);
+    form.setValue("name", data.name);
+    form.setValue("description", data.description);
+    form.setValue("quantity", data.quantity);
   };
 
+  // Function to validate the uniqueness of the inventory name
   async function validateName(name: string): Promise<boolean> {
-    const filteredInventory = inventory.filter(
-      (i: Inventory) => i.id !== data.id
+    const trimmedName = name.trim();
+    return inventory.some(
+      (item: Inventory) =>
+        item.id !== data.id &&
+        item.name.trim().toLowerCase() === trimmedName.toLowerCase()
     );
-
-    return filteredInventory.some((i: Inventory) => i.name === name);
   }
 
   async function onSubmit(formData: z.infer<typeof InventorySchema>) {
@@ -55,29 +66,82 @@ export function EditInventory({ data }: { data: Inventory }) {
     if (nameExists) {
       form.setError("name", {
         type: "manual",
-        message: "Item already exists",
+        message: "Inventory item already exists.",
       });
       return;
     }
 
-    updateInventory(formData);
-    setOpen(false);
+    // Prepare the updated inventory item
+    const updatedItem: Inventory = {
+      ...data,
+      ...formData,
+      updated_at: new Date().toISOString(), // Ensure updated_at is set to current time
+    };
 
-    // Optionally show a toast or notification
-    // toast({
-    //   title: "Inventory Updated",
-    //   description: "Changes saved successfully.",
-    // });
+    // Optimistically update the UI
+    mutate(
+      (currentData: { data: Inventory[]; count: number }) => {
+        let updatedData = currentData.data.map((item) =>
+          item.id === updatedItem.id ? updatedItem : item
+        );
+
+        // Reorder the updatedData array based on updated_at descending
+        updatedData = updatedData.sort((a, b) => {
+          return (
+            new Date(b.updated_at ?? "").getTime() -
+            new Date(a.updated_at ?? "").getTime()
+          );
+        });
+
+        return { ...currentData, data: updatedData };
+      },
+      false // Do not revalidate yet
+    );
+
+    setOpen(false); // Close the modal
+
+    toast({
+      className: cn(
+        "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
+      ),
+      variant: "success",
+      description: "Inventory item updated successfully.",
+      duration: 2000,
+    });
+
+    try {
+      await updateInventory(updatedItem); // Ensure this function returns a promise and handles updated_at
+
+      mutate(); // Revalidate to ensure data consistency
+    } catch (error: any) {
+      // Revert the optimistic update in case of an error
+      mutate();
+
+      toast({
+        className: cn(
+          "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
+        ),
+        variant: "destructive",
+        description: `Failed to update inventory item: ${error.message}`,
+        duration: 2000,
+      });
+    }
   }
+
   useEffect(() => {
+    // Optional: Prevent pointer events during certain operations if needed
     setTimeout(() => (document.body.style.pointerEvents = ""), 0);
   }, []);
+
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <SquarePen
           className="text-sm w-5 text-green-700 cursor-pointer"
-          onClick={() => set()}
+          onClick={() => {
+            setFormValues(); // Set form values when opening the modal
+            setOpen(true);
+          }}
         />
       </SheetTrigger>
       <SheetContent

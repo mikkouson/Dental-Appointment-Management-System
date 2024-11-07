@@ -67,7 +67,7 @@ export default function Login({
               </div>
             </div>
           </form>
-          <form>
+          {/* <form>
             <Button
               variant="outline"
               className="w-full"
@@ -99,7 +99,7 @@ export default function Login({
               </svg>
               Login with Google
             </Button>
-          </form>
+          </form> */}
         </div>
       </div>
     </div>

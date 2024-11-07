@@ -3,27 +3,63 @@ import {
   cancelAppointment,
   rejectAppointment,
 } from "@/app/(admin)/action";
-import type {
-  Appointment,
-  AppointmentsCol,
-  Patient,
-  Service,
-  Status,
-  TimeSlot,
-} from "@/app/schema";
-import SubmitButton from "./buttons/submitBtn";
+import type { AppointmentsCol, TimeSlot } from "@/app/schema";
 import { Separator } from "./ui/separator";
 import { EditAppointment } from "./modal/appointment/editAppointment";
+import { useState } from "react";
+import { Button } from "./ui/button"; // Assuming this is where Button is located
+import { toast } from "./hooks/use-toast";
+import { cn } from "@/lib/utils";
+import { CompleteAppointment } from "./modal/appointment/mark-as-completed";
 
 interface AppointmentsMapProps {
   timeSlots: TimeSlot[];
   appointments: AppointmentsCol[];
+  mutate: any;
 }
 
 export default function AppointmentsMap({
   timeSlots,
   appointments,
+  mutate,
 }: AppointmentsMapProps) {
+  const [loading, setLoading] = useState<number | null>(null);
+  const [loadingType, setLoadingType] = useState<string | null>(null); // Track the type of action
+
+  const handleAction = async (
+    action: () => Promise<void>,
+    aptId: number,
+    actionType: string
+  ) => {
+    setLoading(aptId);
+    setLoadingType(actionType); // Set the type of loading action
+    try {
+      await action();
+      toast({
+        className: cn(
+          "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
+        ),
+        variant: "success",
+        description: `Appointment ${actionType} successfully.`,
+        duration: 2000,
+      });
+    } catch (error: any) {
+      console.error("Failed to perform action", error);
+      toast({
+        className: cn(
+          "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
+        ),
+        variant: "destructive",
+        description: `Failed to ${actionType.toLowerCase()} appointment: ${
+          error.message
+        }`,
+      });
+    } finally {
+      setLoading(null);
+      setLoadingType(null); // Reset loading type
+    }
+  };
+
   return (
     <>
       {timeSlots.map((time) => {
@@ -62,65 +98,77 @@ export default function AppointmentsMap({
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center space-x-2 mt-3 md:mt-0 just">
-                      <form className="items-center flex">
-                        {apt.status?.id === 1 && (
-                          <SubmitButton
-                            className="bg-red-500 text-white px-3 py-1 rounded mr-2"
-                            formAction={async () => {
-                              try {
-                                await cancelAppointment({ aptId: apt.id });
-                              } catch (error) {
-                                console.error(
-                                  "Failed to cancel appointment",
-                                  error
-                                );
-                              }
-                            }}
-                            pendingText="Cancelling..."
+                    <div className="flex flex-wrap items-center space-x-2 mt-3 md:mt-0">
+                      {apt.status?.id === 1 && (
+                        <>
+                          <Button
+                            type="button"
+                            className="bg-red-500 text-white px-3 py-1 rounded"
+                            disabled={loading === apt.id}
+                            onClick={() =>
+                              handleAction(
+                                () => cancelAppointment({ aptId: apt.id }),
+                                apt.id,
+                                "cancelled"
+                              )
+                            }
                           >
-                            Cancel
-                          </SubmitButton>
-                        )}
-                        {apt.status?.id === 2 && (
-                          <>
-                            <SubmitButton
-                              className="bg-green-500 text-white px-3 py-1 rounded mr-2"
-                              formAction={async () => {
-                                try {
-                                  await acceptAppointment({ aptId: apt.id });
-                                } catch (error) {
-                                  console.error(
-                                    "Failed to accept appointment",
-                                    error
-                                  );
-                                }
-                              }}
-                              pendingText="Accepting..."
-                            >
-                              Accept
-                            </SubmitButton>
-                            <SubmitButton
-                              className="bg-red-500 text-white px-3 py-1 rounded mr-2"
-                              formAction={async () => {
-                                try {
-                                  await rejectAppointment({ aptId: apt.id });
-                                } catch (error) {
-                                  console.error(
-                                    "Failed to reject appointment",
-                                    error
-                                  );
-                                }
-                              }}
-                              pendingText="Rejecting..."
-                            >
-                              Reject
-                            </SubmitButton>
-                          </>
-                        )}
+                            {loading === apt.id && loadingType === "cancelled"
+                              ? "Cancelling..."
+                              : "Cancel"}
+                          </Button>
+                          <CompleteAppointment
+                            appointmentId={apt.id}
+                            text={false}
+                            disabled={false}
+                          />
+                        </>
+                      )}
 
-                        <EditAppointment appointment={apt} text={true} />
-                      </form>
+                      {apt.status?.id === 2 && (
+                        <>
+                          <Button
+                            type="button"
+                            className="bg-green-500 text-white px-3 py-1 rounded"
+                            disabled={loading === apt.id}
+                            onClick={() =>
+                              handleAction(
+                                () => acceptAppointment({ aptId: apt.id }),
+                                apt.id,
+                                "accepted"
+                              )
+                            }
+                          >
+                            {loading === apt.id && loadingType === "accepted"
+                              ? "Accepting..."
+                              : "Accept"}
+                          </Button>
+
+                          <Button
+                            type="button"
+                            className="bg-red-700 text-white px-3 py-1 rounded"
+                            disabled={loading === apt.id}
+                            onClick={() =>
+                              handleAction(
+                                () => rejectAppointment({ aptId: apt.id }),
+                                apt.id,
+                                "rejected"
+                              )
+                            }
+                          >
+                            {loading === apt.id && loadingType === "rejected"
+                              ? "Rejecting..."
+                              : "Reject"}
+                          </Button>
+                        </>
+                      )}
+
+                      <EditAppointment
+                        appointment={apt}
+                        text={true}
+                        disabled={loading === apt.id} // Disable while loading
+                        mutate={mutate}
+                      />
                     </div>
                   </div>
                 ))}

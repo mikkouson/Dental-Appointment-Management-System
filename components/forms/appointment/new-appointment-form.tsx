@@ -4,7 +4,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { newApp } from "@/app/(admin)/action";
+import { CalendarForm } from "@/components/buttons/selectDate";
+import TimeSlot from "@/components/buttons/selectTime";
 import { toast } from "@/components/hooks/use-toast";
+import { useAppointments } from "@/components/hooks/useAppointment";
+import { useBranches } from "@/components/hooks/useBranches";
+import { usePatients } from "@/components/hooks/usePatient";
+import { useService } from "@/components/hooks/useService";
+import { useStatuses } from "@/components/hooks/useStatuses";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -14,13 +22,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { cn } from "@/lib/utils";
 import { ChevronDownIcon } from "lucide-react";
-import useSWR from "swr";
-import { CalendarForm } from "../buttons/selectDate";
-import TimeSlot from "../buttons/selectTime";
-import Field from "./formField";
-import { newApp } from "@/app/(admin)/action";
-import { ScrollArea } from "../ui/scroll-area";
+import Field from "../formField";
 
 type Appointment = {
   id: string;
@@ -50,58 +54,71 @@ const FormSchema = z.object({
   }),
 });
 
-const fetcher = (url: string): Promise<any[]> =>
-  fetch(url).then((res) => res.json());
+const statuses = [
+  { name: "Pending", id: 2 },
+  { name: "Completed", id: 4 },
+] as const;
 
 const type = [
   { name: "Walk in", id: "walk in" },
   { name: "Phone Call", id: "phone call" },
 ] as const;
 
-export function NewAppointmentForm({
-  setOpen,
-}: {
+interface NewServiceFormProps {
   setOpen: (open: boolean) => void;
-}) {
-  const { data, error } = useSWR("/api/data/", fetcher);
+  mutate: any; // It's better to type this more specifically if possible
+}
+export function NewAppointmentForm({ setOpen, mutate }: NewServiceFormProps) {
+  const { branches, branchLoading } = useBranches();
+  const { services, serviceError, serviceLoading } = useService();
+  const { appointments, appointmentsLoading } = useAppointments();
+  const { patients, patientError, patientLoading } = usePatients();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    newApp(data);
-    // setOpen(false);
-    // toast({
-    //   title: "You submitted the following values:",
-    //   description: (
-    //     <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-    //       <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-    //     </pre>
-    //   ),
-    // });
+  async function onSubmit(formData: z.infer<typeof FormSchema>) {
+    mutate();
+
+    try {
+      await newApp(formData); // Make sure this function returns a promise
+      setOpen(false); // Close the modal
+
+      toast({
+        className: cn(
+          "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
+        ),
+        variant: "success",
+        description: "Service added successfully.",
+        duration: 2000,
+      });
+      mutate(); // Revalidate to ensure data consistency
+    } catch (error: any) {
+      // Revert the optimistic update in case of an error
+      mutate();
+      toast({
+        className: cn(
+          "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
+        ),
+        variant: "destructive",
+        description: `Failed to add service: ${error.message}`,
+      });
+    }
   }
 
-  if (!data) return <>Loading ...</>;
+  if (branchLoading || serviceLoading || appointmentsLoading || patientLoading)
+    return <>Loading</>;
+
   const date = form.watch("date");
   const selectedBranch = form.watch("branch");
   const patient = form.watch("id");
 
-  const patientsTable = data.find((item) => item.table_name === "patients");
-  const patients = patientsTable?.row_data?.filter(
-    (item: { deleteOn: null | Date }) => item.deleteOn === null
-  );
-  const appointmentsTable = data.find(
-    (item) => item.table_name === "appointments"
-  );
-
-  const services = data.find((item) => item.table_name === "services");
-  const branch = data.find((item) => item.table_name === "branch");
-  const statuses = data.find((item) => item.table_name === "status");
-
-  const patientAppointments = (appointmentsTable.row_data as Appointment[])
+  const patientAppointments = (appointments?.data as Appointment[])
     .filter((item) => item.patient_id === patient)
     .map((item) => item.date);
+
+  const { isSubmitting } = form.formState;
 
   return (
     <Form {...form}>
@@ -112,7 +129,7 @@ export function NewAppointmentForm({
             form={form}
             name={"id"}
             label={"Patient"}
-            data={patients}
+            data={patients?.data}
             num={true}
             search={true}
           />
@@ -120,21 +137,21 @@ export function NewAppointmentForm({
             form={form}
             name={"branch"}
             label={"Branch"}
-            data={branch.row_data}
+            data={branches}
             num={true}
           />
           <Field
             form={form}
             name={"status"}
             label={"Status"}
-            data={statuses.row_data}
+            data={statuses}
             num={true}
           />
           <Field
             form={services}
             name={"service"}
             label={"Service"}
-            data={services.row_data}
+            data={services?.data}
             num={true}
           />
           <Field form={form} name={"type"} label={"Type"} data={type} />
@@ -204,7 +221,9 @@ export function NewAppointmentForm({
         {/* </ScrollArea> */}
 
         <div className="flex justify-end">
-          <Button type="submit">Submit</Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Submitting..." : "Submit"}
+          </Button>
         </div>
       </form>
     </Form>
