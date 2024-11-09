@@ -80,7 +80,9 @@ export function CompleteAppointment({
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button disabled={disabled}>Complete</Button>
+        <Button disabled={disabled} variant="outline">
+          Complete
+        </Button>
       </SheetTrigger>
       <SheetContent
         className="w-full md:w-[800px] overflow-auto"

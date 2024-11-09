@@ -95,7 +95,7 @@ export function EditAppointment({
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         {text ? (
-          <Button disabled={disabled} onClick={() => set()}>
+          <Button disabled={disabled} onClick={() => set()} variant="outline">
             Edit
           </Button>
         ) : (
