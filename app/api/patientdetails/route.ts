@@ -14,6 +14,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
        address (
       *
     ),
+         
       appointments (
         *,
         services (
@@ -28,6 +29,8 @@ export async function GET(req: NextRequest, res: NextResponse) {
             branch (
           *
         )
+      ),
+      tooth_history(*)
       )
     `
     )

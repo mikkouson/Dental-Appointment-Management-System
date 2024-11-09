@@ -113,3 +113,18 @@ export const UpdateUser = z.object({
 });
 
 export type UpdateUserForm = z.infer<typeof UpdateUser>;
+
+export const ToothHistory = z.object({
+  id: z.number().optional(),
+  tooth_location: z.number(),
+  tooth_condition: z.string(),
+  tooth_history: z.string(),
+  history_date: z.date(),
+  patient_id: z.number().optional(),
+  // newPassword: z
+  //   .string()
+  //   .min(6, { message: "Password must be at least 6 characters" })
+  //   .optional(),
+});
+
+export type ToothHistoryFormValue = z.infer<typeof ToothHistory>;

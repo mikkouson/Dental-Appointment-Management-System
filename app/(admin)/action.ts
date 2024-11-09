@@ -5,6 +5,7 @@ import {
   PatientSchema,
   ServiceFormValues,
   ServiceSchema,
+  ToothHistoryFormValue,
   UpdateInventoryFormValues,
   UpdateInventorySchema,
   UpdateUser,
@@ -858,4 +859,23 @@ export async function completeAppoinment(formData: UpdateInventoryFormValues) {
 
   // Redirect after all async operations are complete
   redirect("/appointments");
+}
+
+export async function updateToothHistory(data: ToothHistoryFormValue) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("tooth_history")
+    .update({
+      ...data,
+    })
+    .eq("id", data.id);
+
+  if (error) {
+    console.error("Error updating tooth history:", error.message);
+    // Throw an error to be caught by the calling function
+    throw new Error(error.message);
+  }
+
+  // Return success response
+  return { success: true };
 }

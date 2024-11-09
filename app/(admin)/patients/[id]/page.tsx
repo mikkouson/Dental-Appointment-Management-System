@@ -1,6 +1,7 @@
 "use client";
 import useSWR from "swr";
-
+import { useEffect } from "react";
+import { createClient } from "@/utils/supabase/client";
 import { useSetActiveAppointments } from "@/app/store";
 import StaticMaps from "@/components/staticMap";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -28,6 +29,7 @@ import Link from "next/link";
 import { columns } from "@/components/tables/patient-slug-table/column";
 import { DataTableDemo } from "@/components/tables/patient-slug-table/dataTable";
 import PatientAppointmentExport from "@/components/buttons/exportButtons/patientAppointmentExport";
+import TeethChart from "@/components/teeth-permanent";
 
 const fetcher = async (url: any): Promise<any> => {
   const res = await fetch(url);
@@ -48,6 +50,26 @@ export default function Page({ params }: PageProps) {
     `/api/patientdetails?id=${params.id}`,
     fetcher
   );
+
+  const supabase = createClient();
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("realtime tooth_history")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "tooth_history" },
+
+        () => {
+          mutate();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [supabase, mutate]);
 
   const active = useSetActiveAppointments((state) => state.selectedAppointment);
 
@@ -221,6 +243,7 @@ export default function Page({ params }: PageProps) {
                   />
                 </CardContent>
               </Card>
+              <TeethChart history={data.tooth_history} id={params.id} />
             </div>
           </div>
         </main>

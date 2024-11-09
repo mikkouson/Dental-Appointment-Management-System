@@ -21,8 +21,8 @@ export async function GET(req: NextRequest, res: NextResponse) {
     .from("services")
     .select("*", { count: "exact" })
     .ilike("name", `%${filterParam}%`) // Filter based on 'name' column
-    .order("updated_at", { ascending: false }); // Sort by 'updated_at' descending
-  // .is("deleteOn", null); // Exclude soft-deleted items
+    .order("updated_at", { ascending: false })
+    .is("deleteOn", null); // Exclude soft-deleted items
 
   if (pageParam) {
     query.range((page - 1) * limit, page * limit - 1);
