@@ -90,6 +90,7 @@ const DentalArches = ({ history, id }: any) => {
 
       {/* Tooth 11 */}
       {/* Tooth 11 */}
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
       <g
         id="tooth-11"
         style={{
@@ -114,7 +115,7 @@ const DentalArches = ({ history, id }: any) => {
           11
         </text>
       </g>
-
+      </EditToothCondition>
       {/* Tooth 12 */}
       <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
         <g
@@ -146,6 +147,7 @@ const DentalArches = ({ history, id }: any) => {
       </EditToothCondition>
       {/* Repeat similar blocks for each additional tooth, adding onClick with respective tooth number */}
       {/* Tooth */}
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
       <g
         id="tooth-13"
         style={{
@@ -173,7 +175,8 @@ const DentalArches = ({ history, id }: any) => {
           13
         </text>
       </g>
-
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
       <g
         id="tooth-14"
         style={{
@@ -204,7 +207,9 @@ const DentalArches = ({ history, id }: any) => {
           14
         </text>
       </g>
-
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
+      <g>
       <g
         id="tooth-15"
         style={{
@@ -351,7 +356,10 @@ const DentalArches = ({ history, id }: any) => {
           15
         </text>
       </g>
-
+      </g>
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
+      <g>
       <g
         id="tooth-16"
         style={{
@@ -498,6 +506,9 @@ const DentalArches = ({ history, id }: any) => {
           16
         </text>
       </g>
+      </g>
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
       <g
         id="tooth-17"
         style={{
@@ -527,7 +538,8 @@ const DentalArches = ({ history, id }: any) => {
           17
         </text>
       </g>
-
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
       <g
         id="tooth-18"
         style={{
@@ -558,6 +570,8 @@ const DentalArches = ({ history, id }: any) => {
           18
         </text>
       </g>
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
       <g
         id="tooth-21"
         style={{
@@ -582,6 +596,8 @@ const DentalArches = ({ history, id }: any) => {
           21
         </text>
       </g>
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
       <g
         id="tooth-22"
         style={{
@@ -608,7 +624,8 @@ const DentalArches = ({ history, id }: any) => {
           22
         </text>
       </g>
-
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
       <g
         id="tooth-23"
         style={{
@@ -635,7 +652,8 @@ const DentalArches = ({ history, id }: any) => {
           23
         </text>
       </g>
-
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
       <g
         id="tooth-24"
         style={{
@@ -666,7 +684,8 @@ const DentalArches = ({ history, id }: any) => {
           24
         </text>
       </g>
-
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
       <g
         id="tooth-25"
         style={{
@@ -695,7 +714,8 @@ const DentalArches = ({ history, id }: any) => {
           25
         </text>
       </g>
-
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
       <g
         id="tooth-26"
         style={{
@@ -727,7 +747,9 @@ const DentalArches = ({ history, id }: any) => {
           26
         </text>
       </g>
-
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
+      <g>
       <g
         id="tooth-27"
         style={{
@@ -898,7 +920,10 @@ const DentalArches = ({ history, id }: any) => {
           27
         </text>
       </g>
-
+      </g>
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
+      <g>
       <g
         id="tooth-28"
         style={{
@@ -1045,7 +1070,9 @@ const DentalArches = ({ history, id }: any) => {
           28
         </text>
       </g>
-
+      </g>
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
       <g
         id="tooth-31"
         style={{
@@ -1072,6 +1099,8 @@ const DentalArches = ({ history, id }: any) => {
           31
         </text>
       </g>
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
       <g
         id="tooth-32"
         style={{
@@ -1099,7 +1128,8 @@ const DentalArches = ({ history, id }: any) => {
           32
         </text>
       </g>
-
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
       <g
         id="tooth-33"
         style={{
@@ -1128,7 +1158,8 @@ const DentalArches = ({ history, id }: any) => {
           33
         </text>
       </g>
-
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
       <g
         id="tooth-34"
         style={{
@@ -1157,7 +1188,8 @@ const DentalArches = ({ history, id }: any) => {
           34
         </text>
       </g>
-
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
       <g
         id="tooth-35"
         style={{
@@ -1186,7 +1218,8 @@ const DentalArches = ({ history, id }: any) => {
           35
         </text>
       </g>
-
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
       <g
         id="tooth-36"
         style={{
@@ -1218,7 +1251,9 @@ const DentalArches = ({ history, id }: any) => {
           36
         </text>
       </g>
-
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
+      <g>
       <g
         id="tooth-37"
         style={{
@@ -1413,6 +1448,9 @@ const DentalArches = ({ history, id }: any) => {
           37
         </text>
       </g>
+      </g>
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
       <g
         id="tooth-38"
         style={{
@@ -1443,7 +1481,8 @@ const DentalArches = ({ history, id }: any) => {
           38
         </text>
       </g>
-
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
       <g
         id="tooth-41"
         style={{
@@ -1470,6 +1509,8 @@ const DentalArches = ({ history, id }: any) => {
           41
         </text>
       </g>
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
       <g
         id="tooth-42"
         style={{
@@ -1497,7 +1538,10 @@ const DentalArches = ({ history, id }: any) => {
           42
         </text>
       </g>
-
+      </EditToothCondition>
+      
+<EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
+      <g>
       <g
         id="tooth-43"
         style={{
@@ -1596,7 +1640,10 @@ const DentalArches = ({ history, id }: any) => {
           43
         </text>
       </g>
-
+      </g>
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
+      <g>
       <g
         id="tooth-44"
         style={{
@@ -1692,6 +1739,9 @@ const DentalArches = ({ history, id }: any) => {
           44
         </text>
       </g>
+      </g>
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
       <g
         id="tooth-45"
         style={{
@@ -1720,7 +1770,8 @@ const DentalArches = ({ history, id }: any) => {
           45
         </text>
       </g>
-
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
       <g
         id="tooth-46"
         style={{
@@ -1752,7 +1803,8 @@ const DentalArches = ({ history, id }: any) => {
           46
         </text>
       </g>
-
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
       <g
         id="tooth-47"
         style={{
@@ -1785,7 +1837,8 @@ const DentalArches = ({ history, id }: any) => {
           47
         </text>
       </g>
-
+      </EditToothCondition>
+      <EditToothCondition selectedToothHistory={selectedToothHistory} id={id}>
       <g
         id="tooth-48"
         style={{
@@ -1815,6 +1868,7 @@ const DentalArches = ({ history, id }: any) => {
           48
         </text>
       </g>
+      </EditToothCondition>
     </svg>
   );
 };
