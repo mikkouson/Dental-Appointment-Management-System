@@ -1,20 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import React, { useState } from "react";
 
+import { updateToothHistory } from "@/app/(admin)/action";
+import { ToothHistory, ToothHistoryFormValue } from "@/app/types";
+import ToothConditionFields from "@/components/forms/patients/tooth-condition-field";
+import { toast } from "@/components/hooks/use-toast";
+import { Separator } from "@/components/ui/separator";
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { toast } from "@/components/hooks/use-toast";
-import ToothConditionFields from "@/components/forms/patients/tooth-condition-field";
-import { ToothHistory } from "@/app/types";
 import { cn } from "@/lib/utils";
-import { updateToothHistory } from "@/app/(admin)/action";
-import { Separator } from "@/components/ui/separator";
+import { UseFormReturn } from "react-hook-form";
 import { LiaToothSolid } from "react-icons/lia";
 import { z } from "zod";
 
@@ -114,41 +113,14 @@ interface EditToothConditionProps {
   children: React.ReactNode;
   selectedToothHistory: any;
   id: number;
+  form: UseFormReturn<ToothHistoryFormValue>;
 }
 
 export function EditToothCondition({
   children,
-  selectedToothHistory,
-  id,
+  form,
 }: EditToothConditionProps) {
   const [open, setOpen] = useState(false);
-  const form = useForm<z.infer<typeof ToothHistory>>({
-    defaultValues: {
-      id: selectedToothHistory?.id || undefined,
-      tooth_location: selectedToothHistory?.tooth_location || 0,
-      tooth_condition: selectedToothHistory?.tooth_condition || "",
-      tooth_history: selectedToothHistory?.tooth_history || "",
-      history_date: selectedToothHistory?.history_date || new Date(),
-      patient_id: id || 0,
-    },
-  });
-
-  useEffect(() => {
-    if (selectedToothHistory) {
-      form.setValue("id", selectedToothHistory.id || undefined);
-      form.setValue("tooth_location", selectedToothHistory.tooth_location || 0);
-      form.setValue(
-        "tooth_condition",
-        selectedToothHistory.tooth_condition || ""
-      );
-      form.setValue("tooth_history", selectedToothHistory.tooth_history || "");
-      form.setValue(
-        "history_date",
-        selectedToothHistory.history_date || new Date()
-      );
-      form.setValue("patient_id", id || 0);
-    }
-  }, [selectedToothHistory, form, id]);
 
   const formatToothTitle = (location: number) => {
     const universalNumber = getUniversalNumber(location);
@@ -171,6 +143,8 @@ export function EditToothCondition({
   };
 
   async function onSubmit(data: z.infer<typeof ToothHistory>) {
+    //get the type of the history_date
+
     try {
       await updateToothHistory(data);
       toast({
@@ -195,6 +169,7 @@ export function EditToothCondition({
     }
   }
 
+  const tooth_location = form.watch("tooth_location");
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>{children}</SheetTrigger>
@@ -219,7 +194,7 @@ export function EditToothCondition({
           <Separator className="my-2" />
 
           <div className="font-thin italic">
-            {formatToothTitle(selectedToothHistory?.tooth_location)}
+            {formatToothTitle(tooth_location)}
           </div>
           {/* <SheetDescription>
             Make changes to your profile here. Click save when you&apos;re done.
