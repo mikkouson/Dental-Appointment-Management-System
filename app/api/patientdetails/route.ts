@@ -35,6 +35,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
     `
     )
     .eq("id", id)
+    .is("tooth_history.deleteOn", null)
     .single();
 
   if (error) {

@@ -20,30 +20,33 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-export function EditToothCondition({
-  treatment,
-  form,
-}: {
-  treatment: any;
+interface EditToothConditionProps {
+  children: React.ReactNode;
+  history: any;
+  id: number;
   form: UseFormReturn<ToothHistoryFormValue>;
-}) {
-  const [open, setOpen] = useState(false);
+}
 
+export function SheetDemo({ treatment }: EditToothConditionProps) {
+  const [open, setOpen] = useState(false);
+  const form = useForm<z.infer<typeof ToothHistory>>({
+    resolver: zodResolver(ToothHistory),
+  });
   const handleClick = () => {
     form.reset();
 
     if (treatment?.history_date) {
       form.setValue(
         "history_date",
-        new Date(treatment.history_date) || new Date()
+        new Date(treatment?.history_date) || new Date()
       );
     }
 
     form.setValue("id", treatment?.id || undefined);
-    form.setValue("tooth_location", Number(treatment.tooth_location) || 0);
+    form.setValue("tooth_location", Number(treatment?.tooth_location) || 0);
     form.setValue("tooth_condition", treatment?.tooth_condition || "");
     form.setValue("tooth_history", treatment?.tooth_history || "");
-    form.setValue("patient_id", Number(treatment.patient_id) || 0);
+    form.setValue("patient_id", Number(treatment?.patient_id) || 0);
   };
   const formatToothTitle = (location: number) => {
     const description = getToothDescription(location);
@@ -90,14 +93,14 @@ export function EditToothCondition({
   }
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
+    <Sheet>
       <SheetTrigger asChild>
         <Button
           variant="ghost"
           className="w-full text-left justify-start"
           onClick={() => handleClick()}
         >
-          Edit
+          Open
         </Button>
       </SheetTrigger>
       <SheetContent className="w-full md:w-[400px] overflow-auto">
@@ -106,11 +109,16 @@ export function EditToothCondition({
           <Separator className="my-2" />
 
           <div className="font-thin italic">
-            {formatToothTitle(treatment.tooth_location)}
+            {formatToothTitle(treatment?.tooth_location)}
           </div>
         </SheetHeader>
         <Separator className="my-2" />
         <ToothConditionFields form={form} onSubmit={onSubmit} />
+        <Separator className="my-2" />
+        <div className="flex items-center  gap-2">
+          <LiaToothSolid size={20} />
+          <p className="font-medium text-sm">Treatment History</p>
+        </div>
       </SheetContent>
     </Sheet>
   );

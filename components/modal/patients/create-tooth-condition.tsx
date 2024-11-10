@@ -12,39 +12,27 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { getToothDescription } from "@/components/ui/tooth-description";
 import { cn } from "@/lib/utils";
-import { useForm, UseFormReturn } from "react-hook-form";
+import { UseFormReturn } from "react-hook-form";
 import { LiaToothSolid } from "react-icons/lia";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
-import { zodResolver } from "@hookform/resolvers/zod";
+import ToothHistoryCard from "@/components/cards/toothHistoryCard";
+import { getToothDescription } from "@/components/ui/tooth-description";
 
-export function EditToothCondition({
-  treatment,
-  form,
-}: {
-  treatment: any;
+interface NewToothConditionProps {
+  children: React.ReactNode;
+  history: any;
+  id: number;
   form: UseFormReturn<ToothHistoryFormValue>;
-}) {
+}
+
+export function NewToothCondition({
+  children,
+  form,
+  history,
+}: NewToothConditionProps) {
   const [open, setOpen] = useState(false);
 
-  const handleClick = () => {
-    form.reset();
-
-    if (treatment?.history_date) {
-      form.setValue(
-        "history_date",
-        new Date(treatment.history_date) || new Date()
-      );
-    }
-
-    form.setValue("id", treatment?.id || undefined);
-    form.setValue("tooth_location", Number(treatment.tooth_location) || 0);
-    form.setValue("tooth_condition", treatment?.tooth_condition || "");
-    form.setValue("tooth_history", treatment?.tooth_history || "");
-    form.setValue("patient_id", Number(treatment.patient_id) || 0);
-  };
   const formatToothTitle = (location: number) => {
     const description = getToothDescription(location);
     return (
@@ -66,7 +54,7 @@ export function EditToothCondition({
     //get the type of the history_date
 
     try {
-      await updateToothHistory(data);
+      await createToothHistory(data);
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
@@ -89,28 +77,50 @@ export function EditToothCondition({
     }
   }
 
+  const tooth_location = form.watch("tooth_location");
+  const historyForTooth = history.filter(
+    (h: any) => h.tooth_location === tooth_location
+  );
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <Button
-          variant="ghost"
-          className="w-full text-left justify-start"
-          onClick={() => handleClick()}
-        >
-          Edit
-        </Button>
-      </SheetTrigger>
-      <SheetContent className="w-full md:w-[400px] overflow-auto">
+      <SheetTrigger asChild>{children}</SheetTrigger>
+      <SheetContent
+        className="w-full md:w-[400px] overflow-auto"
+        onInteractOutside={(e) => {
+          const hasPacContainer = e.composedPath().some((el: EventTarget) => {
+            if ("classList" in el) {
+              return Array.from((el as Element).classList).includes(
+                "pac-container"
+              );
+            }
+            return false;
+          });
+          if (hasPacContainer) {
+            e.preventDefault();
+          }
+        }}
+      >
         <SheetHeader>
           <SheetTitle>Tooth History</SheetTitle>
           <Separator className="my-2" />
 
           <div className="font-thin italic">
-            {formatToothTitle(treatment.tooth_location)}
+            {formatToothTitle(tooth_location)}
           </div>
+          {/* <SheetDescription>
+            Make changes to your profile here. Click save when you&apos;re done.
+          </SheetDescription> */}
         </SheetHeader>
         <Separator className="my-2" />
         <ToothConditionFields form={form} onSubmit={onSubmit} />
+        <Separator className="my-2" />
+        <div className="flex items-center  gap-2">
+          <LiaToothSolid size={20} />
+          <p className="font-medium text-sm">Treatment History</p>
+        </div>
+        <Separator className="my-2" />
+
+        <ToothHistoryCard treatments={historyForTooth} edit={true} />
       </SheetContent>
     </Sheet>
   );

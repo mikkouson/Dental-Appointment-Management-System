@@ -1,16 +1,16 @@
 import { useTheme } from "next-themes";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { EditToothCondition } from "./modal/patients/edit-tooth-condition";
+import { NewToothCondition } from "./modal/patients/create-tooth-condition";
 
 import { ToothHistory } from "@/app/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { conditionColors } from "./tooth-colors";
+
 const DentalArches = ({ history, id }: any) => {
   const [highlightedTooth, setHighlightedTooth] = useState(null);
-  const [selectedToothHistory, setSelectedToothHistory] = useState(null);
 
-  const [open, setOpen] = useState(false);
   const { theme } = useTheme(); // Get the current theme
   const isDark = theme === "dark";
   const handleMouseEnter = (toothId: any) => {
@@ -25,74 +25,52 @@ const DentalArches = ({ history, id }: any) => {
     resolver: zodResolver(ToothHistory),
   });
   const handleToothClick = (toothNumber: number) => {
-    console.log(toothNumber);
     form.reset();
 
-    const toothHistory = history.find(
-      (record: { tooth_location: number }) =>
-        record.tooth_location === toothNumber
-    );
+    // const toothHistory = history.find(
+    //   (record: { tooth_location: number }) =>
+    //     record.tooth_location === toothNumber
+    // );
 
-    if (toothHistory?.history_date) {
-      form.setValue(
-        "history_date",
-        new Date(toothHistory.history_date) || new Date()
-      );
-    }
+    // if (toothHistory?.history_date) {
+    //   form.setValue(
+    //     "history_date",
+    //     new Date(toothHistory.history_date) || new Date()
+    //   );
+    // }
 
-    form.setValue("id", toothHistory?.id || undefined);
+    // form.setValue("id", toothHistory?.id || undefined);
     form.setValue("tooth_location", Number(toothNumber));
-    form.setValue("tooth_condition", toothHistory?.tooth_condition || "");
-    form.setValue("tooth_history", toothHistory?.tooth_history || "");
+    // form.setValue("tooth_condition", toothHistory?.tooth_condition || "");
+    // form.setValue("tooth_history", toothHistory?.tooth_history || "");
     form.setValue("patient_id", Number(id) || 0);
   };
   const number = form.watch("tooth_location");
-  console.log(number);
   // Mapping tooth conditions to colors
-  const conditionColors = {
-    sound: "#A8E6A1", // Light green for sound
-    filled: "#87CEEB", // Updated blue for filled (Sky blue)
-    compromised: "#FFCC99", // Light orange for compromised
-    endo: "#DAB6FC", // Light purple for endo
-    missing: "#D3D3D3", // Light gray for missing
-    rotated: "#EED5B7", // Light brown for rotated
-    displaced: "#FFFACD", // Light yellow for displaced
-    "gum-recessed": "#FFC0CB", // Light pink for gum-recessed
-    cavities: "#FFD1DC", // Light rose for cavities
-    fractured: "#FAE3D9", // Light peach for fractured
-    chipped: "#E0FFFF", // Light cyan for chipped
-    eroded: "#FFF5EE", // Light seashell for eroded
-    impacted: "#FFE4B5", // Light moccasin for impacted
-    decayed: "#FFEFD5", // Light papaya whip for decayed
-    restored: "#B0E0E6", // Light powder blue for restored
-    "periodontally-compromised": "#FFDAB9", // Light peach for periodontally compromised
-    attrition: "#E6E6FA", // Light lavender for attrition
-    abrasion: "#F5DEB3", // Light wheat for abrasion
-    "root-canal-treated": "#F0E68C", // Light khaki for root canal treated
-    stained: "#FFB6C1", // Light pink for stained
-    crowded: "#FFEBCD", // Light blanched almond for crowded
-    loose: "#FFDEAD", // Light navajo white for loose
-    "partially-erupted": "#FDF5E6", // Light old lace for partially erupted
-    hypoplastic: "#FFF0F5", // Light lavender blush for hypoplastic
-    supernumerary: "#E0FFFF", // Light cyan for supernumerary
-    malformed: "#F0FFF0", // Light honeydew for malformed
-    "fluorosis-affected": "#FFFACD", // Light lemon chiffon for fluorosis affected
-    transposed: "#FFE4E1", // Light misty rose for transposed
-  };
 
   // Determine the fill color based on the tooth condition
   const getFillColor = (toothNumber: any) => {
-    const toothHistory = history.find(
+    // Find all history records for this tooth
+    const toothHistories = history.filter(
       (record: any) => record.tooth_location === toothNumber
     );
 
-    if (toothHistory) {
+    if (toothHistories.length > 0) {
+      // Sort histories by date in descending order (newest first)
+      const latestHistory = toothHistories.sort(
+        (a: { history_date: string }, b: { history_date: string }) =>
+          new Date(b.history_date).getTime() -
+          new Date(a.history_date).getTime()
+      )[0];
+
+      // Return color based on the most recent condition
       return highlightedTooth === `tooth-${toothNumber}`
         ? "lightblue"
         : conditionColors[
-            toothHistory.tooth_condition as keyof typeof conditionColors
+            latestHistory.tooth_condition as keyof typeof conditionColors
           ] || "none";
     }
+
     return highlightedTooth === `tooth-${toothNumber}` ? "lightblue" : "none";
   };
 
@@ -104,17 +82,13 @@ const DentalArches = ({ history, id }: any) => {
       width="289.61084"
       height="370.54398"
     >
-      {/* <EditToothCondition open={open} setOpen={setOpen} /> */}
+      {/* <NewToothCondition open={open} setOpen={setOpen} /> */}
 
       <title>Human Dental Arches</title>
 
       {/* Tooth 11 */}
       {/* Tooth 11 */}
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      <NewToothCondition history={history} id={id} form={form}>
         <g
           id="tooth-11"
           style={{
@@ -139,13 +113,9 @@ const DentalArches = ({ history, id }: any) => {
             11
           </text>
         </g>
-      </EditToothCondition>
+      </NewToothCondition>
       {/* Tooth 12 */}
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      <NewToothCondition history={history} id={id} form={form}>
         <g
           id="tooth-12"
           style={{
@@ -172,14 +142,10 @@ const DentalArches = ({ history, id }: any) => {
             12
           </text>
         </g>
-      </EditToothCondition>
+      </NewToothCondition>
       {/* Repeat similar blocks for each additional tooth, adding onClick with respective tooth number */}
       {/* Tooth */}
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      <NewToothCondition history={history} id={id} form={form}>
         <g
           id="tooth-13"
           style={{
@@ -207,12 +173,8 @@ const DentalArches = ({ history, id }: any) => {
             13
           </text>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g
           id="tooth-14"
           style={{
@@ -243,12 +205,8 @@ const DentalArches = ({ history, id }: any) => {
             14
           </text>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g>
           <g
             id="tooth-15"
@@ -397,12 +355,8 @@ const DentalArches = ({ history, id }: any) => {
             </text>
           </g>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g>
           <g
             id="tooth-16"
@@ -551,12 +505,8 @@ const DentalArches = ({ history, id }: any) => {
             </text>
           </g>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g
           id="tooth-17"
           style={{
@@ -586,12 +536,8 @@ const DentalArches = ({ history, id }: any) => {
             17
           </text>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g
           id="tooth-18"
           style={{
@@ -622,12 +568,8 @@ const DentalArches = ({ history, id }: any) => {
             18
           </text>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g
           id="tooth-21"
           style={{
@@ -652,12 +594,8 @@ const DentalArches = ({ history, id }: any) => {
             21
           </text>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g
           id="tooth-22"
           style={{
@@ -684,12 +622,8 @@ const DentalArches = ({ history, id }: any) => {
             22
           </text>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g
           id="tooth-23"
           style={{
@@ -716,12 +650,8 @@ const DentalArches = ({ history, id }: any) => {
             23
           </text>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g
           id="tooth-24"
           style={{
@@ -752,12 +682,8 @@ const DentalArches = ({ history, id }: any) => {
             24
           </text>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g
           id="tooth-25"
           style={{
@@ -786,12 +712,8 @@ const DentalArches = ({ history, id }: any) => {
             25
           </text>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g
           id="tooth-26"
           style={{
@@ -823,12 +745,8 @@ const DentalArches = ({ history, id }: any) => {
             26
           </text>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g>
           <g
             id="tooth-27"
@@ -1001,12 +919,8 @@ const DentalArches = ({ history, id }: any) => {
             </text>
           </g>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g>
           <g
             id="tooth-28"
@@ -1155,12 +1069,8 @@ const DentalArches = ({ history, id }: any) => {
             </text>
           </g>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g
           id="tooth-31"
           style={{
@@ -1187,12 +1097,8 @@ const DentalArches = ({ history, id }: any) => {
             31
           </text>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g
           id="tooth-32"
           style={{
@@ -1220,12 +1126,8 @@ const DentalArches = ({ history, id }: any) => {
             32
           </text>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g
           id="tooth-33"
           style={{
@@ -1254,12 +1156,8 @@ const DentalArches = ({ history, id }: any) => {
             33
           </text>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g
           id="tooth-34"
           style={{
@@ -1288,12 +1186,8 @@ const DentalArches = ({ history, id }: any) => {
             34
           </text>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g
           id="tooth-35"
           style={{
@@ -1322,12 +1216,8 @@ const DentalArches = ({ history, id }: any) => {
             35
           </text>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g
           id="tooth-36"
           style={{
@@ -1359,12 +1249,8 @@ const DentalArches = ({ history, id }: any) => {
             36
           </text>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g>
           <g
             id="tooth-37"
@@ -1561,12 +1447,8 @@ const DentalArches = ({ history, id }: any) => {
             </text>
           </g>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g
           id="tooth-38"
           style={{
@@ -1597,12 +1479,8 @@ const DentalArches = ({ history, id }: any) => {
             38
           </text>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g
           id="tooth-41"
           style={{
@@ -1629,12 +1507,8 @@ const DentalArches = ({ history, id }: any) => {
             41
           </text>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g
           id="tooth-42"
           style={{
@@ -1662,13 +1536,9 @@ const DentalArches = ({ history, id }: any) => {
             42
           </text>
         </g>
-      </EditToothCondition>
+      </NewToothCondition>
 
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      <NewToothCondition history={history} id={id} form={form}>
         <g>
           <g
             id="tooth-43"
@@ -1769,12 +1639,8 @@ const DentalArches = ({ history, id }: any) => {
             </text>
           </g>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g>
           <g
             id="tooth-44"
@@ -1872,12 +1738,8 @@ const DentalArches = ({ history, id }: any) => {
             </text>
           </g>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g
           id="tooth-45"
           style={{
@@ -1906,12 +1768,8 @@ const DentalArches = ({ history, id }: any) => {
             45
           </text>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g
           id="tooth-46"
           style={{
@@ -1943,12 +1801,8 @@ const DentalArches = ({ history, id }: any) => {
             46
           </text>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g
           id="tooth-47"
           style={{
@@ -1981,12 +1835,8 @@ const DentalArches = ({ history, id }: any) => {
             47
           </text>
         </g>
-      </EditToothCondition>
-      <EditToothCondition
-        selectedToothHistory={selectedToothHistory}
-        id={id}
-        form={form}
-      >
+      </NewToothCondition>
+      <NewToothCondition history={history} id={id} form={form}>
         <g
           id="tooth-48"
           style={{
@@ -2016,7 +1866,7 @@ const DentalArches = ({ history, id }: any) => {
             48
           </text>
         </g>
-      </EditToothCondition>
+      </NewToothCondition>
     </svg>
   );
 };
