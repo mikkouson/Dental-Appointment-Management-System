@@ -862,6 +862,11 @@ export async function completeAppoinment(formData: UpdateInventoryFormValues) {
 }
 
 export async function updateToothHistory(data: ToothHistoryFormValue) {
+  // If no ID is present, create a new record instead
+  if (!data.id) {
+    return createToothHistory(data);
+  }
+
   const supabase = createClient();
   const { error } = await supabase
     .from("tooth_history")
@@ -872,6 +877,20 @@ export async function updateToothHistory(data: ToothHistoryFormValue) {
 
   if (error) {
     console.error("Error updating tooth history:", error.message);
+    // Throw an error to be caught by the calling function
+    throw new Error(error.message);
+  }
+
+  // Return success response
+  return { success: true };
+}
+
+export async function createToothHistory(data: ToothHistoryFormValue) {
+  const supabase = createClient();
+  const { error } = await supabase.from("tooth_history").insert([data]);
+
+  if (error) {
+    console.error("Error creating tooth history:", error.message);
     // Throw an error to be caught by the calling function
     throw new Error(error.message);
   }

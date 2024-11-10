@@ -117,8 +117,10 @@ export type UpdateUserForm = z.infer<typeof UpdateUser>;
 export const ToothHistory = z.object({
   id: z.number().optional(),
   tooth_location: z.number(),
-  tooth_condition: z.string(),
-  tooth_history: z.string(),
+  tooth_condition: z
+    .string()
+    .min(1, { message: "Tooth Condition is required." }),
+  tooth_history: z.string().min(1, { message: "Tooth History is required." }),
   history_date: z.date(),
   patient_id: z.number().optional(),
   // newPassword: z
