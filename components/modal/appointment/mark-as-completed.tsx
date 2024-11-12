@@ -4,6 +4,7 @@ import { completeAppoinment } from "@/app/(admin)/action";
 import { UpdateInventorySchema } from "@/app/types";
 import ItemUsedField from "@/components/forms/appointment/item-used-field";
 import { toast } from "@/components/hooks/use-toast";
+import TeethChart from "@/components/teeth-permanent";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -108,6 +109,7 @@ export function CompleteAppointment({
           </SheetDescription>
         </SheetHeader>
         <ItemUsedField form={form} onSubmit={onSubmit} />
+        <TeethChart />
       </SheetContent>
     </Sheet>
   );

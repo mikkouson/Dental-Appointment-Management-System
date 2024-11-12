@@ -8,17 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis } from "recharts";
-import useSWR from "swr";
 import { ChartConfig, ChartContainer, ChartTooltipContent } from "../ui/chart";
-
-interface ApiResponse {
-  data: PatientRecord[];
-}
-
-interface PatientRecord {
-  date: string;
-  patient_id: string;
-}
 
 interface AggregatedDataPoint {
   day: string;
@@ -35,14 +25,6 @@ interface DateRange {
   end: string; // Format: 'YYYY-MM-DD'
 }
 
-const fetcher = async (url: string): Promise<ApiResponse> => {
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error("Failed to fetch data");
-  }
-  return res.json();
-};
-
 const chartConfig = {
   newPatient: {
     label: "New",
@@ -56,17 +38,13 @@ const chartConfig = {
 
 interface AreaGraphProps {
   range: DateRange; // Accept range prop
+  data: any; // Accept data prop
 }
 
-export function PatientChart({ range }: AreaGraphProps) {
-  const { data, error } = useSWR<ApiResponse>("/api/apt", fetcher);
-
-  if (error) return <div>Failed to load</div>;
-  if (!data) return <div>Loading...</div>;
-
+export function PatientChart({ range, data }: AreaGraphProps) {
   const aggregatedData: AggregatedData = {};
 
-  data.data.forEach((item) => {
+  data.data.forEach((item: any) => {
     const date = new Date(item.date);
     const day = date.toISOString().split("T")[0];
 
@@ -77,7 +55,7 @@ export function PatientChart({ range }: AreaGraphProps) {
       }
 
       const patientOccurrences = data.data.filter(
-        (p) => p.patient_id === item.patient_id
+        (p: { patient_id: any }) => p.patient_id === item.patient_id
       ).length;
 
       if (patientOccurrences === 1) {

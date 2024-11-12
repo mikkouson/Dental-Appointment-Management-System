@@ -25,6 +25,7 @@ import {
 import { cn } from "@/lib/utils";
 import { ChevronDownIcon } from "lucide-react";
 import Field from "../formField";
+import FormSkeleton from "./loading";
 
 type Appointment = {
   id: string;
@@ -108,7 +109,7 @@ export function NewAppointmentForm({ setOpen, mutate }: NewServiceFormProps) {
   }
 
   if (branchLoading || serviceLoading || appointmentsLoading || patientLoading)
-    return <>Loading</>;
+    return <FormSkeleton />;
 
   const date = form.watch("date");
   const selectedBranch = form.watch("branch");
