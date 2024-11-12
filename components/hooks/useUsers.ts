@@ -56,7 +56,7 @@ export function useUsers(
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [supabase, mutate]);
+  }, [page, supabase, mutate]);
 
   return { users, userError, userLoading, mutate };
 }

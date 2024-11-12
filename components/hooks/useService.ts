@@ -56,7 +56,7 @@ export function useService(
       console.log("Removing channel");
       supabase.removeChannel(channel);
     };
-  }, [supabase, mutate]);
+  }, [page, supabase, mutate]);
 
   return { services, serviceError, serviceLoading, mutate };
 }

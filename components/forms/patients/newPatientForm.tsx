@@ -12,9 +12,11 @@ import useSWR, { mutate as globalMutate } from "swr";
 import { Patient, PatientCol } from "@/app/schema";
 import { toast } from "@/components/hooks/use-toast";
 import { usePatients } from "@/components/hooks/usePatient";
-
-const fetcher = (url: string): Promise<any> =>
-  fetch(url).then((res) => res.json());
+import TeethChart from "@/components/teeth-permanent";
+import { useTeethArray } from "@/app/store";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ToothHistoryCard from "@/components/cards/toothHistoryCard";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface NewPatientFormProps {
   setOpen: (open: boolean) => void;
@@ -59,6 +61,7 @@ export function NewPatientForm({ setOpen, mutate }: NewPatientFormProps) {
   const checkEmailExists = (email: string): boolean => {
     return patients.some((patient: PatientCol) => patient.email === email);
   };
+  const { teethLocations } = useTeethArray();
 
   async function onSubmit(data: PatientFormValues) {
     // Check if email already exists in fetched data
@@ -91,7 +94,7 @@ export function NewPatientForm({ setOpen, mutate }: NewPatientFormProps) {
     // setOpen(false); // Close the modal
 
     try {
-      await newPatient(data); // Ensure this function returns a promise
+      await newPatient(data, teethLocations); // Ensure this function returns a promise
       // Show success toast immediately
       toast({
         className: cn(
@@ -119,5 +122,39 @@ export function NewPatientForm({ setOpen, mutate }: NewPatientFormProps) {
     }
   }
 
-  return <PatientFields form={form} onSubmit={onSubmit} />;
+  return (
+    <>
+      <Tabs defaultValue="info" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="info">Patient Info</TabsTrigger>
+          <TabsTrigger value="teeth">Teeth Chart</TabsTrigger>
+        </TabsList>
+        <TabsContent value="info">
+          <PatientFields form={form} onSubmit={onSubmit} />
+        </TabsContent>
+        <TabsContent value="teeth" className="flex gap-6 ">
+          <div className="flex justify-center items-center">
+            <TeethChart history={[]} newPatient={true} />
+          </div>
+          {/* {teethLocations.map((tooth) => (
+            <ToothHistoryCard
+              key={tooth.tooth_location}
+              treatments={tooth.treatments}
+              edit={true}
+            />
+          ))} */}
+
+          {teethLocations.length === 0 ? (
+            <div className="flex justify-center items-center w-full text-muted-foreground">
+              No treatment history. Click a tooth to add treatment history.{" "}
+            </div>
+          ) : (
+            <ScrollArea className="h-[200px] w-full">
+              <ToothHistoryCard edit={true} treatments={teethLocations} />
+            </ScrollArea>
+          )}
+        </TabsContent>
+      </Tabs>
+    </>
+  );
 }

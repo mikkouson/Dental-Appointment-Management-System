@@ -73,7 +73,7 @@ export default function Page({ params }: PageProps) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [mutate]);
+  }, [supabase, mutate]);
 
   const active = useSetActiveAppointments((state) => state.selectedAppointment);
 
@@ -259,7 +259,7 @@ export default function Page({ params }: PageProps) {
                 <CardHeader>
                   <CardTitle>Medical History</CardTitle>
                   <CardDescription>
-                    Patient's medical records and history
+                    Patients medical records and history
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

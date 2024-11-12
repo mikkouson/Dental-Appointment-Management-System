@@ -449,14 +449,13 @@ export async function newApp(data: Inputs) {
     await pendingAppointment({ aptId: newAppointmentData.id });
   }
 }
-
-export async function newPatient(data: patientInput) {
+export async function newPatient(data: patientInput, teethLocations?: any) {
   const result = PatientSchema.safeParse(data);
 
   if (!result.success) {
     const validationErrors = result.error.format();
-    console.log("Validation errors:", validationErrors); // Optional: Keep logging if needed
-    throw new Error("Validation errors occurred."); // Throw error for validation issues
+    console.log("Validation errors:", validationErrors);
+    throw new Error("Validation errors occurred.");
   }
 
   const supabase = createClient();
@@ -471,40 +470,59 @@ export async function newPatient(data: patientInput) {
         longitude: data.address.longitude,
       },
     ])
-    .select("id") // Select the id of the newly inserted address
+    .select("id")
     .single();
 
   if (addressError || !addressData) {
     const errorMessage = addressError
       ? addressError.message
       : "Failed to insert address.";
-    throw new Error(`Error inserting address: ${errorMessage}`); // Throw error for address insert failure
+    throw new Error(`Error inserting address: ${errorMessage}`);
   }
 
   const addressId = addressData.id;
 
-  // Step 2: Insert patient with the address ID
-  const { error: patientError } = await supabase.from("patients").insert([
-    {
-      name: data.name,
-      email: data.email,
-      sex: data.sex,
-      address: addressId,
-      phone_number: data.phoneNumber,
-      dob: data.dob,
-      status: data.status,
-    },
-  ]);
+  // Step 2: Insert patient with the address ID and get the patient ID
+  const { data: patientData, error: patientError } = await supabase
+    .from("patients")
+    .insert([
+      {
+        name: data.name,
+        email: data.email,
+        sex: data.sex,
+        address: addressId,
+        phone_number: data.phoneNumber,
+        dob: data.dob,
+        status: data.status,
+      },
+    ])
+    .select("id")
+    .single();
 
   if (patientError) {
-    throw new Error(`Error inserting patient: ${patientError.message}`); // Throw error for patient insert failure
-  } else {
-    console.log("Patient data inserted successfully");
+    throw new Error(`Error inserting patient: ${patientError.message}`);
   }
 
-  // if (error) {
-  //   throw new Error(`Error creating user: ${error.message}`); // Throw error for user creation failure
-  // }
+  // Step 3: Create tooth history records if teethLocations are provided
+  // Step 3: If teethLocations are provided, call createMultipleToothHistory
+  if (teethLocations && teethLocations.length > 0) {
+    const toothHistoryData = teethLocations.map((location: any) => ({
+      tooth_location: location.tooth_location,
+      tooth_condition: location.tooth_condition,
+      tooth_history: location.tooth_history,
+      history_date: new Date(),
+      patient_id: patientData.id,
+    }));
+
+    try {
+      await createMultipleToothHistory(toothHistoryData);
+    } catch (error) {
+      console.error("Error creating multiple tooth history records:", error);
+      // Continue execution even if tooth history creation fails
+    }
+  }
+  console.log("Patient data inserted successfully");
+  return { success: true, patientId: patientData?.id };
 }
 
 export async function deletePatient(id: number) {
@@ -912,4 +930,17 @@ export async function deleteToothHistory(id: number) {
     console.log("Error deleting tooth history", error.message);
     throw new Error(error.message);
   }
+}
+export async function createMultipleToothHistory(
+  data: ToothHistoryFormValue[]
+) {
+  const supabase = createClient();
+  const { error } = await supabase.from("tooth_history").insert(data);
+
+  if (error) {
+    console.error("Error creating tooth history records:", error.message);
+    throw new Error(error.message);
+  }
+
+  return { success: true };
 }

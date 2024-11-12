@@ -18,20 +18,24 @@ import { LiaToothSolid } from "react-icons/lia";
 import { z } from "zod";
 import ToothHistoryCard from "@/components/cards/toothHistoryCard";
 import { getToothDescription } from "@/components/ui/tooth-description";
+import { useTeethArray } from "@/app/store";
 
 interface NewToothConditionProps {
   children: React.ReactNode;
   history: any;
   id: number;
   form: UseFormReturn<ToothHistoryFormValue>;
+  newPatient?: boolean;
 }
 
 export function NewToothCondition({
   children,
   form,
   history,
+  newPatient = false,
 }: NewToothConditionProps) {
   const [open, setOpen] = useState(false);
+  const { addTeethLocation } = useTeethArray();
 
   const formatToothTitle = (location: number) => {
     const description = getToothDescription(location);
@@ -54,7 +58,19 @@ export function NewToothCondition({
     //get the type of the history_date
 
     try {
-      await createToothHistory(data);
+      if (newPatient) {
+        // Save to store if it's a new patient
+        addTeethLocation({
+          tooth_location: data.tooth_location,
+          tooth_condition: data.tooth_condition,
+          tooth_history: data.tooth_history,
+          history_date: data.history_date,
+        });
+      } else {
+        // Save to database if it's an existing patient
+        await createToothHistory(data);
+      }
+
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
@@ -113,14 +129,36 @@ export function NewToothCondition({
         </SheetHeader>
         <Separator className="my-2" />
         <ToothConditionFields form={form} onSubmit={onSubmit} />
+        {/* {historyForTooth ||
+          (history.length > 0 && (
+            <div>
+              <Separator className="my-2" />
+
+              <div className="flex items-center  gap-2">
+                <LiaToothSolid size={20} />
+                <p className="font-medium text-sm">Treatment History</p>
+              </div>
+              <Separator className="my-2" />
+
+              <ToothHistoryCard treatments={historyForTooth} edit={true} />
+            </div>
+          ))} */}
+
         <Separator className="my-2" />
+
         <div className="flex items-center  gap-2">
           <LiaToothSolid size={20} />
           <p className="font-medium text-sm">Treatment History</p>
         </div>
         <Separator className="my-2" />
 
-        <ToothHistoryCard treatments={historyForTooth} edit={true} />
+        {history.length < 0 ? (
+          <ToothHistoryCard treatments={historyForTooth} edit={true} />
+        ) : (
+          <div className="flex justify-center items-center w-full text-muted-foreground">
+            No treatment history found.
+          </div>
+        )}
       </SheetContent>
     </Sheet>
   );

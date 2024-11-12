@@ -54,7 +54,7 @@ export function useUser(page?: number, query?: string, limit?: number | null) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [supabase, mutate]);
+  }, [page, supabase, mutate]);
 
   return { user, userError, userLoading, mutate };
 }

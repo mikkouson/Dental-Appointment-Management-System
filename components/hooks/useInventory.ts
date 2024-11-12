@@ -68,7 +68,7 @@ export function useInventory(
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [supabase, mutate]);
+  }, [page, supabase, mutate]);
 
   return { inventory, inventoryError, inventoryLoading, mutate };
 }

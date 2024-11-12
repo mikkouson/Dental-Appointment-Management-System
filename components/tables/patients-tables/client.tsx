@@ -1,5 +1,5 @@
 "use client";
-import { useSetActive } from "@/app/store";
+import { useSetActive, useTeethArray } from "@/app/store";
 import BurgerMenu from "@/components/buttons/burgerMenu";
 import PatientExport from "@/components/buttons/exportButtons/patientExport";
 import PatientCard from "@/components/cards/patientCard";
@@ -24,6 +24,7 @@ export default function UserClient() {
   const [searchQuery, setSearchQuery] = useState<string>(
     useSearchParams().get("query") || ""
   );
+
   const activePatient = useSetActive((state) => state.selectedPatient);
 
   const searchParams = useSearchParams();

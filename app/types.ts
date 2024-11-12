@@ -123,10 +123,6 @@ export const ToothHistory = z.object({
   tooth_history: z.string().min(1, { message: "Tooth History is required." }),
   history_date: z.date(),
   patient_id: z.number().optional(),
-  // newPassword: z
-  //   .string()
-  //   .min(6, { message: "Password must be at least 6 characters" })
-  //   .optional(),
 });
 
 export type ToothHistoryFormValue = z.infer<typeof ToothHistory>;

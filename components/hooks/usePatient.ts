@@ -58,7 +58,7 @@ export function usePatients(
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [supabase, mutate]);
+  }, [page, supabase, mutate]);
 
   return { patients, patientError, patientLoading, mutate };
 }

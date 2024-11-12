@@ -21,12 +21,12 @@ import { ScrollArea } from "../ui/scroll-area";
 import { getToothDescription } from "../ui/tooth-description";
 
 interface Treatment {
-  id: any;
-  history_date: string;
+  id?: any;
+  history_date: Date;
   tooth_location: number;
   tooth_condition: string;
   tooth_history: string;
-  patient_id: number;
+  patient_id?: number;
 }
 
 interface ToothHistoryProps {
@@ -36,7 +36,7 @@ interface ToothHistoryProps {
 
 type SortOrder = "asc" | "desc";
 
-export default function toothHistoryCard({
+export default function ToothHistoryCard({
   treatments,
   edit,
 }: ToothHistoryProps) {
@@ -109,7 +109,7 @@ export default function toothHistoryCard({
       <ScrollArea className={cn("bg-transparent w-full", !edit && "h-[395px]")}>
         <div className="space-y-6">
           {sortedTreatments.map((treatment, index) => {
-            const date = formatDate(treatment.history_date);
+            const date = formatDate(treatment.history_date.toString());
             const toothDescription = getToothDescription(
               treatment.tooth_location
             );

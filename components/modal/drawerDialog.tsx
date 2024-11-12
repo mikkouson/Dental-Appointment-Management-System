@@ -22,6 +22,7 @@ import {
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ScrollArea } from "../ui/scroll-area";
+import { useTeethArray } from "@/app/store";
 
 interface DrawerDialogDemoProps {
   open: boolean;
@@ -36,6 +37,8 @@ export function DrawerDialogDemo({
   label,
   children,
 }: DrawerDialogDemoProps) {
+  const { clearTeethLocations } = useTeethArray();
+
   const isDesktop = useMediaQuery("(min-width: 768px)");
   useEffect(() => {
     setTimeout(() => (document.body.style.pointerEvents = ""), 0);
@@ -44,7 +47,7 @@ export function DrawerDialogDemo({
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button className="bg-primary ">
+          <Button className="bg-primary " onClick={() => clearTeethLocations()}>
             <Plus size={20} className="mr-2 " />
             {label}
           </Button>
@@ -81,7 +84,10 @@ export function DrawerDialogDemo({
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button className="bg-primary text-xs p-0  sm:text-sm px-2 sm:px-4">
+        <Button
+          className="bg-primary text-xs p-0  sm:text-sm px-2 sm:px-4"
+          onClick={() => clearTeethLocations()}
+        >
           <Plus size={14} />
         </Button>
       </DrawerTrigger>
