@@ -11,6 +11,8 @@ import {
   UpdateUser,
   UpdateUserForm,
   UserForm,
+  DoctorFormValues,
+  DoctorSchema,
 } from "@/app/types";
 import DentalAppointmentCancellationEmail from "@/components/emailTemplates/cancelAppointment";
 import DentalAppointmentEmail from "@/components/emailTemplates/newAppointment";
@@ -655,6 +657,76 @@ export async function updateService(data: ServiceFormValues) {
     console.log("Patient data updated successfully");
   }
 }
+
+
+// Doctor Actions
+
+export async function newDoctor(data: DoctorFormValues) {
+  const result = DoctorSchema.safeParse(data);
+
+  if (!result.success) {
+    console.log("Validation errors:", result.error.format());
+    return;
+  }
+
+  const supabase = createClient();
+
+  const { error } = await supabase.from("doctors").insert([
+    {
+      name: data.name,
+      email: data.email,
+      contact_info: data.contact_info,
+    },
+  ]);
+
+  if (error) {
+    console.error("Error inserting doctor data:", error.message);
+  } else {
+    console.log("Doctor data inserted successfully");
+  }
+}
+
+export async function deleteDoctor(id: number) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("doctors")
+    .update({
+      deleteOn: new Date().toISOString(),
+    })
+    .eq("id", id);
+  if (error) {
+    console.log("Error deleting doctor data", error.message);
+    throw error; // Throw the error to be handled by the caller
+  }
+}
+
+export async function updateDoctor(data: DoctorFormValues) {
+  const result = DoctorSchema.safeParse(data);
+
+  if (!result.success) {
+    console.log("Validation errors:", result.error.format());
+    return;
+  }
+
+  const supabase = createClient();
+
+  // Update doctor
+  const { error } = await supabase
+    .from("doctors")
+    .update({
+      name: data.name,
+      email: data.email,
+      contact_info: data.contact_info,
+    })
+    .eq("id", data.id);
+
+  if (error) {
+    console.error("Error updating doctor data:", error.message);
+  } else {
+    console.log("Doctor data updated successfully");
+  }
+}
+
 
 // Inventory Actions
 

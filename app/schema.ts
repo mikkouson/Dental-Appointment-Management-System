@@ -13,6 +13,7 @@ export type Patient = Database["public"]["Tables"]["patients"]["Row"];
 export type Address = Database["public"]["Tables"]["addresses"]["Row"];
 export type Inventory = Database["public"]["Tables"]["inventory"]["Row"];
 export type User = Database["public"]["Tables"]["profiles"]["Row"];
+export type Doctor = Database["public"]["Tables"]["doctors"]["Row"];
 
 export type PatientCol = Tables<"patients"> & {
   name: string | null;
@@ -50,6 +51,13 @@ export type UserCol = Tables<"profiles"> & {
   name: string | null;
   email: string | null;
 };
+export type DoctorCol = Tables<"doctors"> & {
+  name: string | null;
+  contact_info: string | null;
+  email: string | null;
+  
+};
+
 
 export type Database = {
   public: {
@@ -185,21 +193,41 @@ export type Database = {
       };
       doctors: {
         Row: {
+          deleteOn: string | null;
           contact_info: string | null;
           id: number;
           name: string | null;
+          branch?: number | null;
+          updated_at: string | null;
+          email?: string | null;
         };
         Insert: {
-          contact_info?: string | null;
-          id?: number;
-          name?: string | null;
+          deleteOn: string | null;
+          contact_info: string | null;
+          id: number;
+          name: string | null;
+          branch?: number | null;
+          updated_at: string | null;
+          email?: string | null;
         };
         Update: {
-          contact_info?: string | null;
-          id?: number;
-          name?: string | null;
+          deleteOn: string | null;
+          contact_info: string | null;
+          id: number;
+          name: string | null;
+          branch?: number | null;
+          updated_at: string | null;
+          email?: string | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "doctors_branch_fkey";
+            columns: ["branch"];
+            isOneToOne: false;
+            referencedRelation: "branch";
+            referencedColumns: ["id"];
+          }
+        ];
       };
       inventory: {
         Row: {

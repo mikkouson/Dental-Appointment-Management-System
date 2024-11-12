@@ -102,6 +102,19 @@ export const UserSchema = z.object({
 
 export type UserForm = z.infer<typeof UserSchema>;
 
+
+export const DoctorSchema = z.object({
+  id: z.number().optional(),
+  email: z.string().min(1, { message: "Email is required." }),
+  name: z.string().min(1, { message: "Name is required." }),
+  contact_info: z.coerce
+    .number()
+    .min(100000000, { message: "Invalid Phone Number" })
+    .max(999999999, { message: "Invalid Phone Number" }),
+});
+
+export type DoctorFormValues = z.infer<typeof DoctorSchema>;
+
 export const UpdateUser = z.object({
   id: z.string().optional(),
   email: z.string().email({ message: "Invalid email address" }),
