@@ -44,7 +44,8 @@ export function usePatients(
 
   useEffect(() => {
     const channel = supabase
-      .channel("realtime patients")
+      .channel(`realtime-patients-${page}`)
+
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "patients" },

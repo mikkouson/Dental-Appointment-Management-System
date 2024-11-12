@@ -40,6 +40,8 @@ export async function GET(req: NextRequest) {
     )
     .ilike("patients.name", `%${filterParam}%`)
     .is("patients.deleteOn", null)
+
+    .is("deleteOn", null)
     .order("updated_at", { ascending: false });
 
   if (statusParam) {

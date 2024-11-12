@@ -24,10 +24,12 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TabsLinkTrigger } from "@/components/ui/tabs-link-trigger";
 import { createClient } from "@/utils/supabase/client";
 import { Activity, ClipboardList } from "lucide-react";
 import moment from "moment";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import useSWR from "swr";
 
@@ -50,6 +52,9 @@ export default function Page({ params }: PageProps) {
     `/api/patientdetails?id=${params.id}`,
     fetcher
   );
+  // Get the current "tabs" parameter from URL
+  const searchParams = useSearchParams();
+  const currentTab = searchParams.get("tabs") || "appointments";
 
   const supabase = createClient();
 
@@ -68,7 +73,7 @@ export default function Page({ params }: PageProps) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [supabase, mutate]);
+  }, [mutate]);
 
   const active = useSetActiveAppointments((state) => state.selectedAppointment);
 
@@ -211,19 +216,16 @@ export default function Page({ params }: PageProps) {
           </div>
 
           {/* Tabs Section */}
-          <Tabs defaultValue="appointments" className="w-full">
+          <Tabs value={currentTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-4">
-              <TabsTrigger
-                value="appointments"
-                className="flex items-center gap-2"
-              >
+              <TabsLinkTrigger href="?tabs=appointments" value="appointments">
                 <ClipboardList className="h-4 w-4" />
                 Appointment History
-              </TabsTrigger>
-              <TabsTrigger value="medical" className="flex items-center gap-2">
+              </TabsLinkTrigger>
+              <TabsLinkTrigger href="?tabs=medical" value="medical">
                 <Activity className="h-4 w-4" />
                 Medical History
-              </TabsTrigger>
+              </TabsLinkTrigger>
             </TabsList>
 
             {/* Appointments Tab */}

@@ -607,6 +607,7 @@ export async function deleteService(id: number) {
     .eq("id", id);
   if (error) {
     console.log("Error deleting patient", error.message);
+    throw error; // Throw the error to be handled by the caller
   }
 }
 

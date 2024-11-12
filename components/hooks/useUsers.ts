@@ -11,7 +11,11 @@ const fetcher = async (
   count: number;
 }> => fetch(url).then((res) => res.json());
 
-export function useUsers(page?: number | null, query?: string, limit?: number | null) {
+export function useUsers(
+  page?: number | null,
+  query?: string,
+  limit?: number | null
+) {
   const queryString = new URLSearchParams();
 
   if (page != null) {
@@ -39,7 +43,7 @@ export function useUsers(page?: number | null, query?: string, limit?: number | 
   // Subscribe to realtime updates
   useEffect(() => {
     const channel = supabase
-      .channel("realtime profiles")
+      .channel(`realtime-users-${page}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "profiles" },

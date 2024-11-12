@@ -40,7 +40,8 @@ export function useUser(page?: number, query?: string, limit?: number | null) {
   // Subscribe to realtime updates
   useEffect(() => {
     const channel = supabase
-      .channel("realtime service")
+      .channel(`realtime-user-${page}`)
+
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "profiles" },

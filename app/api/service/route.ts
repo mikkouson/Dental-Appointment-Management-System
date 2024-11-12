@@ -19,10 +19,11 @@ export async function GET(req: NextRequest, res: NextResponse) {
   // Perform the query with sorting by 'updated_at' in descending order
   let query = supabase
     .from("services")
+
     .select("*", { count: "exact" })
+    .is("deleteOn", null)
     .ilike("name", `%${filterParam}%`) // Filter based on 'name' column
-    .order("updated_at", { ascending: false })
-    .is("deleteOn", null); // Exclude soft-deleted items
+    .order("updated_at", { ascending: false });
 
   if (pageParam) {
     query.range((page - 1) * limit, page * limit - 1);

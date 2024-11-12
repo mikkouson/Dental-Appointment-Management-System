@@ -36,7 +36,6 @@ export function EditService({ data, mutate }: EditServiceProps) {
   const service = services?.data || [];
 
   const [open, setOpen] = useState(false);
-  console.log(data);
   useEffect(() => {
     setTimeout(() => (document.body.style.pointerEvents = ""), 0);
   });
