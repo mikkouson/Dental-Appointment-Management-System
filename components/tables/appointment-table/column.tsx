@@ -3,6 +3,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { SquarePen } from "lucide-react";
 import { DeleteModal } from "@/components/modal/deleteModal";
 import { EditPatient } from "@/components/modal/patients/editPatient";
+import Link from "next/link";
 
 type Column = ColumnDef<AppointmentsCol>;
 
@@ -14,9 +15,28 @@ export const columns: Column[] = [
   },
 
   {
-    accessorFn: (row) => row.patients?.name || "N/A",
-    id: "patients",
+    accessorFn: (row) => ({
+      name: row.patients?.name || "N/A",
+      id: row.patients?.id,
+    }),
+    id: "patient_link",
     header: "PATIENT",
+    cell: ({ row }) => {
+      const patient = row.getValue("patient_link") as {
+        name: string;
+        id: string;
+      };
+      return patient.id ? (
+        <Link
+          href={`/patients/${patient.id}`}
+          className="text-blue-600 hover:underline cursor-pointer"
+        >
+          {patient.name}
+        </Link>
+      ) : (
+        patient.name
+      );
+    },
   },
   {
     accessorKey: "date",
