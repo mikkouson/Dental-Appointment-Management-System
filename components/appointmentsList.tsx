@@ -1,8 +1,3 @@
-import {
-  acceptAppointment,
-  cancelAppointment,
-  rejectAppointment,
-} from "@/app/(admin)/action";
 import type { AppointmentsCol, TimeSlot } from "@/app/schema";
 import { Separator } from "./ui/separator";
 import { EditAppointment } from "./modal/appointment/editAppointment";
@@ -12,9 +7,33 @@ import { toast } from "./hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { CompleteAppointment } from "./modal/appointment/mark-as-completed";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Stethoscope, User, Info, Phone, Ticket, Hospital } from "lucide-react";
+import {
+  Stethoscope,
+  User,
+  Info,
+  Phone,
+  Ticket,
+  Hospital,
+  MoreHorizontal,
+  MoreVertical,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import {
+  acceptAppointment,
+  cancelAppointment,
+  deleteAppointment,
+  rejectAppointment,
+} from "@/app/(admin)/appointments/action";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { DeleteToothHistory } from "./modal/patients/deleteToothHistory";
+import { EditToothCondition } from "./modal/patients/edit-tooth-condition";
+import { DeleteModal } from "./modal/deleteModal";
 
 interface AppointmentsMapProps {
   timeSlots: TimeSlot[];
@@ -29,7 +48,6 @@ export default function AppointmentsMap({
 }: AppointmentsMapProps) {
   const [loading, setLoading] = useState<number | null>(null);
   const [loadingType, setLoadingType] = useState<string | null>(null);
-
   const handleAction = async (
     action: () => Promise<void>,
     aptId: number,
@@ -37,6 +55,8 @@ export default function AppointmentsMap({
   ) => {
     setLoading(aptId);
     setLoadingType(actionType);
+    mutate();
+
     try {
       await action();
       toast({
@@ -47,6 +67,7 @@ export default function AppointmentsMap({
         description: `Appointment ${actionType} successfully.`,
         duration: 2000,
       });
+      mutate();
     } catch (error: any) {
       console.error("Failed to perform action", error);
       toast({
@@ -54,10 +75,9 @@ export default function AppointmentsMap({
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         variant: "destructive",
-        description: `Failed to ${actionType.toLowerCase()} appointment: ${
-          error.message
-        }`,
+        description: "Update appointment status failed",
       });
+      mutate();
     } finally {
       setLoading(null);
       setLoadingType(null);
@@ -84,9 +104,43 @@ export default function AppointmentsMap({
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {filteredAppointments.map((apt: any) => (
                   <Card key={apt.id}>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base flex items-center"></CardTitle>
+                    <CardHeader className="pb-0 flex flex-row justify-between  items-center text-center  ">
+                      <div>
+                        <CardTitle className="text-base flex">
+                          Appointment Details
+                        </CardTitle>
+                      </div>
+                      <div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-6 w-6 p-0"
+                            >
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <EditAppointment
+                              appointment={apt}
+                              text={true}
+                              disabled={loading === apt.id}
+                              mutate={mutate}
+                            />
+                            <DropdownMenuSeparator />
+                            <DeleteModal
+                              formAction={async () => {
+                                await deleteAppointment(apt.id);
+                                mutate();
+                              }}
+                            />
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </CardHeader>
+                    <Separator className="my-2" />
+
                     <CardContent>
                       <div className="flex flex-col space-y-2">
                         <span className="text-sm md:text-base flex items-center">
@@ -138,12 +192,6 @@ export default function AppointmentsMap({
                         </span>
                       </div>
                       <div className="flex flex-wrap items-center gap-2 mt-4">
-                        <EditAppointment
-                          appointment={apt}
-                          text={true}
-                          disabled={loading === apt.id}
-                          mutate={mutate}
-                        />
                         {apt.status?.id === 1 && (
                           <>
                             <CompleteAppointment

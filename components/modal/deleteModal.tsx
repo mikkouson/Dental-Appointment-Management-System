@@ -28,10 +28,13 @@ export function DeleteModal({ formAction }: DeleteModalProps) {
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <Trash2
-            className="text-sm w-5 text-muted-foreground  mr-2 cursor-pointer"
+          <Button
             onClick={() => setIsOpen(true)}
-          />
+            variant="ghost"
+            className="w-full text-left justify-start"
+          >
+            Delete
+          </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>

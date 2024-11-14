@@ -159,7 +159,7 @@ export function DataTableDemo({
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                No data available
               </TableCell>
             </TableRow>
           )}

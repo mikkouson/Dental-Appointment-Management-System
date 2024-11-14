@@ -1,6 +1,6 @@
 "use client";
 
-import { rescheduleAppointment } from "@/app/(admin)/action";
+import { rescheduleAppointment } from "@/app/(admin)/appointments/action";
 import { AppointmentsCol } from "@/app/schema";
 import { AppointmentSchema } from "@/app/types";
 import { AppointmentField } from "@/components/forms/appointment/appointmentField";
@@ -70,7 +70,7 @@ export function EditAppointment({
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         variant: "success",
-        description: "Service added successfully.",
+        description: "Appointment updated successfully.",
         duration: 2000,
       });
       mutate(); // Revalidate to ensure data consistency
@@ -95,7 +95,12 @@ export function EditAppointment({
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         {text ? (
-          <Button disabled={disabled} onClick={() => set()} variant="outline">
+          <Button
+            disabled={disabled}
+            onClick={() => set()}
+            variant="ghost"
+            className="w-full text-left justify-start"
+          >
             Edit
           </Button>
         ) : (

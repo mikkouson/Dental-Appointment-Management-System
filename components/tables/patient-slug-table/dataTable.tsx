@@ -19,7 +19,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { deleteAppointment } from "@/app/(admin)/action";
 import type { AppointmentsCol } from "@/app/schema";
 import { useSetActiveAppointments } from "@/app/store";
 import { toast } from "@/components/hooks/use-toast";
@@ -32,6 +31,7 @@ import {
   SortingState,
   VisibilityState,
 } from "@tanstack/react-table";
+import { deleteAppointment } from "@/app/(admin)/appointments/action";
 
 type Column = ColumnDef<AppointmentsCol>;
 
@@ -173,7 +173,7 @@ export function DataTableDemo({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  No data available
                 </TableCell>
               </TableRow>
             )}

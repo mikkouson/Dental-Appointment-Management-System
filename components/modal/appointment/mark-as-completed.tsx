@@ -1,6 +1,5 @@
 "use client";
 
-import { completeAppointment } from "@/app/(admin)/action";
 import { useTeethArray } from "@/app/store";
 import { UpdateInventorySchema } from "@/app/types";
 import ItemUsedField from "@/components/forms/appointment/item-used-field";
@@ -22,6 +21,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import ToothHistoryCard from "@/components/cards/toothHistoryCard";
+import { completeAppointment } from "@/app/(admin)/appointments/action";
 
 type UseTeethArrayReturn = {
   teethArray: number[];
@@ -70,30 +70,24 @@ export function CompleteAppointment({
     try {
       await completeAppointment(formData, teethLocations); // Make sure this function returns a promise
       // setOpen(false); // Close the modal
+      setOpen(false); // Close the modal
 
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         variant: "success",
-        // description: "Service added successfully. ",
-        description: (
-          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-            <code className="text-white">
-              {JSON.stringify(formData, null, 2)}
-            </code>
-          </pre>
-        ),
+        description: `Appointment marked as done successfully.`,
         duration: 2000,
       });
     } catch (error: any) {
-      // Revert the optimistic update in case of an error
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         variant: "destructive",
-        description: `Failed to add service: ${error.message}`,
+        description: "Update appointment status failed",
+        duration: 2000,
       });
     }
   }
@@ -130,12 +124,12 @@ export function CompleteAppointment({
         }}
       >
         <SheetHeader>
-          <SheetTitle>Accept Appointment</SheetTitle>
+          <SheetTitle>Complete Appointment</SheetTitle>
           <SheetDescription>
             Make changes to the appointment here. Click save when youre done.
           </SheetDescription>
         </SheetHeader>
-        <Tabs defaultValue="chart" className="w-full">
+        <Tabs defaultValue="chart" className="w-full mt-2">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="chart">Teeth Chart</TabsTrigger>
             <TabsTrigger value="items">Items Used</TabsTrigger>

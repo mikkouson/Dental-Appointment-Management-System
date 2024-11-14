@@ -137,7 +137,9 @@ export function ItemUsedField({
           className="w-full space-y-6"
         >
           <div className="w-full space-y-4">
-            <Field form={form} name={"id"} label={"Id"} num={true} disabled />
+            <div className="hidden">
+              <Field form={form} name={"id"} label={"Id"} num={true} disabled />
+            </div>
             <FormField
               control={form.control}
               name="selectedItems"

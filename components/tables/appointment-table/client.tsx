@@ -138,20 +138,14 @@ export default function UserClient() {
           <TabsContent value="table">
             <div>
               {!isLoading ? (
-                <div>
-                  {data && data.data.length ? (
-                    <>
-                      <DataTableDemo
-                        columns={columns}
-                        data={data.data}
-                        mutate={mutate}
-                      />
-                      <PaginationDemo totalPages={totalPages} />
-                    </>
-                  ) : (
-                    <p>No data available.</p>
-                  )}
-                </div>
+                <>
+                  <DataTableDemo
+                    columns={columns}
+                    data={data?.data || []}
+                    mutate={mutate}
+                  />
+                  <PaginationDemo totalPages={totalPages} />
+                </>
               ) : (
                 <TableLoadingSkeleton />
               )}
