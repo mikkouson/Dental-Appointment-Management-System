@@ -24,35 +24,23 @@ import { cn } from "@/lib/utils";
 
 const tooth_condition = [
   { name: "Sound", id: "sound" },
-  { name: "Filled", id: "filled" },
-  { name: "Compromised", id: "compromised" },
-  { name: "Endo", id: "endo" },
-  { name: "Missing", id: "missing" },
-  { name: "Rotated", id: "rotated" },
-  { name: "Displaced", id: "displaced" },
-  { name: "Gum Recessed", id: "gum-recessed" },
-  { name: "Cavities", id: "cavities" },
-  { name: "Fractured", id: "fractured" },
-  { name: "Chipped", id: "chipped" },
-  { name: "Eroded", id: "eroded" },
-  { name: "Impacted", id: "impacted" },
+  { name: "Caries", id: "caries" },
+  { name: "Partial Erupted", id: "partial_erupted" },
+  { name: "Un-erupted", id: "unerupted" },
+  { name: "Impacted Visible", id: "impacted_visible" },
+  { name: "Anomaly", id: "anomaly" },
   { name: "Decayed", id: "decayed" },
+  { name: "Missing", id: "missing" },
   { name: "Restored", id: "restored" },
-  { name: "Periodontally Compromised", id: "periodontally-compromised" },
-  { name: "Attrition", id: "attrition" },
-  { name: "Abrasion", id: "abrasion" },
-  { name: "Root Canal Treated", id: "root-canal-treated" },
-  { name: "Stained", id: "stained" },
-  { name: "Crowded", id: "crowded" },
-  { name: "Loose", id: "loose" },
-  { name: "Partially Erupted", id: "partially-erupted" },
-  { name: "Hypoplastic", id: "hypoplastic" },
-  { name: "Supernumerary", id: "supernumerary" },
-  { name: "Malformed", id: "malformed" },
-  { name: "Fluorosis Affected", id: "fluorosis-affected" },
-  { name: "Transposed", id: "transposed" },
+  { name: "Root Canal Treated", id: "root_canal" },
+  { name: "Gingival Recession", id: "gingival_recession" },
+  { name: "Implant", id: "implant" },
+  { name: "Fluorosis", id: "fluorosis" },
+  { name: "Crowns", id: "crowns" },
+  { name: "Bridges", id: "bridges" },
+  { name: "Sealants", id: "sealants" },
+  { name: "Fissures", id: "fissures" },
 ] as const;
-
 interface PatientFieldsProps {
   form: UseFormReturn<ToothHistoryFormValue>;
   onSubmit: (data: ToothHistoryFormValue) => void;
@@ -131,7 +119,7 @@ const ToothConditionFields = ({ form, onSubmit }: PatientFieldsProps) => {
           <Field
             form={form}
             name={"tooth_history"}
-            label={"Tooth History"}
+            label={"Description"}
             textarea
           />
           {/* <Field form={form} data={sex} name={"sex"} label={"Sex"} />

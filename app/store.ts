@@ -63,6 +63,7 @@ type TeethLocationState = {
   tooth_condition: string;
   tooth_history: string;
   history_date: Date;
+  patient_id: number;
 };
 
 type TeethArray = {
@@ -72,6 +73,7 @@ type TeethArray = {
 type TeethArrayActions = {
   addTeethLocation: (tooth: TeethLocationState) => void;
   clearTeethLocations: () => void;
+  updateToothLocation: (updatedTooth: TeethLocationState) => void;
 };
 
 export const useTeethArray = create<TeethArray & TeethArrayActions>((set) => ({
@@ -79,4 +81,13 @@ export const useTeethArray = create<TeethArray & TeethArrayActions>((set) => ({
   addTeethLocation: (tooth) =>
     set((state) => ({ teethLocations: [...state.teethLocations, tooth] })),
   clearTeethLocations: () => set({ teethLocations: [] }),
+  updateToothLocation: (updatedTooth) =>
+    set((state) => ({
+      teethLocations: state.teethLocations.map((tooth) =>
+        tooth.tooth_location === updatedTooth.tooth_location &&
+        tooth.patient_id === updatedTooth.patient_id
+          ? updatedTooth
+          : tooth
+      ),
+    })),
 }));

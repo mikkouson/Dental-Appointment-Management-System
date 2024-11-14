@@ -30,7 +30,14 @@ export async function GET(req: NextRequest, res: NextResponse) {
           *
         )
       ),
-      tooth_history(*)
+      tooth_history(*,
+          appointments (
+        *,
+        services (
+          *
+        )
+      )
+      )
       )
     `
     )

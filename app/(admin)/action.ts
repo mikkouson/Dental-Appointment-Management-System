@@ -1,7 +1,10 @@
 "use server";
 import {
+  DoctorFormValues,
+  DoctorSchema,
   InventoryFormValues,
   InventorySchema,
+  PatientFormValues,
   PatientSchema,
   ServiceFormValues,
   ServiceSchema,
@@ -11,8 +14,6 @@ import {
   UpdateUser,
   UpdateUserForm,
   UserForm,
-  DoctorFormValues,
-  DoctorSchema,
 } from "@/app/types";
 import DentalAppointmentCancellationEmail from "@/components/emailTemplates/cancelAppointment";
 import DentalAppointmentEmail from "@/components/emailTemplates/newAppointment";
@@ -539,7 +540,25 @@ export async function deletePatient(id: number) {
     console.log("Error deleting patient", error.message);
   }
 }
-export async function updatePatient(data: patientInput) {
+interface AddressInput {
+  id?: number; // Changed from string to number
+  address: string;
+  latitude: number;
+  longitude: number;
+}
+
+interface PatientInput {
+  id: number; // Changed from string to number
+  name: string;
+  email: string;
+  sex: string;
+  phoneNumber: string;
+  dob: string;
+  status: string;
+  address: AddressInput;
+}
+
+export async function updatePatient(data: PatientFormValues) {
   const result = PatientSchema.safeParse(data);
 
   if (!result.success) {
@@ -549,28 +568,46 @@ export async function updatePatient(data: patientInput) {
 
   const supabase = createClient();
 
-  // Check if address ID is provided
-  if (!data.address.id) {
-    console.error("Address ID is missing or undefined.");
-    return;
+  // Handle address update or creation
+  let addressId: number; // Changed from string to number
+
+  if (data.address.id) {
+    // Update existing address
+    const { error: addressError } = await supabase
+      .from("addresses")
+      .update({
+        address: data.address.address,
+        latitude: data.address.latitude,
+        longitude: data.address.longitude,
+      })
+      .eq("id", data.address.id);
+
+    if (addressError) {
+      console.error("Error updating address:", addressError.message);
+      return;
+    }
+    addressId = data.address.id;
+  } else {
+    // Create new address
+    const { data: newAddress, error: createError } = await supabase
+      .from("addresses")
+      .insert({
+        address: data.address.address,
+        latitude: data.address.latitude,
+        longitude: data.address.longitude,
+      })
+      .select()
+      .single();
+
+    if (createError) {
+      console.error("Error creating address:", createError.message);
+      return;
+    }
+
+    addressId = newAddress.id;
   }
 
-  // Update address
-  const { error: addressError } = await supabase
-    .from("addresses")
-    .update({
-      address: data.address.address,
-      latitude: data.address.latitude,
-      longitude: data.address.longitude,
-    })
-    .eq("id", data.address.id);
-
-  if (addressError) {
-    console.error("Error updating address:", addressError.message);
-    return;
-  }
-
-  // Update patient
+  // Update patient with potentially new address ID
   const { error: patientError } = await supabase
     .from("patients")
     .update({
@@ -580,6 +617,7 @@ export async function updatePatient(data: patientInput) {
       phone_number: data.phoneNumber,
       dob: data.dob,
       status: data.status,
+      address: addressId,
     })
     .eq("id", data.id);
 
@@ -657,76 +695,6 @@ export async function updateService(data: ServiceFormValues) {
     console.log("Patient data updated successfully");
   }
 }
-
-
-// Doctor Actions
-
-export async function newDoctor(data: DoctorFormValues) {
-  const result = DoctorSchema.safeParse(data);
-
-  if (!result.success) {
-    console.log("Validation errors:", result.error.format());
-    return;
-  }
-
-  const supabase = createClient();
-
-  const { error } = await supabase.from("doctors").insert([
-    {
-      name: data.name,
-      email: data.email,
-      contact_info: data.contact_info,
-    },
-  ]);
-
-  if (error) {
-    console.error("Error inserting doctor data:", error.message);
-  } else {
-    console.log("Doctor data inserted successfully");
-  }
-}
-
-export async function deleteDoctor(id: number) {
-  const supabase = createClient();
-  const { error } = await supabase
-    .from("doctors")
-    .update({
-      deleteOn: new Date().toISOString(),
-    })
-    .eq("id", id);
-  if (error) {
-    console.log("Error deleting doctor data", error.message);
-    throw error; // Throw the error to be handled by the caller
-  }
-}
-
-export async function updateDoctor(data: DoctorFormValues) {
-  const result = DoctorSchema.safeParse(data);
-
-  if (!result.success) {
-    console.log("Validation errors:", result.error.format());
-    return;
-  }
-
-  const supabase = createClient();
-
-  // Update doctor
-  const { error } = await supabase
-    .from("doctors")
-    .update({
-      name: data.name,
-      email: data.email,
-      contact_info: data.contact_info,
-    })
-    .eq("id", data.id);
-
-  if (error) {
-    console.error("Error updating doctor data:", error.message);
-  } else {
-    console.log("Doctor data updated successfully");
-  }
-}
-
 
 // Inventory Actions
 
@@ -875,36 +843,10 @@ export async function updateUser(formData: UpdateUserForm) {
   return user;
 }
 
-export async function updateProfile(formData: UpdateUserForm) {
-  const result = UpdateUser.safeParse(formData);
-  if (!result.success) {
-    console.log("Validation errors:", result.error.format());
-    return;
-  }
-
-  if (!formData?.id) {
-    console.log("User ID is missing.");
-    return;
-  }
-
-  const supabase = createClient();
-
-  // Update the profiles table with name and email
-  const { error: profileError } = await supabase
-    .from("profiles")
-    .update({
-      name: formData.name,
-    })
-    .eq("id", formData.id);
-
-  if (profileError) {
-    console.log("Error updating profile:", profileError.message);
-  }
-}
-
-// Complete Appointment Action
-export async function completeAppoinment(formData: UpdateInventoryFormValues) {
-  // Validate form data
+export async function completeAppointment(
+  formData: UpdateInventoryFormValues,
+  teethLocations: any
+) {
   const validationResult = UpdateInventorySchema.safeParse(formData);
   if (!validationResult.success) {
     throw new Error("Invalid form data.");
@@ -913,7 +855,7 @@ export async function completeAppoinment(formData: UpdateInventoryFormValues) {
   const supabase = createClient();
   const { id, selectedItems } = formData;
 
-  // Start a transaction to update the appointment and insert items
+  // Get appointment and patient data
   const { data: appointmentData, error: updateError } = await supabase
     .from("appointments")
     .update({ status: 4 })
@@ -930,7 +872,7 @@ export async function completeAppoinment(formData: UpdateInventoryFormValues) {
     throw new Error(`Error updating appointment: ${updateError.message}`);
   }
 
-  // Prepare data for bulk insert into the inventory
+  // Handle inventory items
   const insertData = selectedItems.map((item) => ({
     appointment_id: id,
     item_id: item.id,
@@ -945,13 +887,29 @@ export async function completeAppoinment(formData: UpdateInventoryFormValues) {
     throw new Error(`Error inserting inventory data: ${insertError.message}`);
   }
 
-  // Revalidate the path to update the cache
-  revalidatePath("/");
+  // Handle tooth history records
+  if (teethLocations && teethLocations.length > 0) {
+    const toothHistoryData = teethLocations.map((location: any) => ({
+      tooth_location: location.tooth_location,
+      tooth_condition: location.tooth_condition,
+      tooth_history: location.tooth_history,
+      history_date: new Date(),
+      patient_id: appointmentData.patients.id,
+      appointment_id: appointmentData.id,
+    }));
 
-  // Redirect after all async operations are complete
+    try {
+      await createMultipleToothHistory(toothHistoryData);
+      console.log("Tooth history records created successfully.");
+    } catch (error) {
+      console.error("Error creating tooth history records:", error);
+      throw error;
+    }
+  }
+
+  revalidatePath("/");
   redirect("/appointments");
 }
-
 export async function updateToothHistory(data: ToothHistoryFormValue) {
   // // If no ID is present, create a new record instead
   // if (!data.id) {
@@ -1015,4 +973,72 @@ export async function createMultipleToothHistory(
   }
 
   return { success: true };
+}
+
+// Doctor Actions
+
+export async function newDoctor(data: DoctorFormValues) {
+  const result = DoctorSchema.safeParse(data);
+
+  if (!result.success) {
+    console.log("Validation errors:", result.error.format());
+    return;
+  }
+
+  const supabase = createClient();
+
+  const { error } = await supabase.from("doctors").insert([
+    {
+      name: data.name,
+      email: data.email,
+      contact_info: data.contact_info,
+    },
+  ]);
+
+  if (error) {
+    console.error("Error inserting doctor data:", error.message);
+  } else {
+    console.log("Doctor data inserted successfully");
+  }
+}
+
+export async function deleteDoctor(id: number) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("doctors")
+    .update({
+      deleteOn: new Date().toISOString(),
+    })
+    .eq("id", id);
+  if (error) {
+    console.log("Error deleting doctor data", error.message);
+    throw error; // Throw the error to be handled by the caller
+  }
+}
+
+export async function updateDoctor(data: DoctorFormValues) {
+  const result = DoctorSchema.safeParse(data);
+
+  if (!result.success) {
+    console.log("Validation errors:", result.error.format());
+    return;
+  }
+
+  const supabase = createClient();
+
+  // Update doctor
+  const { error } = await supabase
+    .from("doctors")
+    .update({
+      name: data.name,
+      email: data.email,
+      contact_info: data.contact_info,
+    })
+    .eq("id", data.id);
+
+  if (error) {
+    console.error("Error updating doctor data:", error.message);
+  } else {
+    console.log("Doctor data updated successfully");
+  }
 }

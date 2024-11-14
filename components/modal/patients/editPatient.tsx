@@ -186,7 +186,7 @@ export function EditPatient({ patient, mutate }: EditPatientProps) {
         }}
       >
         <SheetHeader>
-          <SheetTitle>Edit profile</SheetTitle>
+          <SheetTitle>Edit Patients</SheetTitle>
           <SheetDescription>
             Make changes to your profile here. Click save when you’re done.
           </SheetDescription>

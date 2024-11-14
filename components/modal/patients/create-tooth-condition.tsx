@@ -35,7 +35,8 @@ export function NewToothCondition({
   newPatient = false,
 }: NewToothConditionProps) {
   const [open, setOpen] = useState(false);
-  const { addTeethLocation } = useTeethArray();
+  const { teethLocations, addTeethLocation, updateToothLocation } =
+    useTeethArray();
 
   const formatToothTitle = (location: number) => {
     const description = getToothDescription(location);
@@ -55,17 +56,30 @@ export function NewToothCondition({
   };
 
   async function onSubmit(data: z.infer<typeof ToothHistory>) {
-    //get the type of the history_date
-
     try {
       if (newPatient) {
-        // Save to store if it's a new patient
-        addTeethLocation({
+        // Check if tooth location already exists for this patient
+        const existingTooth = teethLocations.find(
+          (tooth) =>
+            tooth.tooth_location === data.tooth_location &&
+            tooth.patient_id === Number(data.patient_id)
+        );
+
+        const toothData = {
           tooth_location: data.tooth_location,
           tooth_condition: data.tooth_condition,
           tooth_history: data.tooth_history,
           history_date: data.history_date,
-        });
+          patient_id: Number(data.patient_id),
+        };
+
+        if (existingTooth) {
+          // Update existing tooth
+          updateToothLocation(toothData);
+        } else {
+          // Add new tooth
+          addTeethLocation(toothData);
+        }
       } else {
         // Save to database if it's an existing patient
         await createToothHistory(data);
@@ -151,14 +165,15 @@ export function NewToothCondition({
           <p className="font-medium text-sm">Treatment History</p>
         </div>
         <Separator className="my-2" />
+        <ToothHistoryCard treatments={historyForTooth} />
 
-        {history.length < 0 ? (
+        {/* {history.length < 0 ? (
           <ToothHistoryCard treatments={historyForTooth} edit={true} />
         ) : (
           <div className="flex justify-center items-center w-full text-muted-foreground">
             No treatment history found.
           </div>
-        )}
+        )} */}
       </SheetContent>
     </Sheet>
   );

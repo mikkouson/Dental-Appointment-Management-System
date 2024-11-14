@@ -50,7 +50,7 @@ export default function Field({
             />
           ) : textarea ? (
             <Textarea
-              placeholder={`Tell us a little bit about ${label}`}
+              placeholder={`${label}`}
               className="resize-none"
               disabled={disabled} // Pass disabled here
               {...field}

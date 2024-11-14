@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Doctor} from "@/app/schema";
+import { Doctor } from "@/app/schema";
 import { DoctorSchema } from "@/app/types";
 import DoctorFields from "@/components/forms/doctors/doctorField";
 import {
@@ -48,7 +48,7 @@ export function EditDoctor({ data, mutate }: EditDoctorProps) {
   const set = () => {
     form.setValue("id", data.id || 0);
     form.setValue("name", data.name || "");
-    form.setValue("email", data.email || "");    
+    form.setValue("email", data.email || "");
   };
 
   async function validateName(name: string): Promise<boolean> {
@@ -92,7 +92,7 @@ export function EditDoctor({ data, mutate }: EditDoctorProps) {
     }
 
     // Prepare the updated inventory item
-    const updatedItem: Doctor = {
+    const updatedItem: any = {
       ...data,
       ...formData,
       updated_at: new Date().toISOString(), // Update the timestamp

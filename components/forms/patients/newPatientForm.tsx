@@ -143,7 +143,6 @@ export function NewPatientForm({ setOpen, mutate }: NewPatientFormProps) {
               edit={true}
             />
           ))} */}
-
           {teethLocations.length === 0 ? (
             <div className="flex justify-center items-center w-full text-muted-foreground">
               No treatment history. Click a tooth to add treatment history.{" "}

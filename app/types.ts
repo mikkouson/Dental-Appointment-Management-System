@@ -102,7 +102,6 @@ export const UserSchema = z.object({
 
 export type UserForm = z.infer<typeof UserSchema>;
 
-
 export const DoctorSchema = z.object({
   id: z.number().optional(),
   email: z.string().min(1, { message: "Email is required." }),
@@ -133,7 +132,7 @@ export const ToothHistory = z.object({
   tooth_condition: z
     .string()
     .min(1, { message: "Tooth Condition is required." }),
-  tooth_history: z.string().min(1, { message: "Tooth History is required." }),
+  tooth_history: z.string().min(1, { message: "Description is required." }),
   history_date: z.date(),
   patient_id: z.number().optional(),
 });

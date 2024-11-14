@@ -32,6 +32,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import useSWR from "swr";
+import Loading from "../loading";
 
 const fetcher = async (url: any): Promise<any> => {
   const res = await fetch(url);
@@ -77,13 +78,13 @@ export default function Page({ params }: PageProps) {
 
   const active = useSetActiveAppointments((state) => state.selectedAppointment);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <Loading />;
   if (error) return <div>Error loading patient data</div>;
 
-  const acceptedAppointments = data.appointments.filter(
+  const acceptedAppointments = data?.appointments.filter(
     (appointment: { status?: { id?: number } }) => appointment.status?.id === 1
   );
-  const completedAppointments = data.appointments.filter(
+  const completedAppointments = data?.appointments.filter(
     (appointment: { status?: { id?: number } }) => appointment.status?.id === 4
   );
 
@@ -107,7 +108,7 @@ export default function Page({ params }: PageProps) {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage>{data.name}</BreadcrumbPage>
+                <BreadcrumbPage>{data?.name}</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -128,9 +129,9 @@ export default function Page({ params }: PageProps) {
                     />
                     <AvatarFallback>CN</AvatarFallback>
                   </Avatar>
-                  <CardTitle>{data.name}</CardTitle>
+                  <CardTitle>{data?.name}</CardTitle>
                   <CardDescription className="mb-2">
-                    {data.email}
+                    {data?.email}
                   </CardDescription>
                   <div className="space-y-1">
                     <CardDescription className="text-sm font-medium leading-none">
@@ -166,21 +167,21 @@ export default function Page({ params }: PageProps) {
                     Sex
                   </CardDescription>
                   <p className="text-xs">
-                    {data.sex.charAt(0).toUpperCase() + data.sex.slice(1)}
+                    {data?.sex.charAt(0).toUpperCase() + data?.sex.slice(1)}
                   </p>
                 </div>
                 <div>
                   <CardDescription className="text-md text-muted-foreground">
                     Phone Number
                   </CardDescription>
-                  <p className="text-xs">(+639) {data.phone_number}</p>
+                  <p className="text-xs">(+639) {data?.phone_number}</p>
                 </div>
                 <div>
                   <CardDescription className="text-md text-muted-foreground">
                     Date of Birth
                   </CardDescription>
                   <p className="text-xs">
-                    {moment(data.dob).format("MM/DD/YYYY")}
+                    {moment(data?.dob).format("MM/DD/YYYY")}
                   </p>
                 </div>
                 <div>
@@ -188,14 +189,14 @@ export default function Page({ params }: PageProps) {
                     Registered Date
                   </CardDescription>
                   <p className="text-xs">
-                    {moment(data.created_at).format("MM/DD/YYYY")}
+                    {moment(data?.created_at).format("MM/DD/YYYY")}
                   </p>
                 </div>
                 <div>
                   <CardDescription className="text-md text-muted-foreground">
                     Status
                   </CardDescription>
-                  <p className="text-xs">{data.status}</p>
+                  <p className="text-xs">{data?.status}</p>
                 </div>
               </CardContent>
             </Card>
@@ -206,10 +207,10 @@ export default function Page({ params }: PageProps) {
                 <CardDescription className="text-md text-muted-foreground">
                   Address
                 </CardDescription>
-                <p className="text-xs mb-2">{data.address.address}</p>
+                <p className="text-xs mb-2">{data?.address?.address}</p>
                 <StaticMaps
-                  latitude={data.address?.latitude}
-                  longitude={data.address?.longitude}
+                  latitude={data?.address?.latitude}
+                  longitude={data?.address?.longitude}
                 />
               </CardContent>
             </Card>
@@ -232,7 +233,7 @@ export default function Page({ params }: PageProps) {
             <TabsContent value="appointments" className="space-y-4">
               <div className="flex items-center mb-2">
                 <div className="ml-auto">
-                  <PatientAppointmentExport data={data.appointments} />
+                  <PatientAppointmentExport data={data?.appointments} />
                 </div>
               </div>
 
@@ -246,7 +247,7 @@ export default function Page({ params }: PageProps) {
                 <CardContent>
                   <DataTableDemo
                     columns={columns}
-                    data={data.appointments}
+                    data={data?.appointments}
                     mutate={mutate}
                   />
                 </CardContent>
@@ -266,10 +267,13 @@ export default function Page({ params }: PageProps) {
                   <div className="flex">
                     {/* Static TeethChart Component */}
                     <div className="mr-4">
-                      <TeethChart history={data.tooth_history} id={params.id} />
+                      <TeethChart
+                        history={data?.tooth_history}
+                        id={params.id}
+                      />
                     </div>
                     {/* Scrollable ToothHistory Component */}
-                    <ToothHistoryCard treatments={data.tooth_history} />
+                    <ToothHistoryCard treatments={data?.tooth_history} />
                   </div>
                 </CardContent>
               </Card>

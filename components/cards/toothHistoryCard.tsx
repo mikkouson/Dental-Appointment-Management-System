@@ -19,6 +19,7 @@ import {
 } from "../ui/dropdown-menu";
 import { ScrollArea } from "../ui/scroll-area";
 import { getToothDescription } from "../ui/tooth-description";
+import { Separator } from "../ui/separator";
 
 interface Treatment {
   id?: any;
@@ -27,18 +28,25 @@ interface Treatment {
   tooth_condition: string;
   tooth_history: string;
   patient_id?: number;
+  appointments?: {
+    services?: {
+      name: string;
+    };
+  };
 }
 
 interface ToothHistoryProps {
   treatments: Treatment[];
   edit?: boolean;
+  newPatient?: boolean;
 }
 
 type SortOrder = "asc" | "desc";
 
 export default function ToothHistoryCard({
   treatments,
-  edit,
+  edit = false,
+  newPatient = false,
 }: ToothHistoryProps) {
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const form = useForm<z.infer<typeof ToothHistory>>({
@@ -141,6 +149,7 @@ export default function ToothHistoryCard({
                             {date.year}
                           </div>
                         </div>
+
                         <div className="space-y-1">
                           <h3 className="font-medium text-sm">
                             <span>
@@ -163,32 +172,51 @@ export default function ToothHistoryCard({
                           >
                             {treatment.tooth_condition}
                           </Badge>
-                          <p className="text-sm text-muted-foreground">
-                            {treatment.tooth_history}
-                          </p>
+
+                          {treatment?.appointments?.services && (
+                            <div className="flex gap-2">
+                              <h3 className="font-medium text-sm">Service:</h3>
+                              <p className="text-sm text-muted-foreground">
+                                {treatment?.appointments?.services?.name}
+                              </p>
+                            </div>
+                          )}
+                          <div className="flex gap-2">
+                            <h3 className="font-medium text-sm">
+                              Description:
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              {treatment.tooth_history}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-6 w-6 p-0"
-                        >
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <EditToothCondition treatment={treatment} form={form} />
-                        {/* <DropdownMenuItem>View Details</DropdownMenuItem> */}
-                        <DropdownMenuSeparator />
-                        {/* <DropdownMenuItem className="text-destructive">
-                          Delete
-                        </DropdownMenuItem> */}
-                        <DeleteToothHistory id={treatment?.id} form={form} />
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    {!newPatient && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-6 w-6 p-0"
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <EditToothCondition
+                            treatment={treatment}
+                            form={form}
+                          />
+                          {/* <DropdownMenuItem>View Details</DropdownMenuItem> */}
+                          <DropdownMenuSeparator />
+                          {/* <DropdownMenuItem className="text-destructive">
+                         Delete
+                       </DropdownMenuItem> */}
+                          <DeleteToothHistory id={treatment?.id} form={form} />
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
                   </CardContent>
                 </Card>
               </div>

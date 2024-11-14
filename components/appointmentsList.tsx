@@ -150,6 +150,7 @@ export default function AppointmentsMap({
                               appointmentId={apt.id}
                               text={false}
                               disabled={loading === apt.id}
+                              patientId={apt.patients?.id}
                             />
                             <Button
                               variant="destructive"

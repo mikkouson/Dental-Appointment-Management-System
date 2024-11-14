@@ -25,32 +25,43 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
   const form = useForm<z.infer<typeof ToothHistory>>({
     resolver: zodResolver(ToothHistory),
   });
+  const { teethLocations } = useTeethArray();
+
   const handleToothClick = (toothNumber: number) => {
     form.reset();
 
-    // const toothHistory = history.find(
-    //   (record: { tooth_location: number }) =>
-    //     record.tooth_location === toothNumber
-    // );
+    if (newPatient) {
+      // For new patients, check the teethLocations array
+      const toothData = teethLocations.find(
+        (record: any) => record.tooth_location === toothNumber
+      );
 
-    // if (toothHistory?.history_date) {
-    //   form.setValue(
-    //     "history_date",
-    //     new Date(toothHistory.history_date) || new Date()
-    //   );
-    // }
+      if (toothData) {
+        // If tooth data exists, set the values from teethLocations
+        form.setValue("tooth_location", Number(toothNumber));
+        form.setValue("tooth_condition", toothData.tooth_condition || "");
+        form.setValue(
+          "history_date",
+          new Date(toothData.history_date) || new Date()
+        );
 
-    // form.setValue("id", toothHistory?.id || undefined);
-    form.setValue("tooth_location", Number(toothNumber));
-    // form.setValue("tooth_condition", toothHistory?.tooth_condition || "");
-    // form.setValue("tooth_history", toothHistory?.tooth_history || "");
-    form.setValue("patient_id", Number(id) || 0);
+        form.setValue("tooth_history", toothData.tooth_history || "");
+        form.setValue("patient_id", Number(id) || 0);
+      } else {
+        // If no tooth data exists, set only location and patient_id
+        form.setValue("tooth_location", Number(toothNumber));
+        form.setValue("patient_id", Number(id) || 0);
+      }
+    } else {
+      // For existing patients, set only location and patient_id
+      form.setValue("tooth_location", Number(toothNumber));
+      form.setValue("patient_id", Number(id) || 0);
+    }
   };
   const number = form.watch("tooth_location");
   // Mapping tooth conditions to colors
 
   // Determine the fill color based on the tooth condition
-  const { teethLocations } = useTeethArray();
 
   const getFillColor = (toothNumber: any) => {
     if (newPatient) {
