@@ -9,11 +9,11 @@ export default function DoctorExport() {
   const query = searchParams.get("query") || "";
   const { doctors: data } = useDoctor(null, query, null);
 
-  const mappedData = (data?.data || []).map((doctor: DoctorCol) => ({
+  const mappedData = (data?.data || []).map((doctor: any) => ({
     name: doctor.name || "null",
     phone_number: doctor.contact_info || "null",
     email: doctor.email || "null",
-  })); 
+  }));
 
   return <CSVExportButton data={mappedData} filename={"Doctors.csv"} />;
 }

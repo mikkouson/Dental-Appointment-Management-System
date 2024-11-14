@@ -1,10 +1,10 @@
-import type { Doctor } from "@/app/schema";
+import type { DoctorCol } from "@/app/schema";
 import { ColumnDef } from "@tanstack/react-table";
 import { SquarePen } from "lucide-react";
 import { DeleteModal } from "@/components/modal/deleteModal";
 import { EditPatient } from "@/components/modal/patients/editPatient";
 
-type Column = ColumnDef<Doctor>;
+type Column = ColumnDef<DoctorCol>;
 
 export const columns: Column[] = [
   {

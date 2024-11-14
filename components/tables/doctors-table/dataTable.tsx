@@ -4,7 +4,7 @@ import type { DoctorCol } from "@/app/schema"; // Import the correct schema for 
 import { useSetActiveAppointments } from "@/app/store"; // You may not need this hook if it's specific to appointments
 import { toast } from "@/components/hooks/use-toast";
 import { DeleteModal } from "@/components/modal/deleteModal";
-import { EditDoctor} from "@/components/modal/doctors/editDoctor";
+import { EditDoctor } from "@/components/modal/doctors/editDoctor";
 import {
   Table,
   TableBody,
@@ -33,25 +33,24 @@ import { ScrollArea, ScrollBar } from "../../ui/scroll-area";
 type Column = ColumnDef<DoctorCol>;
 
 type DataTableProps = {
-  data: DoctorCol[] | [];
+  data: any;
   columns: Column[];
-  activeDoctor?: number;
   mutate: any;
 };
 
 // In your DataTableDemo component for doctors
-export function DataTableDemo({
-  columns,
-  data,
-  activeDoctor,
-  mutate,
-}: DataTableProps) {
+export function DataTableDemo({ columns, data, mutate }: DataTableProps) {
   const setActive = useSetActiveAppointments((state) => state.setActiveState);
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState<Record<string, boolean>>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState<
+    Record<string, boolean>
+  >({});
 
   const table = useReactTable({
     data,
@@ -81,7 +80,7 @@ export function DataTableDemo({
       if (!id) return;
 
       // Optimistically update the UI
-      const filteredDoctors = data.filter((doctor) => doctor.id !== id);
+      const filteredDoctors = data.filter((doctor: any) => doctor.id !== id);
       mutate({ data: filteredDoctors }, false);
       deleteDoctor(id); // Update delete function for doctors
       toast({
@@ -129,8 +128,8 @@ export function DataTableDemo({
               <TableRow
                 key={row.id}
                 className={cn(
-                  "cursor-pointer",
-                  activeDoctor === row.original.id && "bg-muted"
+                  "cursor-pointer"
+                  // activeDoctor === row.original.id && "bg-muted"
                 )}
                 onClick={() => handleClick(row)}
               >

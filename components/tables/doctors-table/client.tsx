@@ -71,9 +71,7 @@ export default function UserClient() {
               Total Appointments ({doctors ? doctors.count : "Loading"})
             </h4>
             <Heading
-              title={`Total Services (${
-                doctors ? doctors.count : "loading"
-              })`}
+              title={`Total Services (${doctors ? doctors.count : "loading"})`}
               description="Manage Services (Server side table functionalities.)"
             />
           </div>
@@ -116,7 +114,6 @@ export default function UserClient() {
                   columns={columns}
                   data={doctors.data}
                   mutate={mutate}
-                  activePatient={undefined}
                 />
 
                 <PaginationDemo totalPages={totalPages} />

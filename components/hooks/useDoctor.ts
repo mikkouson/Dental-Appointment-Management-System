@@ -57,7 +57,7 @@ export function useDoctor(
       console.log("Removing channel");
       supabase.removeChannel(channel);
     };
-  }, [supabase, mutate]);
+  }, [supabase, mutate, page]);
 
   return { doctors, doctorError, doctorLoading, mutate };
 }
