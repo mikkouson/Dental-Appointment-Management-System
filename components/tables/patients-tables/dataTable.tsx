@@ -149,6 +149,7 @@ export function DataTableDemo({
                 <TableCell>
                   <div className="flex px-2">
                     <DeleteModal
+                      label="patient"
                       formAction={() => handleDelete(row.original.id)}
                     />
                     <EditPatient patient={row.original} mutate={mutate} />

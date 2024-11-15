@@ -15,8 +15,9 @@ import { Trash2 } from "lucide-react";
 import SubmitButton from "../buttons/submitBtn";
 type DeleteModalProps = {
   formAction: () => void;
+  label: string;
 };
-export function DeleteModal({ formAction }: DeleteModalProps) {
+export function DeleteModal({ formAction, label }: DeleteModalProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleDelete = () => {
@@ -31,7 +32,7 @@ export function DeleteModal({ formAction }: DeleteModalProps) {
           <Button
             onClick={() => setIsOpen(true)}
             variant="ghost"
-            className="w-full text-left justify-start"
+            className="w-full text-left justify-start text-destructive"
           >
             Delete
           </Button>
@@ -40,7 +41,7 @@ export function DeleteModal({ formAction }: DeleteModalProps) {
           <DialogHeader>
             <DialogTitle>Confirm Deletion</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this patient?
+              Are you sure you want to delete this {label}?
             </DialogDescription>
           </DialogHeader>
 
@@ -51,7 +52,10 @@ export function DeleteModal({ formAction }: DeleteModalProps) {
                 handleDelete(); // Call deletion handler
               }}
             >
-              <Button type="submit"> Delete</Button>
+              <Button type="submit" variant="destructive">
+                {" "}
+                Delete
+              </Button>
             </form>
             <DialogClose asChild>
               <Button type="button" variant="secondary">

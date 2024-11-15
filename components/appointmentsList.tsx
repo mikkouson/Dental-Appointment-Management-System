@@ -130,6 +130,7 @@ export default function AppointmentsMap({
                             />
                             <DropdownMenuSeparator />
                             <DeleteModal
+                              label="appointment"
                               formAction={async () => {
                                 await deleteAppointment(apt.id);
                                 mutate();

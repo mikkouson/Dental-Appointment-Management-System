@@ -146,6 +146,7 @@ export function DataTableDemo({ columns, data, mutate }: DataTableProps) {
                 <TableCell>
                   <div className="flex px-2">
                     <DeleteModal
+                      label="staff"
                       formAction={() => handleDelete(row.original.id)}
                     />
                     <EditDoctor data={row.original} mutate={mutate} />

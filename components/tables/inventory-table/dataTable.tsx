@@ -153,6 +153,7 @@ export function DataTableDemo({
                 <TableCell>
                   <div className="flex px-2">
                     <DeleteModal
+                      label="item"
                       formAction={() => handleDelete(row.original.id)}
                     />
                     <EditInventory data={row.original} mutate={mutate} />
