@@ -191,7 +191,8 @@ export default function AppointmentsMap({
                           {apt.patients?.phone_number || "No phone number"}
                         </span>
                       </div>
-                      <div className="flex flex-wrap items-center gap-2 mt-4">
+
+                      <div className="flex flex-wrap items-center justify-end gap-2 mt-4">
                         {apt.status?.id === 1 && (
                           <>
                             <CompleteAppointment

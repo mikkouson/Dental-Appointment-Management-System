@@ -23,6 +23,10 @@ export default function ThemeToggle() {
         className={`ml-2 ${theme === "dark" ? "opacity-100" : "opacity-50"}`}
         size={15}
       />
+      <Monitor
+        className={`ml-2 ${theme === "system" ? "opacity-100" : "opacity-50"}`}
+        size={15}
+      />
     </div>
   );
 }
