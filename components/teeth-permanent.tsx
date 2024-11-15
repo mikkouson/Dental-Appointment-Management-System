@@ -1,19 +1,19 @@
-import { useTheme } from "next-themes";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { NewToothCondition } from "./modal/patients/create-tooth-condition";
 
+import { useTeethArray } from "@/app/store";
 import { ToothHistory } from "@/app/types";
+import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { conditionColors } from "./tooth-colors";
-import { useTeethArray } from "@/app/store";
+import { useConditionColors } from "./tooth-colors";
 
 const TeethChart = ({ history, id, newPatient = false }: any) => {
   const [highlightedTooth, setHighlightedTooth] = useState(null);
 
-  const { theme } = useTheme(); // Get the current theme
-  const isDark = theme === "dark";
+  const conditionColors = useConditionColors();
+
   const handleMouseEnter = (toothId: any) => {
     setHighlightedTooth(toothId);
   };
@@ -125,18 +125,11 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
       >
         <g
           id="tooth-11"
-          style={{
-            cursor: "pointer",
-
-            fill: getFillColor(11),
-            stroke: isDark ? "#ffffff" : "#000000",
-            strokeWidth: "1",
-            strokeLinecap: "round",
-            strokeLinejoin: "miter",
-            strokeMiterlimit: "4",
-            strokeOpacity: "1",
-            strokeDasharray: "none",
-          }}
+          className={cn(
+            "cursor-pointer stroke-1 stroke-current rounded-none",
+            "stroke-black dark:stroke-white"
+          )}
+          style={{ fill: getFillColor(11) }} // Keep fill in style
           onMouseEnter={() => handleMouseEnter("tooth-11")}
           onMouseLeave={handleMouseLeave}
           onClick={() => handleToothClick(11)}
@@ -158,17 +151,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         <g
           id="tooth-12"
           style={{
-            cursor: "pointer",
-
             fill: getFillColor(12),
-            stroke: isDark ? "#ffffff" : "#000000",
-            strokeWidth: "1",
-            strokeLinecap: "round",
-            strokeLinejoin: "miter",
-            strokeMiterlimit: "4",
-            strokeOpacity: "1",
-            strokeDasharray: "none",
           }}
+          className={cn(
+            "cursor-pointer stroke-1 stroke-current rounded-none",
+            "stroke-black dark:stroke-white"
+          )}
           onMouseEnter={() => handleMouseEnter("tooth-12")}
           onMouseLeave={handleMouseLeave}
           onClick={() => handleToothClick(12)}
@@ -193,17 +181,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         <g
           id="tooth-13"
           style={{
-            cursor: "pointer",
-
             fill: getFillColor(13),
-            stroke: isDark ? "#ffffff" : "#000000",
-            strokeWidth: "1",
-            strokeLinecap: "round",
-            strokeLinejoin: "miter",
-            strokeMiterlimit: "4",
-            strokeOpacity: "1",
-            strokeDasharray: "none",
           }}
+          className={cn(
+            "cursor-pointer stroke-1 stroke-current rounded-none",
+            "stroke-black dark:stroke-white"
+          )}
           onMouseEnter={() => handleMouseEnter("tooth-13")}
           onMouseLeave={handleMouseLeave}
           onClick={() => handleToothClick(13)}
@@ -227,17 +210,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         <g
           id="tooth-14"
           style={{
-            cursor: "pointer",
-
             fill: getFillColor(14),
-            stroke: isDark ? "#ffffff" : "#000000",
-            strokeWidth: "1",
-            strokeLinecap: "round",
-            strokeLinejoin: "miter",
-            strokeMiterlimit: "4",
-            strokeOpacity: "1",
-            strokeDasharray: "none",
           }}
+          className={cn(
+            "cursor-pointer stroke-1 stroke-current rounded-none",
+            "stroke-black dark:stroke-white"
+          )}
           onMouseEnter={() => handleMouseEnter("tooth-14")}
           onMouseLeave={handleMouseLeave}
           onClick={() => handleToothClick(14)}
@@ -265,17 +243,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-15"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(15),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-15")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(15)}
@@ -291,17 +264,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-15"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(15),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-15")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(15)}
@@ -315,17 +283,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-15"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(15),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-15")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(15)}
@@ -339,17 +302,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-15"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(15),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-15")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(15)}
@@ -363,17 +321,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-15"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(15),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-15")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(15)}
@@ -387,17 +340,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-15"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(15),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-15")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(15)}
@@ -420,17 +368,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-16"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(16),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-16")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(16)}
@@ -446,17 +389,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-16"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(16),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-16")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(16)}
@@ -470,17 +408,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-16"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(16),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-16")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(16)}
@@ -494,17 +427,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-16"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(16),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-16")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(16)}
@@ -518,17 +446,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-16"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(16),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-16")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(16)}
@@ -542,17 +465,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-16"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(16),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-16")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(16)}
@@ -574,17 +492,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         <g
           id="tooth-17"
           style={{
-            cursor: "pointer",
-
             fill: getFillColor(17),
-            stroke: isDark ? "#ffffff" : "#000000",
-            strokeWidth: "1",
-            strokeLinecap: "round",
-            strokeLinejoin: "miter",
-            strokeMiterlimit: "4",
-            strokeOpacity: "1",
-            strokeDasharray: "none",
           }}
+          className={cn(
+            "cursor-pointer stroke-1 stroke-current rounded-none",
+            "stroke-black dark:stroke-white"
+          )}
           onMouseEnter={() => handleMouseEnter("tooth-17")}
           onMouseLeave={handleMouseLeave}
           onClick={() => handleToothClick(17)}
@@ -610,17 +523,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         <g
           id="tooth-18"
           style={{
-            cursor: "pointer",
-
             fill: getFillColor(18),
-            stroke: isDark ? "#ffffff" : "#000000",
-            strokeWidth: "1",
-            strokeLinecap: "round",
-            strokeLinejoin: "miter",
-            strokeMiterlimit: "4",
-            strokeOpacity: "1",
-            strokeDasharray: "none",
           }}
+          className={cn(
+            "cursor-pointer stroke-1 stroke-current rounded-none",
+            "stroke-black dark:stroke-white"
+          )}
           onMouseEnter={() => handleMouseEnter("tooth-18")}
           onMouseLeave={handleMouseLeave}
           onClick={() => handleToothClick(18)}
@@ -647,17 +555,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         <g
           id="tooth-21"
           style={{
-            cursor: "pointer",
-
             fill: getFillColor(21),
-            stroke: isDark ? "#ffffff" : "#000000",
-            strokeWidth: "1",
-            strokeLinecap: "round",
-            strokeLinejoin: "miter",
-            strokeMiterlimit: "4",
-            strokeOpacity: "1",
-            strokeDasharray: "none",
           }}
+          className={cn(
+            "cursor-pointer stroke-1 stroke-current rounded-none",
+            "stroke-black dark:stroke-white"
+          )}
           onMouseEnter={() => handleMouseEnter("tooth-21")}
           onMouseLeave={handleMouseLeave}
           onClick={() => handleToothClick(21)}
@@ -678,17 +581,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         <g
           id="tooth-22"
           style={{
-            cursor: "pointer",
-
             fill: getFillColor(22),
-            stroke: isDark ? "#ffffff" : "#000000",
-            strokeWidth: "1",
-            strokeLinecap: "round",
-            strokeLinejoin: "miter",
-            strokeMiterlimit: "4",
-            strokeOpacity: "1",
-            strokeDasharray: "none",
           }}
+          className={cn(
+            "cursor-pointer stroke-1 stroke-current rounded-none",
+            "stroke-black dark:stroke-white"
+          )}
           onMouseEnter={() => handleMouseEnter("tooth-22")}
           onMouseLeave={handleMouseLeave}
           onClick={() => handleToothClick(22)}
@@ -711,17 +609,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         <g
           id="tooth-23"
           style={{
-            cursor: "pointer",
-
             fill: getFillColor(23),
-            stroke: isDark ? "#ffffff" : "#000000",
-            strokeWidth: "1",
-            strokeLinecap: "round",
-            strokeLinejoin: "miter",
-            strokeMiterlimit: "4",
-            strokeOpacity: "1",
-            strokeDasharray: "none",
           }}
+          className={cn(
+            "cursor-pointer stroke-1 stroke-current rounded-none",
+            "stroke-black dark:stroke-white"
+          )}
           onMouseEnter={() => handleMouseEnter("tooth-23")}
           onMouseLeave={handleMouseLeave}
           onClick={() => handleToothClick(23)}
@@ -744,17 +637,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         <g
           id="tooth-24"
           style={{
-            cursor: "pointer",
-
             fill: getFillColor(24),
-            stroke: isDark ? "#ffffff" : "#000000",
-            strokeWidth: "1",
-            strokeLinecap: "round",
-            strokeLinejoin: "miter",
-            strokeMiterlimit: "4",
-            strokeOpacity: "1",
-            strokeDasharray: "none",
           }}
+          className={cn(
+            "cursor-pointer stroke-1 stroke-current rounded-none",
+            "stroke-black dark:stroke-white"
+          )}
           onMouseEnter={() => handleMouseEnter("tooth-24")}
           onMouseLeave={handleMouseLeave}
           onClick={() => handleToothClick(24)}
@@ -781,17 +669,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         <g
           id="tooth-25"
           style={{
-            cursor: "pointer",
-
             fill: getFillColor(25),
-            stroke: isDark ? "#ffffff" : "#000000",
-            strokeWidth: "1",
-            strokeLinecap: "round",
-            strokeLinejoin: "miter",
-            strokeMiterlimit: "4",
-            strokeOpacity: "1",
-            strokeDasharray: "none",
           }}
+          className={cn(
+            "cursor-pointer stroke-1 stroke-current rounded-none",
+            "stroke-black dark:stroke-white"
+          )}
           onMouseEnter={() => handleMouseEnter("tooth-25")}
           onMouseLeave={handleMouseLeave}
           onClick={() => handleToothClick(25)}
@@ -816,17 +699,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         <g
           id="tooth-26"
           style={{
-            cursor: "pointer",
-
             fill: getFillColor(26),
-            stroke: isDark ? "#ffffff" : "#000000",
-            strokeWidth: "1",
-            strokeLinecap: "round",
-            strokeLinejoin: "miter",
-            strokeMiterlimit: "4",
-            strokeOpacity: "1",
-            strokeDasharray: "none",
           }}
+          className={cn(
+            "cursor-pointer stroke-1 stroke-current rounded-none",
+            "stroke-black dark:stroke-white"
+          )}
           onMouseEnter={() => handleMouseEnter("tooth-26")}
           onMouseLeave={handleMouseLeave}
           onClick={() => handleToothClick(26)}
@@ -853,17 +731,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-27"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(27),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-27")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(27)}
@@ -879,17 +752,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-27"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(27),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-27")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(27)}
@@ -903,17 +771,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-27"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(27),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-27")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(27)}
@@ -927,17 +790,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-27"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(27),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-27")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(27)}
@@ -951,17 +809,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-27"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(27),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-27")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(27)}
@@ -975,17 +828,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-27"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(27),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-27")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(27)}
@@ -999,17 +847,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-27"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(27),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-27")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(27)}
@@ -1032,17 +875,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-28"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(28),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-28")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(28)}
@@ -1058,17 +896,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-28"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(28),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-28")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(28)}
@@ -1082,17 +915,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-28"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(28),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-28")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(28)}
@@ -1106,17 +934,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-28"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(28),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-28")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(28)}
@@ -1130,17 +953,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-28"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(28),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-28")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(28)}
@@ -1154,17 +972,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-28"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(28),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-28")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(28)}
@@ -1186,17 +999,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         <g
           id="tooth-31"
           style={{
-            cursor: "pointer",
-
             fill: getFillColor(31),
-            stroke: isDark ? "#ffffff" : "#000000",
-            strokeWidth: "1",
-            strokeLinecap: "round",
-            strokeLinejoin: "miter",
-            strokeMiterlimit: "4",
-            strokeOpacity: "1",
-            strokeDasharray: "none",
           }}
+          className={cn(
+            "cursor-pointer stroke-1 stroke-current rounded-none",
+            "stroke-black dark:stroke-white"
+          )}
           onMouseEnter={() => handleMouseEnter("tooth-31")}
           onMouseLeave={handleMouseLeave}
           onClick={() => handleToothClick(31)}
@@ -1219,17 +1027,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         <g
           id="tooth-32"
           style={{
-            cursor: "pointer",
-
             fill: getFillColor(32),
-            stroke: isDark ? "#ffffff" : "#000000",
-            strokeWidth: "1",
-            strokeLinecap: "round",
-            strokeLinejoin: "miter",
-            strokeMiterlimit: "4",
-            strokeOpacity: "1",
-            strokeDasharray: "none",
           }}
+          className={cn(
+            "cursor-pointer stroke-1 stroke-current rounded-none",
+            "stroke-black dark:stroke-white"
+          )}
           onMouseEnter={() => handleMouseEnter("tooth-32")}
           onMouseLeave={handleMouseLeave}
           onClick={() => handleToothClick(32)}
@@ -1253,17 +1056,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         <g
           id="tooth-33"
           style={{
-            cursor: "pointer",
-
             fill: getFillColor(33),
-            stroke: isDark ? "#ffffff" : "#000000",
-            strokeWidth: "1",
-            strokeLinecap: "round",
-            strokeLinejoin: "miter",
-            strokeMiterlimit: "4",
-            strokeOpacity: "1",
-            strokeDasharray: "none",
           }}
+          className={cn(
+            "cursor-pointer stroke-1 stroke-current rounded-none",
+            "stroke-black dark:stroke-white"
+          )}
           onMouseEnter={() => handleMouseEnter("tooth-33")}
           onMouseLeave={handleMouseLeave}
           onClick={() => handleToothClick(33)}
@@ -1288,17 +1086,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         <g
           id="tooth-34"
           style={{
-            cursor: "pointer",
-
             fill: getFillColor(34),
-            stroke: isDark ? "#ffffff" : "#000000",
-            strokeWidth: "1",
-            strokeLinecap: "round",
-            strokeLinejoin: "miter",
-            strokeMiterlimit: "4",
-            strokeOpacity: "1",
-            strokeDasharray: "none",
           }}
+          className={cn(
+            "cursor-pointer stroke-1 stroke-current rounded-none",
+            "stroke-black dark:stroke-white"
+          )}
           onMouseEnter={() => handleMouseEnter("tooth-34")}
           onMouseLeave={handleMouseLeave}
           onClick={() => handleToothClick(34)}
@@ -1323,17 +1116,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         <g
           id="tooth-35"
           style={{
-            cursor: "pointer",
-
             fill: getFillColor(35),
-            stroke: isDark ? "#ffffff" : "#000000",
-            strokeWidth: "1",
-            strokeLinecap: "round",
-            strokeLinejoin: "miter",
-            strokeMiterlimit: "4",
-            strokeOpacity: "1",
-            strokeDasharray: "none",
           }}
+          className={cn(
+            "cursor-pointer stroke-1 stroke-current rounded-none",
+            "stroke-black dark:stroke-white"
+          )}
           onMouseEnter={() => handleMouseEnter("tooth-35")}
           onMouseLeave={handleMouseLeave}
           onClick={() => handleToothClick(35)}
@@ -1358,17 +1146,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         <g
           id="tooth-36"
           style={{
-            cursor: "pointer",
-
             fill: getFillColor(36),
-            stroke: isDark ? "#ffffff" : "#000000",
-            strokeWidth: "1",
-            strokeLinecap: "round",
-            strokeLinejoin: "miter",
-            strokeMiterlimit: "4",
-            strokeOpacity: "1",
-            strokeDasharray: "none",
           }}
+          className={cn(
+            "cursor-pointer stroke-1 stroke-current rounded-none",
+            "stroke-black dark:stroke-white"
+          )}
           onMouseEnter={() => handleMouseEnter("tooth-36")}
           onMouseLeave={handleMouseLeave}
           onClick={() => handleToothClick(36)}
@@ -1397,17 +1180,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-37"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(37),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-37")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(37)}
@@ -1423,17 +1201,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-37"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(37),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-37")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(37)}
@@ -1447,17 +1220,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-37"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(37),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-37")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(37)}
@@ -1471,17 +1239,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-37"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(37),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-37")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(37)}
@@ -1495,17 +1258,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-37"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(37),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-37")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(37)}
@@ -1519,17 +1277,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-37"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(37),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-37")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(37)}
@@ -1543,17 +1296,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-37"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(37),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-37")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(37)}
@@ -1567,17 +1315,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-37"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(37),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-37")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(37)}
@@ -1599,17 +1342,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         <g
           id="tooth-38"
           style={{
-            cursor: "pointer",
-
             fill: getFillColor(38),
-            stroke: isDark ? "#ffffff" : "#000000",
-            strokeWidth: "1",
-            strokeLinecap: "round",
-            strokeLinejoin: "miter",
-            strokeMiterlimit: "4",
-            strokeOpacity: "1",
-            strokeDasharray: "none",
           }}
+          className={cn(
+            "cursor-pointer stroke-1 stroke-current rounded-none",
+            "stroke-black dark:stroke-white"
+          )}
           onMouseEnter={() => handleMouseEnter("tooth-38")}
           onMouseLeave={handleMouseLeave}
           onClick={() => handleToothClick(38)}
@@ -1636,17 +1374,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         <g
           id="tooth-41"
           style={{
-            cursor: "pointer",
-
             fill: getFillColor(41),
-            stroke: isDark ? "#ffffff" : "#000000",
-            strokeWidth: "1",
-            strokeLinecap: "round",
-            strokeLinejoin: "miter",
-            strokeMiterlimit: "4",
-            strokeOpacity: "1",
-            strokeDasharray: "none",
           }}
+          className={cn(
+            "cursor-pointer stroke-1 stroke-current rounded-none",
+            "stroke-black dark:stroke-white"
+          )}
           onMouseEnter={() => handleMouseEnter("tooth-41")}
           onMouseLeave={handleMouseLeave}
           onClick={() => handleToothClick(41)}
@@ -1669,17 +1402,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         <g
           id="tooth-42"
           style={{
-            cursor: "pointer",
-
             fill: getFillColor(42),
-            stroke: isDark ? "#ffffff" : "#000000",
-            strokeWidth: "1",
-            strokeLinecap: "round",
-            strokeLinejoin: "miter",
-            strokeMiterlimit: "4",
-            strokeOpacity: "1",
-            strokeDasharray: "none",
           }}
+          className={cn(
+            "cursor-pointer stroke-1 stroke-current rounded-none",
+            "stroke-black dark:stroke-white"
+          )}
           onMouseEnter={() => handleMouseEnter("tooth-42")}
           onMouseLeave={handleMouseLeave}
           onClick={() => handleToothClick(42)}
@@ -1705,17 +1433,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-43"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(43),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-43")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(43)}
@@ -1731,17 +1454,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-43"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(43),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-43")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(43)}
@@ -1755,17 +1473,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-43"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(43),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-43")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(43)}
@@ -1779,17 +1492,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-43"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(43),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-43")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(43)}
@@ -1812,17 +1520,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-44"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(44),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-44")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(44)}
@@ -1835,17 +1538,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-44"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(44),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-44")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(44)}
@@ -1859,17 +1557,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-44"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(44),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-44")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(44)}
@@ -1883,17 +1576,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
           <g
             id="tooth-44"
             style={{
-              cursor: "pointer",
-
               fill: getFillColor(44),
-              stroke: isDark ? "#ffffff" : "#000000",
-              strokeWidth: "1",
-              strokeLinecap: "round",
-              strokeLinejoin: "miter",
-              strokeMiterlimit: "4",
-              strokeOpacity: "1",
-              strokeDasharray: "none",
             }}
+            className={cn(
+              "cursor-pointer stroke-1 stroke-current rounded-none",
+              "stroke-black dark:stroke-white"
+            )}
             onMouseEnter={() => handleMouseEnter("tooth-44")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleToothClick(44)}
@@ -1915,17 +1603,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         <g
           id="tooth-45"
           style={{
-            cursor: "pointer",
-
             fill: getFillColor(45),
-            stroke: isDark ? "#ffffff" : "#000000",
-            strokeWidth: "1",
-            strokeLinecap: "round",
-            strokeLinejoin: "miter",
-            strokeMiterlimit: "4",
-            strokeOpacity: "1",
-            strokeDasharray: "none",
           }}
+          className={cn(
+            "cursor-pointer stroke-1 stroke-current rounded-none",
+            "stroke-black dark:stroke-white"
+          )}
           onMouseEnter={() => handleMouseEnter("tooth-45")}
           onMouseLeave={handleMouseLeave}
           onClick={() => handleToothClick(45)}
@@ -1950,17 +1633,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         <g
           id="tooth-46"
           style={{
-            cursor: "pointer",
-
             fill: getFillColor(46),
-            stroke: isDark ? "#ffffff" : "#000000",
-            strokeWidth: "1",
-            strokeLinecap: "round",
-            strokeLinejoin: "miter",
-            strokeMiterlimit: "4",
-            strokeOpacity: "1",
-            strokeDasharray: "none",
           }}
+          className={cn(
+            "cursor-pointer stroke-1 stroke-current rounded-none",
+            "stroke-black dark:stroke-white"
+          )}
           onMouseEnter={() => handleMouseEnter("tooth-46")}
           onMouseLeave={handleMouseLeave}
           onClick={() => handleToothClick(46)}
@@ -1988,17 +1666,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         <g
           id="tooth-47"
           style={{
-            cursor: "pointer",
-
             fill: getFillColor(47),
-            stroke: isDark ? "#ffffff" : "#000000",
-            strokeWidth: "1",
-            strokeLinecap: "round",
-            strokeLinejoin: "miter",
-            strokeMiterlimit: "4",
-            strokeOpacity: "1",
-            strokeDasharray: "none",
           }}
+          className={cn(
+            "cursor-pointer stroke-1 stroke-current rounded-none",
+            "stroke-black dark:stroke-white"
+          )}
           onMouseEnter={() => handleMouseEnter("tooth-47")}
           onMouseLeave={handleMouseLeave}
           onClick={() => handleToothClick(47)}
@@ -2027,17 +1700,12 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         <g
           id="tooth-48"
           style={{
-            cursor: "pointer",
-
             fill: getFillColor(48),
-            stroke: isDark ? "#ffffff" : "#000000",
-            strokeWidth: "1",
-            strokeLinecap: "round",
-            strokeLinejoin: "miter",
-            strokeMiterlimit: "4",
-            strokeOpacity: "1",
-            strokeDasharray: "none",
           }}
+          className={cn(
+            "cursor-pointer stroke-1 stroke-current rounded-none",
+            "stroke-black dark:stroke-white"
+          )}
           onMouseEnter={() => handleMouseEnter("tooth-48")}
           onMouseLeave={handleMouseLeave}
           onClick={() => handleToothClick(48)}

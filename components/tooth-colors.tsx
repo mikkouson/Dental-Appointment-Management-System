@@ -1,19 +1,47 @@
-export const conditionColors = {
+import { useTheme } from "next-themes";
+
+const lightModeColors = {
   sound: "#A8E6A1",
-  caries: "#FFD1DC", // Light rose for cavities (caries)
-  partial_erupted: "#FDF5E6", // Light old lace for partially erupted
-  unerupted: "#FFEBCD", // Light blanched almond for unerupted
-  impacted_visible: "#FFE4B5", // Light moccasin for impacted visible
-  anomaly: "#E0FFFF", // Light cyan for anomaly
-  decayed: "#FFEFD5", // Light papaya whip for decayed
-  missing: "#D3D3D3", // Light gray for missing
-  restored: "#B0E0E6", // Light powder blue for restored
-  root_canal: "#F0E68C", // Light khaki for root canal treated
-  gingival_recession: "#FFC0CB", // Light pink for gingival recession
-  implant: "#D3D3D3", // Light gray for implant (matches missing)
-  fluorosis: "#FFFACD", // Light lemon chiffon for fluorosis
-  crowns: "#87CEEB", // Light blue for crowns (filled)
-  bridges: "#FFDAB9", // Light peach for bridges (periodontally compromised)
-  sealants: "#DAB6FC", // Light purple for sealants (endo)
-  fissures: "#FAE3D9", // Light peach for fissures
+  caries: "#FFD1DC",
+  partial_erupted: "#FDF5E6",
+  unerupted: "#FFEBCD",
+  impacted_visible: "#FFE4B5",
+  anomaly: "#E0FFFF",
+  decayed: "#FFEFD5",
+  missing: "#D3D3D3",
+  restored: "#B0E0E6",
+  root_canal: "#F0E68C",
+  gingival_recession: "#FFC0CB",
+  implant: "#D3D3D3",
+  fluorosis: "#FFFACD",
+  crowns: "#87CEEB",
+  bridges: "#FFDAB9",
+  sealants: "#DAB6FC",
+  fissures: "#FAE3D9",
 };
+
+const darkModeColors = {
+  sound: "#6B8E23",
+  caries: "#8B5A65",
+  partial_erupted: "#8B8378",
+  unerupted: "#8B795E",
+  impacted_visible: "#CD853F",
+  anomaly: "#4682B4",
+  decayed: "#8B4513",
+  missing: "#A9A9A9",
+  restored: "#5F9EA0",
+  root_canal: "#BDB76B",
+  gingival_recession: "#FF69B4",
+  implant: "#A9A9A9",
+  fluorosis: "#FFD700",
+  crowns: "#4682B4",
+  bridges: "#CD853F",
+  sealants: "#9370DB",
+  fissures: "#D2691E",
+};
+
+export function useConditionColors() {
+  const { theme } = useTheme();
+  const isDarkMode = theme === "dark";
+  return isDarkMode ? darkModeColors : lightModeColors;
+}

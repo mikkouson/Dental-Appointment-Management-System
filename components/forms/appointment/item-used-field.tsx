@@ -22,6 +22,7 @@ import Field from "../formField";
 import { UpdateInventoryFormValues } from "@/app/types";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import FormSkeleton from "./loading";
 
 // Add styles to remove input spinners
 const inputStyles = `
@@ -64,7 +65,7 @@ export function ItemUsedField({
 }: ItemUsedFieldsProps) {
   const { inventory, inventoryError, inventoryLoading } = useInventory();
 
-  if (inventoryLoading) return <>Loading</>;
+  if (inventoryLoading) return <FormSkeleton />;
 
   const { isSubmitting } = form.formState;
 

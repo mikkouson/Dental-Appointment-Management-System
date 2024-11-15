@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { DeleteToothHistory } from "../modal/patients/deleteToothHistory";
 import { EditToothCondition } from "../modal/patients/edit-tooth-condition";
-import { conditionColors } from "../tooth-colors";
+import { useConditionColors } from "../tooth-colors";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,7 +19,6 @@ import {
 } from "../ui/dropdown-menu";
 import { ScrollArea } from "../ui/scroll-area";
 import { getToothDescription } from "../ui/tooth-description";
-import { Separator } from "../ui/separator";
 
 interface Treatment {
   id?: any;
@@ -48,6 +47,8 @@ export default function ToothHistoryCard({
   edit = false,
   newPatient = false,
 }: ToothHistoryProps) {
+  const conditionColors = useConditionColors();
+
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const form = useForm<z.infer<typeof ToothHistory>>({
     resolver: zodResolver(ToothHistory),
