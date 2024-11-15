@@ -1,4 +1,5 @@
 import { useTheme } from "next-themes";
+import { useState, useEffect } from "react";
 
 const lightModeColors = {
   sound: "#A8E6A1",
@@ -41,7 +42,28 @@ const darkModeColors = {
 };
 
 export function useConditionColors() {
-  const { theme } = useTheme();
-  const isDarkMode = theme === "dark";
-  return isDarkMode ? darkModeColors : lightModeColors;
+  const { theme, systemTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const [currentColors, setCurrentColors] = useState(lightModeColors);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
+    // Handle system theme preference
+    const effectiveTheme = theme === "system" ? systemTheme : theme;
+    setCurrentColors(
+      effectiveTheme === "dark" ? darkModeColors : lightModeColors
+    );
+  }, [theme, systemTheme, mounted]);
+
+  // Return light mode colors during SSR to avoid hydration mismatch
+  if (!mounted) {
+    return lightModeColors;
+  }
+
+  return currentColors;
 }
