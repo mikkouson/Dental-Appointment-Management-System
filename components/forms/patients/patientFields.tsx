@@ -105,8 +105,8 @@ const PatientFields = ({ form, onSubmit }: PatientFieldsProps) => {
           />
         </div>
         <div className="flex justify-end">
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Submitting..." : "Submit"}
+          <Button type="submit" disabled={isSubmitting} variant="outline">
+            {isSubmitting ? "Submitting..." : "Next"}
           </Button>
         </div>
       </form>

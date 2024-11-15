@@ -29,6 +29,7 @@ interface DrawerDialogDemoProps {
   setOpen: (open: boolean) => void;
   label: string;
   children: React.ReactNode;
+  title?: boolean;
 }
 
 export function DrawerDialogDemo({
@@ -36,6 +37,7 @@ export function DrawerDialogDemo({
   setOpen,
   label,
   children,
+  title = true,
 }: DrawerDialogDemoProps) {
   const { clearTeethLocations } = useTeethArray();
 
@@ -70,10 +72,10 @@ export function DrawerDialogDemo({
           }}
         >
           <DialogHeader>
-            <DialogTitle>{label}</DialogTitle>
-            <DialogDescription>
+            {title && <DialogTitle>{label}</DialogTitle>}
+            {/* <DialogDescription>
               Make changes to your profile here. Click save when youre done.
-            </DialogDescription>
+            </DialogDescription> */}
           </DialogHeader>
           {children}
         </DialogContent>

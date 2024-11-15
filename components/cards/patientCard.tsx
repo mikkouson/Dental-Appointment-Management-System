@@ -62,7 +62,7 @@ const PatientCard = ({ activePatient }: { activePatient: Number }) => {
           </CardDescription>
         </div>
         <div className="ml-auto flex items-center gap-1">
-          <DropdownMenu>
+          {/* <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button size="icon" variant="outline" className="h-8 w-8">
                 <MoreVertical className="h-3.5 w-3.5" />
@@ -75,7 +75,7 @@ const PatientCard = ({ activePatient }: { activePatient: Number }) => {
               <DropdownMenuSeparator />
               <DropdownMenuItem>Trash</DropdownMenuItem>
             </DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu> */}
         </div>
       </CardHeader>
       <ScrollArea className="h-[calc(80vh-160px)]">
@@ -133,7 +133,15 @@ const PatientCard = ({ activePatient }: { activePatient: Number }) => {
               </dl>
             </div>
           ) : (
-            <> No appointments</>
+            <div className="grid gap-3">
+              <div className="font-semibold">Latest Appointment</div>
+              <div className="flex flex-col items-center justify-center p-4 text-muted-foreground border rounded-lg bg-muted/10 gap-2">
+                <p>No appointment history</p>
+                <p className="text-xs mt-1 font-thin">
+                  This patient hasnt scheduled any appointments yet
+                </p>
+              </div>
+            </div>
           )}
           <Link href={`/patients/${data?.id}`}>
             <Button variant="outline" className="h-8 w-full gap-1 mt-2 flex">
@@ -147,7 +155,7 @@ const PatientCard = ({ activePatient }: { activePatient: Number }) => {
       </ScrollArea>
       <CardFooter className="flex flex-row items-center border-t bg-muted/50 px-6 py-3">
         <div className="text-xs text-muted-foreground">
-          Updated <time dateTime="2023-11-23">November 23, 2023</time>
+          Updated {moment(data?.updated_at).format("MMMM DD, YYYY")}
         </div>
       </CardFooter>
     </Card>

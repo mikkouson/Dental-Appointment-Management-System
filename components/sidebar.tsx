@@ -42,6 +42,7 @@ export const links = [
   {
     label: "Patients",
     href: "/patients",
+
     icon: (
       <IconUserBolt className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
     ),
@@ -116,7 +117,9 @@ export function SidebarDemo({ user, children, ...props }: Props) {
                   key={idx}
                   className={cn(
                     "px-2 rounded-lg",
-                    path === link.href
+                    // Check if current path starts with link.href for nested routes
+                    path === link.href ||
+                      (link.href !== "/" && path?.startsWith(link.href))
                       ? "dark:bg-[#1c1c21] border dark:border-neutral-700 bg-white border-input"
                       : "transparent",
                     "opacity-80"

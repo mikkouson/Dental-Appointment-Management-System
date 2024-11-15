@@ -1,5 +1,4 @@
 "use client";
-import { deletePatient } from "@/app/(admin)/action";
 import type { PatientCol } from "@/app/schema";
 import { useSetActive } from "@/app/store";
 import { toast } from "@/components/hooks/use-toast";
@@ -29,6 +28,17 @@ import {
 } from "@tanstack/react-table";
 import * as React from "react";
 import { ScrollArea, ScrollBar } from "../../ui/scroll-area";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { EditAppointment } from "@/components/modal/appointment/editAppointment";
+import { MoreHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { deletePatient } from "@/app/(admin)/patients/action";
 
 type Column = ColumnDef<PatientCol>;
 
@@ -108,7 +118,7 @@ export function DataTableDemo({
   return (
     <ScrollArea className="h-[calc(80vh-20px)]   border">
       <Table className="relative">
-        <TableHeader>
+        <TableHeader className=" bg-muted/50">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
@@ -147,13 +157,37 @@ export function DataTableDemo({
                   </TableCell>
                 ))}
                 <TableCell>
-                  <div className="flex px-2">
-                    <DeleteModal
-                      label="patient"
-                      formAction={() => handleDelete(row.original.id)}
-                    />
-                    <EditPatient patient={row.original} mutate={mutate} />
-                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-16 p-0"
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <EditPatient patient={row.original} mutate={mutate} />
+                      <Button
+                        variant="ghost"
+                        className="w-full text-left justify-start"
+                      >
+                        <Link
+                          href={`/patients/${row.original.id}`}
+                          className="w-full"
+                        >
+                          View
+                        </Link>
+                      </Button>
+                      <DropdownMenuSeparator />
+
+                      <DeleteModal
+                        label="patient"
+                        formAction={() => handleDelete(row.original.id)}
+                      />
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </TableCell>
               </TableRow>
             ))

@@ -26,12 +26,14 @@ interface NewToothConditionProps {
   id: number;
   form: UseFormReturn<ToothHistoryFormValue>;
   newPatient?: boolean;
+  showTitle?: boolean;
 }
 
 export function NewToothCondition({
   children,
   form,
   history,
+  showTitle,
   newPatient = false,
 }: NewToothConditionProps) {
   const [open, setOpen] = useState(false);
@@ -157,15 +159,18 @@ export function NewToothCondition({
               <ToothHistoryCard treatments={historyForTooth} edit={true} />
             </div>
           ))} */}
+        {showTitle && (
+          <>
+            <Separator className="my-2" />
 
-        <Separator className="my-2" />
-
-        <div className="flex items-center  gap-2">
-          <LiaToothSolid size={20} />
-          <p className="font-medium text-sm">Treatment History</p>
-        </div>
-        <Separator className="my-2" />
-        <ToothHistoryCard treatments={historyForTooth} />
+            <div className="flex items-center  gap-2">
+              <LiaToothSolid size={20} />
+              <p className="font-medium text-sm">Treatment History</p>
+            </div>
+            <Separator className="my-2" />
+            <ToothHistoryCard treatments={historyForTooth} />
+          </>
+        )}
 
         {/* {history.length < 0 ? (
           <ToothHistoryCard treatments={historyForTooth} edit={true} />

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { deletePatient, deleteToothHistory } from "@/app/(admin)/action";
+import { deleteToothHistory } from "@/app/(admin)/action";
+import { toast } from "@/components/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,9 +11,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { toast } from "@/components/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { Form } from "@/components/ui/form";
+import { useState } from "react";
 
 interface DeleteToothHistoryProps {
   id: number;

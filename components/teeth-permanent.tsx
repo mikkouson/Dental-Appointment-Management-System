@@ -9,7 +9,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useConditionColors } from "./tooth-colors";
 
-const TeethChart = ({ history, id, newPatient = false }: any) => {
+const TeethChart = ({
+  history,
+  id,
+  newPatient = false,
+  showTitle = true,
+}: any) => {
   const [highlightedTooth, setHighlightedTooth] = useState(null);
 
   const conditionColors = useConditionColors();
@@ -122,6 +127,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g
           id="tooth-11"
@@ -147,6 +153,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g
           id="tooth-12"
@@ -177,6 +184,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g
           id="tooth-13"
@@ -206,6 +214,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g
           id="tooth-14"
@@ -238,6 +247,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g>
           <g
@@ -363,6 +373,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g>
           <g
@@ -488,6 +499,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g
           id="tooth-17"
@@ -519,6 +531,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g
           id="tooth-18"
@@ -551,6 +564,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g
           id="tooth-21"
@@ -577,6 +591,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g
           id="tooth-22"
@@ -605,6 +620,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g
           id="tooth-23"
@@ -633,6 +649,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g
           id="tooth-24"
@@ -665,6 +682,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g
           id="tooth-25"
@@ -695,6 +713,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g
           id="tooth-26"
@@ -726,6 +745,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g>
           <g
@@ -870,6 +890,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g>
           <g
@@ -995,6 +1016,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g
           id="tooth-31"
@@ -1023,6 +1045,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g
           id="tooth-32"
@@ -1052,6 +1075,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g
           id="tooth-33"
@@ -1082,6 +1106,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g
           id="tooth-34"
@@ -1112,6 +1137,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g
           id="tooth-35"
@@ -1142,6 +1168,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g
           id="tooth-36"
@@ -1175,6 +1202,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g>
           <g
@@ -1338,6 +1366,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g
           id="tooth-38"
@@ -1370,6 +1399,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g
           id="tooth-41"
@@ -1398,6 +1428,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g
           id="tooth-42"
@@ -1428,6 +1459,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g>
           <g
@@ -1515,6 +1547,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g>
           <g
@@ -1599,6 +1632,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g
           id="tooth-45"
@@ -1629,6 +1663,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g
           id="tooth-46"
@@ -1662,6 +1697,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g
           id="tooth-47"
@@ -1696,6 +1732,7 @@ const TeethChart = ({ history, id, newPatient = false }: any) => {
         id={id}
         form={form}
         newPatient={newPatient}
+        showTitle={showTitle}
       >
         <g
           id="tooth-48"

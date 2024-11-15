@@ -56,7 +56,7 @@ export default function UserClient() {
 
   return (
     <PageContainer>
-      <div className="flex flex-col h-[calc(100svh-20px)] ">
+      <div className="flex flex-col h-[calc(100svh-20px)] gap-1">
         <div className="flex justify-between items-center mt-0 sm:mt-4">
           <div className="flex items-center">
             <BurgerMenu />
@@ -76,6 +76,7 @@ export default function UserClient() {
               open={open}
               setOpen={setOpen}
               label={"New Patient"}
+              title={false}
             >
               <NewPatientForm setOpen={setOpen} mutate={mutate} />
             </DrawerDialogDemo>
@@ -98,7 +99,7 @@ export default function UserClient() {
           />
         </div>
         <Separator />
-        <div className="flex flex-col 2xl:flex-row">
+        <div className="flex flex-col 2xl:flex-row gap-4">
           <div className="flex-1">
             {patientLoading ? (
               <TableLoadingSkeleton />
@@ -120,7 +121,7 @@ export default function UserClient() {
               <p>No data available</p>
             )}
           </div>
-          <div className="w-full mt-5 2xl:w-1/5 2xl:ml-5 2xl:mt-0">
+          <div className="w-1/5 hidden 2xl:block ">
             {patients && patients.data && patients.data.length > 0 ? (
               <PatientCard
                 activePatient={
