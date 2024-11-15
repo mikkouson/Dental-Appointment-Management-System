@@ -32,6 +32,14 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import { deleteAppointment } from "@/app/(admin)/appointments/action";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { MoreHorizontal } from "lucide-react";
 
 type Column = ColumnDef<AppointmentsCol>;
 
@@ -153,18 +161,30 @@ export function DataTableDemo({
                     </TableCell>
                   ))}
                   <TableCell>
-                    <div className="flex px-2">
-                      <DeleteModal
-                        label="appointment"
-                        formAction={() => handleDelete(row.original.id)}
-                      />
-                      <EditAppointment
-                        appointment={row.original}
-                        text={false}
-                        disabled={false}
-                        mutate={mutate}
-                      />
-                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-16 p-0"
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <EditAppointment
+                          appointment={row.original}
+                          text={true}
+                          disabled={false}
+                          mutate={mutate}
+                        />
+                        <DropdownMenuSeparator />
+                        <DeleteModal
+                          label="appointment"
+                          formAction={() => handleDelete(row.original.id)}
+                        />
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))
