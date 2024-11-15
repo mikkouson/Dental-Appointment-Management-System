@@ -29,7 +29,14 @@ import {
 import * as React from "react";
 import { ScrollArea, ScrollBar } from "../../ui/scroll-area";
 import { EditService } from "@/components/modal/users/editService";
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { MoreHorizontal } from "lucide-react";
 type Column = ColumnDef<Service>;
 
 type DataTableProps = {
@@ -150,13 +157,26 @@ export function DataTableDemo({
                   </TableCell>
                 ))}
                 <TableCell>
-                  <div className="flex px-2">
-                    <DeleteModal
-                      label="service"
-                      formAction={() => handleDelete(row.original.id)}
-                    />
-                    <EditService data={row.original} mutate={mutate} />
-                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-16 p-0"
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <EditService data={row.original} mutate={mutate} />
+
+                      <DropdownMenuSeparator />
+                      <DeleteModal
+                        label="service"
+                        formAction={() => handleDelete(row.original.id)}
+                      />
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </TableCell>
               </TableRow>
             ))

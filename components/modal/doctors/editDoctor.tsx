@@ -22,6 +22,7 @@ import useSWR from "swr";
 import { toast } from "@/components/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useDoctor } from "@/components/hooks/useDoctor";
+import { Button } from "@/components/ui/button";
 
 const fetcher = (url: string): Promise<any> =>
   fetch(url).then((res) => res.json());
@@ -154,10 +155,13 @@ export function EditDoctor({ data, mutate }: EditDoctorProps) {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <SquarePen
-          className="text-sm w-5 text-green-700 cursor-pointer"
+        <Button
           onClick={() => set()}
-        />
+          variant="ghost"
+          className="w-full text-left justify-start"
+        >
+          Edit
+        </Button>
       </SheetTrigger>
       <SheetContent
         className="w-full md:w-[800px] overflow-auto"

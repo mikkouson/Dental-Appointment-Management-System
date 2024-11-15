@@ -4,7 +4,7 @@ import type { Inventory } from "@/app/schema";
 import { useSetActive } from "@/app/store";
 import { toast } from "@/components/hooks/use-toast";
 import { DeleteModal } from "@/components/modal/deleteModal";
-import { EditPatient } from "@/components/modal/patients/editPatient";
+
 import {
   Table,
   TableBody,
@@ -30,7 +30,14 @@ import {
 import * as React from "react";
 import { ScrollArea, ScrollBar } from "../../ui/scroll-area";
 import { EditInventory } from "@/components/modal/inventory/editInvetory";
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { MoreHorizontal } from "lucide-react";
 type Column = ColumnDef<Inventory>;
 
 type DataTableProps = {
@@ -151,13 +158,26 @@ export function DataTableDemo({
                   </TableCell>
                 ))}
                 <TableCell>
-                  <div className="flex px-2">
-                    <DeleteModal
-                      label="item"
-                      formAction={() => handleDelete(row.original.id)}
-                    />
-                    <EditInventory data={row.original} mutate={mutate} />
-                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-16 p-0"
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <EditInventory data={row.original} mutate={mutate} />
+
+                      <DropdownMenuSeparator />
+                      <DeleteModal
+                        label="item"
+                        formAction={() => handleDelete(row.original.id)}
+                      />
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </TableCell>
               </TableRow>
             ))
