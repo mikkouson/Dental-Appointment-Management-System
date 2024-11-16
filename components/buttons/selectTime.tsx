@@ -56,7 +56,9 @@ export default function TimeSlot({ branch, field, date }: TimeSlotProps) {
   const handleSelect = (value: number) => {
     field.onChange(value);
   };
-
+  const formatTime = (time: string) => {
+    return moment(time, "HH:mm:ss").format("hh:mm A");
+  };
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -70,14 +72,16 @@ export default function TimeSlot({ branch, field, date }: TimeSlotProps) {
             )}
           >
             {field.value
-              ? data.find((slot: { id: number }) => slot.id === field.value)
-                  ?.time
+              ? formatTime(
+                  data.find((slot: { id: number }) => slot.id === field.value)
+                    ?.time
+                )
               : "Select Time Slot"}
             <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </FormControl>
       </PopoverTrigger>
-      <PopoverContent className=" p-0 popover-content-width-same-as-its-trigger">
+      <PopoverContent className="p-0 popover-content-width-same-as-its-trigger">
         <Command>
           <CommandList>
             <CommandEmpty>No time slots available.</CommandEmpty>
@@ -109,7 +113,7 @@ export default function TimeSlot({ branch, field, date }: TimeSlotProps) {
                         }}
                         className={cn(
                           "flex",
-                          field.value === slot.id ? "bg-gray-200" : "",
+                          field.value === slot.id ? "" : "",
                           isDisabled && "opacity-50 cursor-not-allowed"
                         )}
                         disabled={isDisabled}
@@ -122,7 +126,7 @@ export default function TimeSlot({ branch, field, date }: TimeSlotProps) {
                               : "opacity-0"
                           )}
                         />
-                        <p>{slot.time}</p>
+                        <p>{formatTime(slot.time)}</p>
                       </CommandItem>
                     </div>
                   );

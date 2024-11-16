@@ -10,6 +10,7 @@ import {
   FormItem,
   FormLabel,
   FormControl,
+  FormMessage,
 } from "@/components/ui/form";
 import {
   Popover,
@@ -20,34 +21,82 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Field from "../formField";
 import { UpdateInventoryFormValues } from "@/app/types";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import FormSkeleton from "./loading";
+
+// Add styles to remove input spinners
+const inputStyles = `
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+`;
 
 interface ItemUsedFieldsProps {
   form: UseFormReturn<UpdateInventoryFormValues>;
   onSubmit: (data: UpdateInventoryFormValues) => void;
+  selectedItems: {
+    id: number;
+    name: string;
+    price: number;
+    quantity: number;
+  }[];
+  setSelectedItems: React.Dispatch<
+    React.SetStateAction<
+      {
+        id: number;
+        name: string;
+        price: number;
+        quantity: number;
+      }[]
+    >
+  >;
 }
 
-export function ItemUsedField({ form, onSubmit }: ItemUsedFieldsProps) {
+export function ItemUsedField({
+  form,
+  onSubmit,
+  setSelectedItems,
+  selectedItems,
+}: ItemUsedFieldsProps) {
   const { inventory, inventoryError, inventoryLoading } = useInventory();
-  const [selectedItems, setSelectedItems] = useState<
-    Array<{
-      id: number;
-      name: string;
-      price: number;
-      quantity: number;
-    }>
-  >([]);
 
-  if (inventoryLoading) return <>Loading</>;
+  if (inventoryLoading) return <FormSkeleton />;
 
   const { isSubmitting } = form.formState;
 
-  const updateQuantity = (id: number, delta: number) => {
+  const updateQuantity = (
+    id: number,
+    newValue: string | number,
+    isIncrement = false
+  ) => {
     setSelectedItems((items) =>
-      items.map((item) =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + delta) }
-          : item
-      )
+      items.map((item) => {
+        if (item.id === id) {
+          const inventoryItem = inventory?.data?.find((inv) => inv.id === id);
+          const maxQuantity = inventoryItem?.quantity || 0;
+
+          let validatedQuantity;
+          if (isIncrement) {
+            // Handle increment/decrement
+            validatedQuantity = Math.max(
+              1,
+              Math.min(maxQuantity, item.quantity + (newValue as number))
+            );
+          } else {
+            // Handle direct input
+            const numValue = parseInt(newValue as string) || 0;
+            validatedQuantity = Math.max(1, Math.min(maxQuantity, numValue));
+          }
+
+          return { ...item, quantity: validatedQuantity };
+        }
+        return item;
+      })
     );
   };
 
@@ -81,102 +130,156 @@ export function ItemUsedField({ form, onSubmit }: ItemUsedFieldsProps) {
   );
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
-        <div className="w-full space-y-4">
-          <Field form={form} name={"id"} label={"Id"} num={true} disabled />
-          <FormField
-            control={form.control}
-            name="selectedItems"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Select Inventory Items</FormLabel>
-                <FormControl>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className="w-full">
-                        Select Items
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-full popover-content-width-same-as-its-trigger">
-                      {inventory?.data?.map((item) => {
-                        const isSelected = selectedItems.some(
-                          (selected) => selected.id === item.id
-                        );
-                        return (
-                          <div
-                            key={item.id}
-                            className="flex items-center justify-between p-2 cursor-pointer"
-                            onClick={() => handleItemToggle(!isSelected, item)}
-                          >
-                            <span>{item.name}</span>
-
-                            <Checkbox
-                              checked={isSelected}
-                              onChange={() =>
-                                handleItemToggle(!isSelected, item)
-                              }
-                            />
+    <>
+      <style>{inputStyles}</style>
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="w-full space-y-6"
+        >
+          <div className="w-full space-y-4">
+            <div className="hidden">
+              <Field form={form} name={"id"} label={"Id"} num={true} disabled />
+            </div>
+            <FormField
+              control={form.control}
+              name="selectedItems"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Select Inventory Items</FormLabel>
+                  <FormControl>
+                    <Popover modal={true}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-between"
+                        >
+                          Select Items
+                          {selectedItems.length > 0 && (
+                            <span className="ml-2 rounded-full bg-primary/10 px-2 py-0.5 text-xs">
+                              {selectedItems.length}
+                            </span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 max-h-[300px] overflow-y-auto">
+                        {inventory?.data?.length === 0 ? (
+                          <div className="p-4 text-center text-muted-foreground">
+                            No items available
                           </div>
-                        );
-                      })}
-                    </PopoverContent>
-                  </Popover>
-                </FormControl>
-              </FormItem>
-            )}
-          />
+                        ) : (
+                          inventory?.data?.map((item) => {
+                            const isSelected = selectedItems.some(
+                              (selected) => selected.id === item.id
+                            );
+                            const isDisabled = item.quantity === 0;
 
-          {selectedItems.map((item) => (
-            <Card key={item.id} className="border rounded-lg">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <h3 className="font-medium">{item.name}</h3>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => updateQuantity(item.id, -1)}
-                    >
-                      <Minus className="h-4 w-4" />
-                    </Button>
-                    <span className="w-8 text-center">{item.quantity}</span>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => updateQuantity(item.id, 1)}
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8 text-red-500"
-                      onClick={() => removeItem(item.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                            return (
+                              <div
+                                key={item.id}
+                                className={`flex items-center space-x-2 p-2 hover:bg-accent ${
+                                  isDisabled ? "opacity-50" : ""
+                                }`}
+                              >
+                                <Checkbox
+                                  checked={isSelected}
+                                  onCheckedChange={(checked) =>
+                                    handleItemToggle(checked as boolean, item)
+                                  }
+                                  id={`item-${item.id}`}
+                                  disabled={isDisabled}
+                                />
+                                <label
+                                  htmlFor={`item-${item.id}`}
+                                  className={`flex-1 cursor-pointer text-sm ${
+                                    isDisabled ? "cursor-not-allowed" : ""
+                                  }`}
+                                >
+                                  {item.name} (Available: {item.quantity})
+                                </label>
+                              </div>
+                            );
+                          })
+                        )}
+                      </PopoverContent>
+                    </Popover>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
-        <div className="flex justify-end">
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Submitting..." : "Submit"}
-          </Button>
-        </div>
-      </form>
-    </Form>
+            {selectedItems.map((item) => {
+              const inventoryItem = inventory?.data?.find(
+                (inv) => inv.id === item.id
+              );
+              const maxQuantity = inventoryItem?.quantity || 0;
+
+              return (
+                <Card key={item.id} className="border rounded-lg">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <h3 className="font-medium">{item.name}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Available: {maxQuantity}
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => updateQuantity(item.id, -1, true)}
+                          disabled={item.quantity <= 1}
+                        >
+                          <Minus className="h-4 w-4" />
+                        </Button>
+                        <Input
+                          type="number"
+                          value={item.quantity}
+                          onChange={(e) =>
+                            updateQuantity(item.id, e.target.value)
+                          }
+                          min={1}
+                          max={maxQuantity}
+                          className="w-16 text-center"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => updateQuantity(item.id, 1, true)}
+                          disabled={item.quantity >= maxQuantity}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8 text-red-500"
+                          onClick={() => removeItem(item.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+
+          <div className="flex justify-end">
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Submitting..." : "Submit"}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </>
   );
 }
 

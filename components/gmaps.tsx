@@ -117,16 +117,6 @@ const Maps = ({ field }: MapsProps) => {
           </GoogleMap>
         </div>
       )}
-      {latitude && longitude && (
-        <div className="mt-4">
-          <p>
-            <strong>Latitude:</strong> {latitude}
-          </p>
-          <p>
-            <strong>Longitude:</strong> {longitude}
-          </p>
-        </div>
-      )}
     </div>
   );
 };

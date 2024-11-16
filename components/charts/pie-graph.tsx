@@ -81,7 +81,7 @@ export function PieGraph() {
   const top5Services = chartData.sort((a, b) => b.count - a.count).slice(0, 5);
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
         <CardTitle>Top 5 Services</CardTitle>
         <CardDescription>Usage of top 5 services</CardDescription>

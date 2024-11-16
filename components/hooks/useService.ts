@@ -11,17 +11,21 @@ const fetcher = async (
   count: number;
 }> => fetch(url).then((res) => res.json());
 
-export function useService(page?: number | null, query?: string, limit?: number | null) {
+export function useService(
+  page?: number | null,
+  query?: string,
+  limit?: number | null
+) {
   const queryString = new URLSearchParams();
-  
+
   if (page != null) {
-  queryString.append("page", String(page));
+    queryString.append("page", String(page));
   }
   if (query !== undefined) {
-  queryString.append("query", query);
+    queryString.append("query", query);
   }
   if (limit != null) {
-  queryString.append("limit", String(limit));
+    queryString.append("limit", String(limit));
   }
   const {
     data: services,
@@ -38,7 +42,7 @@ export function useService(page?: number | null, query?: string, limit?: number 
   // Subscribe to realtime updates
   useEffect(() => {
     const channel = supabase
-      .channel("realtime service")
+      .channel(`realtime-services-${page}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "services" },
@@ -49,9 +53,10 @@ export function useService(page?: number | null, query?: string, limit?: number 
       .subscribe();
 
     return () => {
+      console.log("Removing channel");
       supabase.removeChannel(channel);
     };
-  }, [supabase, mutate]);
+  }, [page, supabase, mutate]);
 
   return { services, serviceError, serviceLoading, mutate };
 }

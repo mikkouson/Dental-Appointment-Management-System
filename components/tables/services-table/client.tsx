@@ -103,6 +103,7 @@ export default function UserClient() {
             isSearchFocused={isSearchFocused}
             setIsSearchFocused={setIsSearchFocused}
             handleSearch={handleSearch}
+            label="Service"
           />
         </div>
         <Separator />

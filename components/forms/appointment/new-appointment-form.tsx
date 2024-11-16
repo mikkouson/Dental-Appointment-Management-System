@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { newApp } from "@/app/(admin)/action";
 import { CalendarForm } from "@/components/buttons/selectDate";
 import TimeSlot from "@/components/buttons/selectTime";
 import { toast } from "@/components/hooks/use-toast";
@@ -25,6 +24,8 @@ import {
 import { cn } from "@/lib/utils";
 import { ChevronDownIcon } from "lucide-react";
 import Field from "../formField";
+import FormSkeleton from "./loading";
+import { newApp } from "@/app/(admin)/appointments/action";
 
 type Appointment = {
   id: string;
@@ -90,7 +91,7 @@ export function NewAppointmentForm({ setOpen, mutate }: NewServiceFormProps) {
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         variant: "success",
-        description: "Service added successfully.",
+        description: "Appointment created successfully.",
         duration: 2000,
       });
       mutate(); // Revalidate to ensure data consistency
@@ -108,7 +109,7 @@ export function NewAppointmentForm({ setOpen, mutate }: NewServiceFormProps) {
   }
 
   if (branchLoading || serviceLoading || appointmentsLoading || patientLoading)
-    return <>Loading</>;
+    return <FormSkeleton />;
 
   const date = form.watch("date");
   const selectedBranch = form.watch("branch");

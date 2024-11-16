@@ -50,7 +50,7 @@ export default function Field({
             />
           ) : textarea ? (
             <Textarea
-              placeholder={`Tell us a little bit about ${name}`}
+              placeholder={`${label}`}
               className="resize-none"
               disabled={disabled} // Pass disabled here
               {...field}
@@ -59,7 +59,7 @@ export default function Field({
           ) : (
             <Input
               type={!num ? "text" : "number"}
-              placeholder={`Input ${name} here`}
+              placeholder={`Input ${label} here`}
               disabled={disabled} // Pass disabled here
               {...field}
               value={num ? field.value : field.value}

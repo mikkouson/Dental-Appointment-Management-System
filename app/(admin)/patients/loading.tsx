@@ -8,12 +8,12 @@ export default function Loading() {
   return (
     <PageContainer>
       <div className="space-y-4">
-        <Breadcrumbs
+        {/* <Breadcrumbs
           items={[
             { title: "Dashboard", link: "/" },
             { title: "Patients", link: "/patients" },
           ]}
-        />
+        /> */}
         <div className="flex flex-col 2xl:flex-row lg:items-start lg:justify-between">
           <div className="flex flex-col space-y-2">
             <Skeleton className="h-8 w-64" />

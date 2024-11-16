@@ -55,7 +55,7 @@ export function useInventory(
 
   useEffect(() => {
     const channel = supabase
-      .channel("realtime-inventory")
+      .channel(`realtime-items-${page}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "inventory" },
@@ -68,7 +68,7 @@ export function useInventory(
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [supabase, mutate]);
+  }, [page, supabase, mutate]);
 
   return { inventory, inventoryError, inventoryLoading, mutate };
 }

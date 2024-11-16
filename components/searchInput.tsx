@@ -10,6 +10,7 @@ interface SearchInputProps {
   isSearchFocused: boolean;
   setIsSearchFocused: (focused: boolean) => void;
   handleSearch: (term: string) => void;
+  label: string;
 }
 
 const SearchInput = ({
@@ -18,6 +19,7 @@ const SearchInput = ({
   isSearchFocused,
   setIsSearchFocused,
   handleSearch,
+  label,
 }: SearchInputProps) => {
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -31,7 +33,7 @@ const SearchInput = ({
         <Search className="absolute left-2.5 top-3 h-4 w-4 text-muted-foreground" />
         <Input
           type="search"
-          placeholder="Search Patient Name ..."
+          placeholder={`Search ${label} Name ...`}
           className="w-full rounded-lg bg-background pl-8"
           value={searchQuery}
           onChange={handleInputChange}
@@ -50,7 +52,7 @@ const SearchInput = ({
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Search Patient Name ..."
+            placeholder={`Search ${label} Name ...`}
             className="w-full rounded-lg bg-background pl-8"
             value={searchQuery}
             onChange={handleInputChange}

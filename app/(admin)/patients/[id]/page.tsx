@@ -1,8 +1,11 @@
 "use client";
-import useSWR from "swr";
-
 import { useSetActiveAppointments } from "@/app/store";
+import PatientAppointmentExport from "@/components/buttons/exportButtons/patientAppointmentExport";
+import ToothHistoryCard from "@/components/cards/toothHistoryCard";
 import StaticMaps from "@/components/staticMap";
+import { columns } from "@/components/tables/patient-slug-table/column";
+import { DataTableDemo } from "@/components/tables/patient-slug-table/dataTable";
+import TeethChart from "@/components/teeth-permanent";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Breadcrumb,
@@ -12,22 +15,24 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { File } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TabsLinkTrigger } from "@/components/ui/tabs-link-trigger";
+import { createClient } from "@/utils/supabase/client";
+import { Activity, ClipboardList } from "lucide-react";
 import moment from "moment";
 import Link from "next/link";
-import { columns } from "@/components/tables/patient-slug-table/column";
-import { DataTableDemo } from "@/components/tables/patient-slug-table/dataTable";
-import PatientAppointmentExport from "@/components/buttons/exportButtons/patientAppointmentExport";
+import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
+import useSWR from "swr";
+import Loading from "../loading";
 
 const fetcher = async (url: any): Promise<any> => {
   const res = await fetch(url);
@@ -39,7 +44,7 @@ const fetcher = async (url: any): Promise<any> => {
 
 interface PageProps {
   params: {
-    id: string; // Assuming id is a string, adjust type accordingly if different
+    id: string;
   };
 }
 
@@ -48,24 +53,45 @@ export default function Page({ params }: PageProps) {
     `/api/patientdetails?id=${params.id}`,
     fetcher
   );
+  // Get the current "tabs" parameter from URL
+  const searchParams = useSearchParams();
+  const currentTab = searchParams.get("tabs") || "appointments";
+
+  const supabase = createClient();
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("realtime tooth_history")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "tooth_history" },
+        () => {
+          mutate();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [supabase, mutate]);
 
   const active = useSetActiveAppointments((state) => state.selectedAppointment);
 
-  if (isLoading) return <>Loading</>;
+  if (isLoading) return <Loading />;
+  if (error) return <div>Error loading patient data</div>;
 
-  const acceptedAppointments = data.appointments.filter(
+  const acceptedAppointments = data?.appointments.filter(
     (appointment: { status?: { id?: number } }) => appointment.status?.id === 1
   );
-  const completedAppointments = data.appointments.filter(
+  const completedAppointments = data?.appointments.filter(
     (appointment: { status?: { id?: number } }) => appointment.status?.id === 4
-  );
-  const activeAppointment = data.appointments.find(
-    (appointment: { id: number }) => appointment.id === active
   );
 
   return (
-    <div className="flex min-h-screen w-full flex-col ">
-      <div className="flex flex-col sm:gap-4 ">
+    <div className="flex min-h-screen w-full flex-col">
+      <div className="flex flex-col sm:gap-4">
+        {/* Header with Breadcrumb */}
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
           <Breadcrumb className="hidden md:flex mt-4">
             <BreadcrumbList>
@@ -82,131 +108,137 @@ export default function Page({ params }: PageProps) {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage>{data.name}</BreadcrumbPage>
+                <BreadcrumbPage>{data?.name}</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </header>
-        <main className="grid flex-1 items-start gap-4  sm:px-6 sm:py-0 md:gap-8 lg:grid-cols-2 xl:grid-cols-2">
-          <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
-            <div className="grid gap-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-3 xl:grid-cols-3">
-              <Card
-                className="sm:col-span-1 md:col-span-1 lg:col-span-1 xl:col-span-1"
-                x-chunk="dashboard-05-chunk-0"
-              >
-                <CardHeader className="pb-2 text-center">
-                  <div className="flex flex-col items-center">
-                    <Avatar className="w-16 h-16 mb-4 md-lg">
-                      <AvatarImage
-                        src="https://github.com/shadcn.png"
-                        alt="@shadcn"
-                      />
-                      <AvatarFallback>CN</AvatarFallback>
-                    </Avatar>
-                    <CardTitle>{data.name}</CardTitle>
-                    <CardDescription className="mb-2">
-                      {data.email}
-                    </CardDescription>
-                    <div className="space-y-1">
-                      <CardDescription className="text-sm font-medium leading-none">
-                        Total Appointments
-                      </CardDescription>
-                    </div>
-                    <Separator className="my-2" />
-                    <div className="flex h-8 items-center justify-between space-x-2 text-xs">
-                      <div className="mx-1 p-1">
-                        <CardTitle>{acceptedAppointments.length}</CardTitle>
-                        <CardDescription>Upcoming</CardDescription>
-                      </div>
-                      <Separator orientation="vertical" />
-                      <div className="mx-1 p-1">
-                        <CardTitle>{completedAppointments.length}</CardTitle>
-                        <CardDescription>Completed</CardDescription>
-                      </div>
-                    </div>
-                  </div>
-                  <Separator orientation="vertical" />
-                </CardHeader>
-                <CardFooter className="text-center"></CardFooter>
-              </Card>
 
-              <Card
-                className="sm:col-span-1 md:col-span-1 lg:col-span-1 xl:col-span-1"
-                x-chunk="dashboard-05-chunk-9"
-              >
-                <CardHeader className="pb-2">
-                  <CardTitle className="group flex items-center gap-2 text-lg">
-                    Patient Information
-                  </CardTitle>
-                </CardHeader>
-
-                <CardContent className="pb-2 grid grid-cols-2 gap-2">
-                  <div>
-                    <CardDescription className="text-md text-muted-foreground">
-                      Sex
-                    </CardDescription>
-                    <p className="text-xs">
-                      {data.sex.charAt(0).toUpperCase() + data.sex.slice(1)}
-                    </p>
-                  </div>
-
-                  <div>
-                    <CardDescription className="text-md text-muted-foreground">
-                      Phone Number
-                    </CardDescription>
-                    <p className="text-xs">(+639) {data.phone_number}</p>
-                  </div>
-
-                  <div>
-                    <CardDescription className="text-md text-muted-foreground">
-                      Date of Birth
-                    </CardDescription>
-                    <p className="text-xs">
-                      {moment(data.dob).format("MM/DD/YYYY")}
-                    </p>
-                  </div>
-                  <div>
-                    <CardDescription className="text-md text-muted-foreground">
-                      Registered Date
-                    </CardDescription>
-                    <p className="text-xs ">
-                      {moment(data.created_at).format("MM/DD/YYYY")}{" "}
-                    </p>
-                  </div>
-                  <div>
-                    <CardDescription className="text-md text-muted-foreground">
-                      Status
-                    </CardDescription>
-                    <p className="text-xs ">{data.status}</p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card
-                className="sm:col-span-1 md:col-span-1 lg:col-span-1 xl:col-span-1"
-                x-chunk="dashboard-05-chunk-10"
-              >
-                <CardContent className="mt-6">
-                  <CardDescription className="text-md text-muted-foreground">
-                    Address
+        {/* Main Content */}
+        <main className="grid flex-1 items-start gap-4 sm:px-6 sm:py-0 md:gap-8">
+          {/* Profile Cards Row */}
+          <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3">
+            {/* Profile Card */}
+            <Card>
+              <CardHeader className="pb-2 text-center">
+                <div className="flex flex-col items-center">
+                  <Avatar className="w-16 h-16 mb-4">
+                    <AvatarImage
+                      src="https://github.com/shadcn.png"
+                      alt="@shadcn"
+                    />
+                    <AvatarFallback>CN</AvatarFallback>
+                  </Avatar>
+                  <CardTitle>{data?.name}</CardTitle>
+                  <CardDescription className="mb-2">
+                    {data?.email}
                   </CardDescription>
-                  <p className="text-xs mb-2">{data.address.address}</p>
-                  <StaticMaps
-                    latitude={data.address?.latitude}
-                    longitude={data.address?.longitude}
-                  />
-                </CardContent>
-              </Card>
-            </div>
+                  <div className="space-y-1">
+                    <CardDescription className="text-sm font-medium leading-none">
+                      Total Appointments
+                    </CardDescription>
+                  </div>
+                  <Separator className="my-2" />
+                  <div className="flex h-8 items-center justify-between space-x-2 text-xs">
+                    <div className="mx-1 p-1">
+                      <CardTitle>{acceptedAppointments.length}</CardTitle>
+                      <CardDescription>Upcoming</CardDescription>
+                    </div>
+                    <Separator orientation="vertical" />
+                    <div className="mx-1 p-1">
+                      <CardTitle>{completedAppointments.length}</CardTitle>
+                      <CardDescription>Completed</CardDescription>
+                    </div>
+                  </div>
+                </div>
+              </CardHeader>
+            </Card>
 
-            <div>
-              <div className="flex items-center">
-                <div className="ml-auto flex items-center gap-2 mb-2">
-                  <PatientAppointmentExport data={data.appointments} />
+            {/* Patient Information Card */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="group flex items-center gap-2 text-lg">
+                  Patient Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pb-2 grid grid-cols-2 gap-2">
+                <div>
+                  <CardDescription className="text-md text-muted-foreground">
+                    Sex
+                  </CardDescription>
+                  <p className="text-xs">
+                    {data?.sex.charAt(0).toUpperCase() + data?.sex.slice(1)}
+                  </p>
+                </div>
+                <div>
+                  <CardDescription className="text-md text-muted-foreground">
+                    Phone Number
+                  </CardDescription>
+                  <p className="text-xs">(+639) {data?.phone_number}</p>
+                </div>
+                <div>
+                  <CardDescription className="text-md text-muted-foreground">
+                    Date of Birth
+                  </CardDescription>
+                  <p className="text-xs">
+                    {moment(data?.dob).format("MM/DD/YYYY")}
+                  </p>
+                </div>
+                <div>
+                  <CardDescription className="text-md text-muted-foreground">
+                    Registered Date
+                  </CardDescription>
+                  <p className="text-xs">
+                    {moment(data?.created_at).format("MM/DD/YYYY")}
+                  </p>
+                </div>
+                <div>
+                  <CardDescription className="text-md text-muted-foreground">
+                    Status
+                  </CardDescription>
+                  <p className="text-xs">{data?.status}</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Address Card */}
+            <Card>
+              <CardContent className="mt-6">
+                <CardDescription className="text-md text-muted-foreground">
+                  Address
+                </CardDescription>
+                <p className="text-xs mb-2">{data?.address?.address}</p>
+                <StaticMaps
+                  latitude={data?.address?.latitude}
+                  longitude={data?.address?.longitude}
+                />
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Tabs Section */}
+          <Tabs value={currentTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsLinkTrigger href="?tabs=appointments" value="appointments">
+                <ClipboardList className="h-4 w-4" />
+                Appointment History
+              </TabsLinkTrigger>
+              <TabsLinkTrigger href="?tabs=medical" value="medical">
+                <Activity className="h-4 w-4" />
+                Medical History
+              </TabsLinkTrigger>
+            </TabsList>
+
+            {/* Appointments Tab */}
+            <TabsContent value="appointments" className="space-y-4">
+              <div className="flex items-center mb-2">
+                <div className="ml-auto">
+                  <PatientAppointmentExport data={data?.appointments} />
                 </div>
               </div>
-              <Card x-chunk="dashboard-05-chunk-3">
-                <CardHeader className="px-7">
+
+              <Card>
+                <CardHeader>
                   <CardTitle>Appointments</CardTitle>
                   <CardDescription>
                     Recent appointments from your clinic.
@@ -215,14 +247,38 @@ export default function Page({ params }: PageProps) {
                 <CardContent>
                   <DataTableDemo
                     columns={columns}
-                    data={data.appointments}
-                    // activePatient={active}
+                    data={data?.appointments}
                     mutate={mutate}
                   />
                 </CardContent>
               </Card>
-            </div>
-          </div>
+            </TabsContent>
+
+            {/* Medical History Tab */}
+            <TabsContent value="medical" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Medical History</CardTitle>
+                  <CardDescription>
+                    Patients medical records and history
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex">
+                    {/* Static TeethChart Component */}
+                    <div className="mr-4">
+                      <TeethChart
+                        history={data?.tooth_history}
+                        id={params.id}
+                      />
+                    </div>
+                    {/* Scrollable ToothHistory Component */}
+                    <ToothHistoryCard treatments={data?.tooth_history} />
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </main>
       </div>
     </div>

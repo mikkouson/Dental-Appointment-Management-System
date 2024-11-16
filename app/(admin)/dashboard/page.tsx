@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/card";
 import moment from "moment";
 import { useSearchParams } from "next/navigation";
+import DashboardLoading from "./loading ";
 
 export default function Page() {
   const searchParams = useSearchParams();
@@ -41,7 +42,7 @@ export default function Page() {
   const { appointments, appointmentsLoading } = useAppointments();
   const { patients, patientLoading } = usePatients();
 
-  if (patientLoading || appointmentsLoading) return <> Loading</>;
+  if (patientLoading || appointmentsLoading) return <DashboardLoading />;
 
   const calculateMetrics = () => {
     if (!appointments?.data?.length || !patients?.data?.length)
@@ -280,6 +281,7 @@ export default function Page() {
             <div className="col-span-4">
               <PatientChart
                 range={{ start: dateRangeStart, end: dateRangeEnd }}
+                data={appointments}
               />
             </div>
 

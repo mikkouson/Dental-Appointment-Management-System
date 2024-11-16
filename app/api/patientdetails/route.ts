@@ -14,6 +14,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
        address (
       *
     ),
+         
       appointments (
         *,
         services (
@@ -28,10 +29,21 @@ export async function GET(req: NextRequest, res: NextResponse) {
             branch (
           *
         )
+      ),
+      tooth_history(*,
+          appointments (
+        *,
+        services (
+          *
+        )
+      )
+      )
       )
     `
     )
     .eq("id", id)
+    .is("tooth_history.deleteOn", null)
+    .is("appointments.deleteOn", null)
     .single();
 
   if (error) {

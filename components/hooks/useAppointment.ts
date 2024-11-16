@@ -92,7 +92,7 @@ export function useAppointments(
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [supabase, mutate]);
+  }, [page, supabase, mutate]);
 
   return { appointments, appointmentsError, appointmentsLoading, mutate };
 }

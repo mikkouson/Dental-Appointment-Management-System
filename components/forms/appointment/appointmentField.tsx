@@ -20,6 +20,7 @@ import { useBranches } from "@/components/hooks/useBranches";
 import { useStatuses } from "@/components/hooks/useStatuses";
 import { useService } from "@/components/hooks/useService";
 import { useAppointments } from "@/components/hooks/useAppointment";
+import FormSkeleton from "./loading";
 
 interface AppointmentFieldsProps {
   form: UseFormReturn<AppointmentSchemaType>;
@@ -54,7 +55,7 @@ export function AppointmentField({
   const { isSubmitting } = form.formState;
 
   if (statusLoading || branchLoading || serviceLoading || appointmentsLoading)
-    return <>Loading</>;
+    return <FormSkeleton />;
 
   return (
     <Form {...form}>

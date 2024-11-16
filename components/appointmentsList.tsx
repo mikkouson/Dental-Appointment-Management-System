@@ -1,16 +1,39 @@
-import {
-  acceptAppointment,
-  cancelAppointment,
-  rejectAppointment,
-} from "@/app/(admin)/action";
 import type { AppointmentsCol, TimeSlot } from "@/app/schema";
 import { Separator } from "./ui/separator";
 import { EditAppointment } from "./modal/appointment/editAppointment";
 import { useState } from "react";
-import { Button } from "./ui/button"; // Assuming this is where Button is located
+import { Button } from "./ui/button";
 import { toast } from "./hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { CompleteAppointment } from "./modal/appointment/mark-as-completed";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import {
+  Stethoscope,
+  User,
+  Info,
+  Phone,
+  Ticket,
+  Hospital,
+  MoreHorizontal,
+  MoreVertical,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import {
+  acceptAppointment,
+  cancelAppointment,
+  deleteAppointment,
+  rejectAppointment,
+} from "@/app/(admin)/appointments/action";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { DeleteToothHistory } from "./modal/patients/deleteToothHistory";
+import { EditToothCondition } from "./modal/patients/edit-tooth-condition";
+import { DeleteModal } from "./modal/deleteModal";
 
 interface AppointmentsMapProps {
   timeSlots: TimeSlot[];
@@ -24,15 +47,16 @@ export default function AppointmentsMap({
   mutate,
 }: AppointmentsMapProps) {
   const [loading, setLoading] = useState<number | null>(null);
-  const [loadingType, setLoadingType] = useState<string | null>(null); // Track the type of action
-
+  const [loadingType, setLoadingType] = useState<string | null>(null);
   const handleAction = async (
     action: () => Promise<void>,
     aptId: number,
     actionType: string
   ) => {
     setLoading(aptId);
-    setLoadingType(actionType); // Set the type of loading action
+    setLoadingType(actionType);
+    mutate();
+
     try {
       await action();
       toast({
@@ -43,6 +67,7 @@ export default function AppointmentsMap({
         description: `Appointment ${actionType} successfully.`,
         duration: 2000,
       });
+      mutate();
     } catch (error: any) {
       console.error("Failed to perform action", error);
       toast({
@@ -50,13 +75,12 @@ export default function AppointmentsMap({
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         variant: "destructive",
-        description: `Failed to ${actionType.toLowerCase()} appointment: ${
-          error.message
-        }`,
+        description: "Update appointment status failed",
       });
+      mutate();
     } finally {
       setLoading(null);
-      setLoadingType(null); // Reset loading type
+      setLoadingType(null);
     }
   };
 
@@ -69,108 +93,172 @@ export default function AppointmentsMap({
 
         return (
           <div key={time.id} className="mb-4 overflow-x-hidden">
-            <div className="flex items-center ">
+            <div className="flex items-center">
               <h3 className="text-lg font-semibold mr-2 whitespace-nowrap">
                 {time.time}
               </h3>
-              {timeSlots.length && <Separator className="my-2 max-w-30 " />}
+              {timeSlots.length && <Separator className="my-2 max-w-30" />}
             </div>
 
             {filteredAppointments.length > 0 ? (
-              <div className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {filteredAppointments.map((apt: any) => (
-                  <div
-                    className="border-2 p-2 rounded-lg flex flex-col space-y-3 md:flex-row md:items-center md:justify-between"
-                    key={apt.id}
-                  >
-                    <div className="flex flex-col md:flex-row md:items-center">
-                      <span className="text-base md:text-lg font-semibold mr-2">
-                        {apt.services?.name || "Unknown Service"} -
-                      </span>
+                  <Card key={apt.id}>
+                    <CardHeader className="pb-0 flex flex-row justify-between  items-center text-center  ">
+                      <div>
+                        <CardTitle className="text-base flex">
+                          Appointment Details
+                        </CardTitle>
+                      </div>
+                      <div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-6 w-6 p-0"
+                            >
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <EditAppointment
+                              appointment={apt}
+                              text={true}
+                              disabled={loading === apt.id}
+                              mutate={mutate}
+                            />
+                            <DropdownMenuSeparator />
+                            <DeleteModal
+                              label="appointment"
+                              formAction={async () => {
+                                await deleteAppointment(apt.id);
+                                mutate();
+                              }}
+                            />
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </CardHeader>
+                    <Separator className="my-2" />
 
-                      <div className="flex flex-col">
-                        <span className="text-sm md:text-base">
-                          Patient: {apt.patients?.name || "Unknown Patient"}
+                    <CardContent>
+                      <div className="flex flex-col space-y-2">
+                        <span className="text-sm md:text-base flex items-center">
+                          <User className="w-5 h-5 mr-2 " />
+                          Patient:
+                          <Link
+                            href={`/patients/${apt.patients?.id}`}
+                            className="ml-1 text-blue-600 hover:text-blue-800 underline"
+                          >
+                            {apt.patients?.name || "Unknown Patient"}
+                          </Link>
                         </span>
-                        <span className="text-sm md:text-base">
-                          Status: {apt.status?.name || "Not specified"}
+                        <span className="text-sm md:text-base flex items-center">
+                          <Stethoscope className="w-5 h-5 mr-2" />
+                          Service: {apt.services?.name || "Unknown Service"}
+                        </span>
+                        <span className="text-sm md:text-base flex items-center">
+                          <Info className="w-5 h-5 mr-2" />
+                          Status:{" "}
+                          <Badge
+                            variant={
+                              apt.status?.id === 1
+                                ? "success"
+                                : apt.status?.id === 2
+                                ? "default"
+                                : apt.status?.id === 5 || apt.status?.id === 3
+                                ? "destructive"
+                                : apt.status?.id === 6
+                                ? "rescheduled"
+                                : "success"
+                            }
+                            className="ml-2"
+                          >
+                            {apt.status?.name || "Not specified"}
+                          </Badge>
+                        </span>
+                        <span className="text-sm md:text-base flex items-center">
+                          <Hospital className="w-5 h-5 mr-2" />
+                          Branch: {apt.branch?.name || "No branch specified"}
+                        </span>
+                        <span className="text-sm md:text-base flex items-center">
+                          <Ticket className="w-5 h-5 mr-2" />
+                          Appointment Ticket: {apt.appointment_ticket || "N/A"}
+                        </span>
+                        <span className="text-sm md:text-base flex items-center">
+                          <Phone className="w-5 h-5 mr-2" />
+                          Phone Number:{" "}
+                          {apt.patients?.phone_number || "No phone number"}
                         </span>
                       </div>
-                    </div>
 
-                    <div className="flex flex-wrap items-center space-x-2 mt-3 md:mt-0">
-                      {apt.status?.id === 1 && (
-                        <>
-                          <Button
-                            type="button"
-                            className="bg-red-500 text-white px-3 py-1 rounded"
-                            disabled={loading === apt.id}
-                            onClick={() =>
-                              handleAction(
-                                () => cancelAppointment({ aptId: apt.id }),
-                                apt.id,
-                                "cancelled"
-                              )
-                            }
-                          >
-                            {loading === apt.id && loadingType === "cancelled"
-                              ? "Cancelling..."
-                              : "Cancel"}
-                          </Button>
-                          <CompleteAppointment
-                            appointmentId={apt.id}
-                            text={false}
-                            disabled={false}
-                          />
-                        </>
-                      )}
-
-                      {apt.status?.id === 2 && (
-                        <>
-                          <Button
-                            type="button"
-                            className="bg-green-500 text-white px-3 py-1 rounded"
-                            disabled={loading === apt.id}
-                            onClick={() =>
-                              handleAction(
-                                () => acceptAppointment({ aptId: apt.id }),
-                                apt.id,
-                                "accepted"
-                              )
-                            }
-                          >
-                            {loading === apt.id && loadingType === "accepted"
-                              ? "Accepting..."
-                              : "Accept"}
-                          </Button>
-
-                          <Button
-                            type="button"
-                            className="bg-red-700 text-white px-3 py-1 rounded"
-                            disabled={loading === apt.id}
-                            onClick={() =>
-                              handleAction(
-                                () => rejectAppointment({ aptId: apt.id }),
-                                apt.id,
-                                "rejected"
-                              )
-                            }
-                          >
-                            {loading === apt.id && loadingType === "rejected"
-                              ? "Rejecting..."
-                              : "Reject"}
-                          </Button>
-                        </>
-                      )}
-
-                      <EditAppointment
-                        appointment={apt}
-                        text={true}
-                        disabled={loading === apt.id} // Disable while loading
-                        mutate={mutate}
-                      />
-                    </div>
-                  </div>
+                      <div className="flex flex-wrap items-center justify-end gap-2 mt-4">
+                        {apt.status?.id === 1 && (
+                          <>
+                            <CompleteAppointment
+                              appointmentId={apt.id}
+                              text={false}
+                              disabled={loading === apt.id}
+                              patientId={apt.patients?.id}
+                            />
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              disabled={loading === apt.id}
+                              onClick={() =>
+                                handleAction(
+                                  () => cancelAppointment({ aptId: apt.id }),
+                                  apt.id,
+                                  "cancelled"
+                                )
+                              }
+                            >
+                              {loading === apt.id && loadingType === "cancelled"
+                                ? "Cancelling..."
+                                : "Cancel"}
+                            </Button>
+                          </>
+                        )}
+                        {apt.status?.id === 2 && (
+                          <>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              disabled={loading === apt.id}
+                              onClick={() =>
+                                handleAction(
+                                  () => acceptAppointment({ aptId: apt.id }),
+                                  apt.id,
+                                  "accepted"
+                                )
+                              }
+                            >
+                              {loading === apt.id && loadingType === "accepted"
+                                ? "Accepting..."
+                                : "Accept"}
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              disabled={loading === apt.id}
+                              onClick={() =>
+                                handleAction(
+                                  () => rejectAppointment({ aptId: apt.id }),
+                                  apt.id,
+                                  "rejected"
+                                )
+                              }
+                            >
+                              {loading === apt.id && loadingType === "rejected"
+                                ? "Rejecting..."
+                                : "Reject"}
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
             ) : (

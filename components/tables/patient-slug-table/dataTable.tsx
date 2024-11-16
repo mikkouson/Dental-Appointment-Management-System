@@ -19,7 +19,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { deleteAppointment } from "@/app/(admin)/action";
 import type { AppointmentsCol } from "@/app/schema";
 import { useSetActiveAppointments } from "@/app/store";
 import { toast } from "@/components/hooks/use-toast";
@@ -32,6 +31,15 @@ import {
   SortingState,
   VisibilityState,
 } from "@tanstack/react-table";
+import { deleteAppointment } from "@/app/(admin)/appointments/action";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { MoreHorizontal } from "lucide-react";
 
 type Column = ColumnDef<AppointmentsCol>;
 
@@ -153,17 +161,30 @@ export function DataTableDemo({
                     </TableCell>
                   ))}
                   <TableCell>
-                    <div className="flex px-2">
-                      <DeleteModal
-                        formAction={() => handleDelete(row.original.id)}
-                      />
-                      <EditAppointment
-                        appointment={row.original}
-                        text={false}
-                        disabled={false}
-                        mutate={mutate}
-                      />
-                    </div>
+                    <DropdownMenu modal={false}>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-16 p-0"
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <EditAppointment
+                          appointment={row.original}
+                          text={true}
+                          disabled={false}
+                          mutate={mutate}
+                        />
+                        <DropdownMenuSeparator />
+                        <DeleteModal
+                          label="appointment"
+                          formAction={() => handleDelete(row.original.id)}
+                        />
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))
@@ -173,7 +194,7 @@ export function DataTableDemo({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  No data available
                 </TableCell>
               </TableRow>
             )}

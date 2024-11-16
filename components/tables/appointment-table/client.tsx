@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/heading";
 import BurgerMenu from "@/components/buttons/burgerMenu";
 import SearchInput from "@/components/searchInput";
+import { useQueryState } from "nuqs";
 
 export default function UserClient() {
   const [open, setOpen] = useState(false);
@@ -28,6 +29,9 @@ export default function UserClient() {
     useSearchParams().get("query") || ""
   );
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [activeTab, setActiveTab] = useQueryState("tab", {
+    defaultValue: "table",
+  });
 
   // Routing and URL Management
   const searchParams = useSearchParams();
@@ -38,6 +42,7 @@ export default function UserClient() {
   const branch = searchParams.get("branches");
   const status = searchParams.get("statuses");
   const limit = parseInt(searchParams.get("limit") || "10", 10);
+
   const {
     appointments: data,
     appointmentsLoading: isLoading,
@@ -58,10 +63,18 @@ export default function UserClient() {
 
   const totalPages = data ? Math.ceil(data.count / limit) : 1;
 
+  const handleTabChange = async (value: string) => {
+    await setActiveTab(value);
+  };
+
   return (
     <PageContainer>
       <div className="flex flex-col h-[calc(100svh-20px)] ">
-        <Tabs defaultValue="table" className="flex-grow">
+        <Tabs
+          value={activeTab}
+          onValueChange={handleTabChange}
+          className="flex-grow"
+        >
           <div className="flex justify-between items-center mt-0 sm:mt-4">
             <div className="flex items-center">
               <BurgerMenu />
@@ -86,7 +99,6 @@ export default function UserClient() {
           </div>
           <Separator className="my-2" />
           <div className="flex justify-between items-center">
-            {/* Hide branch and status selectors on smaller screens only when search is focused */}
             {!isSearchFocused && (
               <div className="flex justify-end items-center">
                 <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0 mr-2">
@@ -98,7 +110,7 @@ export default function UserClient() {
                       className="md:hidden text-muted-foreground"
                       size={20}
                     />
-                    <span className=" hidden md:block"> Table Mode</span>
+                    <span className="hidden md:block">Table Mode</span>
                   </TabsTrigger>
                   <TabsTrigger
                     value="calendar"
@@ -108,7 +120,7 @@ export default function UserClient() {
                       className="md:hidden text-muted-foreground"
                       size={20}
                     />
-                    <span className=" hidden md:block"> Calendar Mode</span>
+                    <span className="hidden md:block">Calendar Mode</span>
                   </TabsTrigger>
                 </TabsList>
                 <SelectBranch />
@@ -121,25 +133,20 @@ export default function UserClient() {
               isSearchFocused={isSearchFocused}
               setIsSearchFocused={setIsSearchFocused}
               handleSearch={handleSearch}
+              label="Patient"
             />
           </div>
           <TabsContent value="table">
             <div>
               {!isLoading ? (
-                <div>
-                  {data && data.data.length ? (
-                    <>
-                      <DataTableDemo
-                        columns={columns}
-                        data={data.data}
-                        mutate={mutate}
-                      />
-                      <PaginationDemo totalPages={totalPages} />
-                    </>
-                  ) : (
-                    <p>No data available.</p>
-                  )}
-                </div>
+                <>
+                  <DataTableDemo
+                    columns={columns}
+                    data={data?.data || []}
+                    mutate={mutate}
+                  />
+                  <PaginationDemo totalPages={totalPages} />
+                </>
               ) : (
                 <TableLoadingSkeleton />
               )}
@@ -149,7 +156,6 @@ export default function UserClient() {
             <AppointmentCalendar />
           </TabsContent>
         </Tabs>
-        {/* Pagination now at the very end */}
       </div>
     </PageContainer>
   );

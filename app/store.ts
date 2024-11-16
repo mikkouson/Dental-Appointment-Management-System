@@ -58,3 +58,36 @@ export const useSetActiveAppointments = create<
   selectedAppointment: 0,
   setActiveState: (selectedAppointment) => set({ selectedAppointment }),
 }));
+type TeethLocationState = {
+  tooth_location: number;
+  tooth_condition: string;
+  tooth_history: string;
+  history_date: Date;
+  patient_id: number;
+};
+
+type TeethArray = {
+  teethLocations: TeethLocationState[];
+};
+
+type TeethArrayActions = {
+  addTeethLocation: (tooth: TeethLocationState) => void;
+  clearTeethLocations: () => void;
+  updateToothLocation: (updatedTooth: TeethLocationState) => void;
+};
+
+export const useTeethArray = create<TeethArray & TeethArrayActions>((set) => ({
+  teethLocations: [],
+  addTeethLocation: (tooth) =>
+    set((state) => ({ teethLocations: [...state.teethLocations, tooth] })),
+  clearTeethLocations: () => set({ teethLocations: [] }),
+  updateToothLocation: (updatedTooth) =>
+    set((state) => ({
+      teethLocations: state.teethLocations.map((tooth) =>
+        tooth.tooth_location === updatedTooth.tooth_location &&
+        tooth.patient_id === updatedTooth.patient_id
+          ? updatedTooth
+          : tooth
+      ),
+    })),
+}));

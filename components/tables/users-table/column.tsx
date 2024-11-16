@@ -21,6 +21,10 @@ export const columns: Column[] = [
     accessorKey: "email",
     header: "EMAIL",
   },
+  {
+    accessorKey: "role",
+    header: "ROLE",
+  },
   // {
   //   accessorKey: "price",
   //   header: "PRICE",

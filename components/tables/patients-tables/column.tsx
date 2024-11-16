@@ -1,10 +1,5 @@
 import type { PatientCol } from "@/app/schema";
 import { ColumnDef } from "@tanstack/react-table";
-import { SquarePen } from "lucide-react";
-import { DeleteModal } from "@/components/modal/deleteModal";
-import { EditPatient } from "@/components/modal/patients/editPatient";
-import { deletePatient } from "@/app/(admin)/action";
-import { mutate } from "swr";
 
 type Column = ColumnDef<PatientCol>;
 

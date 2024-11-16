@@ -56,7 +56,7 @@ const PatientFields = ({ form, onSubmit }: PatientFieldsProps) => {
                     </p>
                     <Input
                       type="number"
-                      className="w-full rounded-lg bg-background pl-16 "
+                      className="w-full rounded-lg bg-background pl-16 input-no-spin "
                       {...field}
                     />
                   </div>
@@ -105,8 +105,8 @@ const PatientFields = ({ form, onSubmit }: PatientFieldsProps) => {
           />
         </div>
         <div className="flex justify-end">
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Submitting..." : "Submit"}
+          <Button type="submit" disabled={isSubmitting} variant="outline">
+            {isSubmitting ? "Submitting..." : "Next"}
           </Button>
         </div>
       </form>

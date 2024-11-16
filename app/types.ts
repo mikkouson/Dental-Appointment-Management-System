@@ -91,25 +91,73 @@ export const UpdateInventorySchema = z.object({
 
 export type UpdateInventoryFormValues = z.infer<typeof UpdateInventorySchema>;
 
-export const UserSchema = z.object({
-  id: z.string().optional(),
-  email: z.string().email({ message: "Invalid email address" }),
-  password: z
-    .string()
-    .min(6, { message: "Password must be at least 6 characters" }),
-  name: z.string().min(3, { message: "name must be at least 3 characters" }),
-});
+export const UserSchema = z
+  .object({
+    id: z.string().optional(),
+    email: z.string().email({ message: "Invalid email address" }),
+    name: z.string().min(3, { message: "name must be at least 3 characters" }),
+    role: z.string().min(1, { message: "Sex is required." }),
+
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[0-9]/, "Password must contain at least 1 number")
+      .regex(/[a-z]/, "Password must contain at least 1 lowercase letter")
+      .regex(/[A-Z]/, "Password must contain at least 1 uppercase letter"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"], // Show error on confirm password field
+  });
 
 export type UserForm = z.infer<typeof UserSchema>;
 
-export const UpdateUser = z.object({
-  id: z.string().optional(),
-  email: z.string().email({ message: "Invalid email address" }),
-  name: z.string().min(3, { message: "name must be at least 3 characters" }),
-  newPassword: z
-    .string()
-    .min(6, { message: "Password must be at least 6 characters" })
-    .optional(),
+export const DoctorSchema = z.object({
+  id: z.number().optional(),
+  email: z.string().min(1, { message: "Email is required." }),
+  name: z.string().min(1, { message: "Name is required." }),
+  contact_info: z.coerce
+    .number()
+    .min(100000000, { message: "Invalid Phone Number" })
+    .max(999999999, { message: "Invalid Phone Number" }),
 });
 
+export type DoctorFormValues = z.infer<typeof DoctorSchema>;
+
+export const UpdateUser = z
+  .object({
+    id: z.string().optional(),
+    email: z.string().email({ message: "Invalid email address" }),
+    name: z.string().min(3, { message: "name must be at least 3 characters" }),
+    role: z.string().min(1, { message: "Sex is required." }),
+
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[0-9]/, "Password must contain at least 1 number")
+      .regex(/[a-z]/, "Password must contain at least 1 lowercase letter")
+      .regex(/[A-Z]/, "Password must contain at least 1 uppercase letter")
+      .optional(),
+
+    confirmPassword: z.string().optional(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"], // Show error on confirm password field
+  });
+
 export type UpdateUserForm = z.infer<typeof UpdateUser>;
+
+export const ToothHistory = z.object({
+  id: z.number().optional(),
+  tooth_location: z.number(),
+  tooth_condition: z
+    .string()
+    .min(1, { message: "Tooth Condition is required." }),
+  tooth_history: z.string().min(1, { message: "Description is required." }),
+  history_date: z.date(),
+  patient_id: z.number().optional(),
+});
+
+export type ToothHistoryFormValue = z.infer<typeof ToothHistory>;
