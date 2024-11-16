@@ -92,7 +92,7 @@ export function NewToothCondition({
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         variant: "success",
-        description: "Patient updated successfully.",
+        description: "Tooth condition updated successfully.",
         duration: 2000,
       });
       setOpen(false);
@@ -102,8 +102,8 @@ export function NewToothCondition({
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         variant: "destructive",
-        description: "An unexpected error occurred",
-        duration: 3000,
+        description: " Failed to update tooth condition",
+        duration: 2000,
       });
       console.error("Error in onSubmit:", error);
     }

@@ -109,7 +109,7 @@ export function EditToothCondition({
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         variant: "destructive",
-        description: "An unexpected error occurred",
+        description: " Failed to update patient",
         duration: 3000,
       });
       console.error("Error in onSubmit:", error);

@@ -101,14 +101,14 @@ export function DataTableDemo({
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         variant: "success",
-        description: "Patient deleted successfully.",
+        description: "Service deleted successfully.",
       });
     } catch (error: any) {
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
-        description: `Failed to delete the patient: ${error.message}`,
+        description: `Failed to delete the service: ${error.message}`,
       });
     }
   };

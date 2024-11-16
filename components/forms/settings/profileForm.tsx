@@ -54,7 +54,7 @@ export function ProfileForm({ user }: any) {
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         variant: "destructive",
-        description: `Failed to add user: ${error.message}`,
+        description: `Failed to add user`,
         duration: 2000,
       });
     }

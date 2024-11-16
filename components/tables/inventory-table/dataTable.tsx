@@ -100,7 +100,7 @@ export function DataTableDemo({
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         variant: "success",
-        description: "Patient deleted successfully.",
+        description: "Inventory item deleted successfully.",
         duration: 2000,
       });
     } catch (error: any) {
@@ -108,7 +108,7 @@ export function DataTableDemo({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
-        description: `Failed to delete the patient: ${error.message}`,
+        description: `Failed to delete the item: ${error.message}`,
         duration: 2000,
       });
     }
