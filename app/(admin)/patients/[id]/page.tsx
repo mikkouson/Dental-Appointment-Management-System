@@ -76,8 +76,6 @@ export default function Page({ params }: PageProps) {
     };
   }, [supabase, mutate]);
 
-  const active = useSetActiveAppointments((state) => state.selectedAppointment);
-
   if (isLoading) return <Loading />;
   if (error) return <div>Error loading patient data</div>;
 

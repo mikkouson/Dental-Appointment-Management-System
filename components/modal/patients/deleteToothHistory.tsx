@@ -1,4 +1,5 @@
 import { deleteToothHistory } from "@/app/(admin)/action";
+import { useTeethArray } from "@/app/store";
 import { toast } from "@/components/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,23 +22,35 @@ interface DeleteToothHistoryProps {
       isSubmitting: boolean;
     };
   };
+  newPatient?: boolean;
+  location?: number;
 }
 
-export function DeleteToothHistory({ id, form }: DeleteToothHistoryProps) {
+export function DeleteToothHistory({
+  id,
+  form,
+  newPatient = false,
+  location,
+}: DeleteToothHistoryProps) {
   const [isOpen, setIsOpen] = useState(false);
-
+  const { deleteTooth } = useTeethArray();
   async function handleSubmit() {
     setIsOpen(false);
 
     try {
-      await deleteToothHistory(id);
+      if (newPatient || location !== undefined) {
+        deleteTooth(location!);
+      }
 
+      if (id) {
+        await deleteToothHistory(id);
+      }
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         variant: "success",
-        description: "Patient updated successfully.",
+        description: `Tooth history deleted successfully. ${location}`,
         duration: 2000,
       });
     } catch (error) {

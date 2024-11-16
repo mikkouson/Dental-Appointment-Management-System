@@ -139,7 +139,12 @@ export function CompleteAppointment({
             value="chart"
             className="flex flex-col justify-center items-center gap-4"
           >
-            <TeethChart history={[]} newPatient={true} id={patientId} />
+            <TeethChart
+              history={[]}
+              newPatient={true}
+              id={patientId}
+              showTitle={false}
+            />
             <ToothHistoryCard
               edit={true}
               treatments={teethLocations}

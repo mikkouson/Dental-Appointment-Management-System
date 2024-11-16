@@ -75,13 +75,16 @@ const PatientFields = ({ form, onSubmit }: PatientFieldsProps) => {
                   <Input
                     type="date"
                     value={
-                      field.value instanceof Date
+                      field.value instanceof Date &&
+                      !isNaN(field.value.getTime())
                         ? field.value.toISOString().split("T")[0]
                         : ""
                     }
                     onChange={(e) => {
-                      const selectedDate = new Date(e.target.value);
-                      field.onChange(selectedDate);
+                      const date = e.target.value
+                        ? new Date(e.target.value)
+                        : null;
+                      field.onChange(date);
                     }}
                     max={new Date().toISOString().split("T")[0]}
                   />

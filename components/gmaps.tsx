@@ -85,7 +85,6 @@ const Maps = ({ field }: MapsProps) => {
         onPlaceChanged={handlePlacesChanged}
       >
         <Input
-          placeholder="Enter your address"
           value={address}
           onChange={(e) =>
             field.onChange({ ...field.value, address: e.target.value })
@@ -93,7 +92,7 @@ const Maps = ({ field }: MapsProps) => {
         />
       </Autocomplete>
       {latitude && longitude && (
-        <div className="relative h-96">
+        <div className="relative h-72">
           <GoogleMap
             mapContainerStyle={{ height: "100%", width: "100%" }}
             center={{ lat: latitude, lng: longitude }}
@@ -104,13 +103,7 @@ const Maps = ({ field }: MapsProps) => {
               position={{ lat: latitude, lng: longitude }}
               draggable
               onDragEnd={handleMarkerDragEnd}
-              title="Your address is here"
               options={{
-                label: {
-                  text: "Your address is here",
-                  fontWeight: "bold",
-                  fontSize: "14px",
-                },
                 animation: google.maps.Animation.DROP,
               }}
             />

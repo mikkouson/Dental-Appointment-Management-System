@@ -193,31 +193,36 @@ export default function ToothHistoryCard({
                         </div>
                       </div>
                     </div>
-                    {!newPatient && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-6 w-6 p-0"
-                          >
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <EditToothCondition
-                            treatment={treatment}
-                            form={form}
-                          />
-                          {/* <DropdownMenuItem>View Details</DropdownMenuItem> */}
-                          <DropdownMenuSeparator />
-                          {/* <DropdownMenuItem className="text-destructive">
+
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-6 w-6 p-0"
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <EditToothCondition
+                          treatment={treatment}
+                          form={form}
+                          newPatient={newPatient}
+                        />
+                        {/* <DropdownMenuItem>View Details</DropdownMenuItem> */}
+                        <DropdownMenuSeparator />
+                        {/* <DropdownMenuItem className="text-destructive">
                          Delete
                        </DropdownMenuItem> */}
-                          <DeleteToothHistory id={treatment?.id} form={form} />
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
+                        <DeleteToothHistory
+                          id={treatment?.id}
+                          form={form}
+                          newPatient={newPatient}
+                          location={treatment.tooth_location}
+                        />
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </CardContent>
                 </Card>
               </div>

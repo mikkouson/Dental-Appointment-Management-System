@@ -49,7 +49,7 @@ export const PatientSchema = z.object({
     .refine((data) => data.address.trim().length > 0, {
       message: "Address must be provided.",
     }),
-  sex: z.string().min(1, { message: "Sex is required." }),
+  sex: z.string().min(1, { message: "Sex is a required field" }),
   dob: z.date({
     required_error: "A date of birth is required.",
   }),
@@ -96,7 +96,7 @@ export const UserSchema = z
     id: z.string().optional(),
     email: z.string().email({ message: "Invalid email address" }),
     name: z.string().min(3, { message: "name must be at least 3 characters" }),
-    role: z.string().min(1, { message: "Sex is required." }),
+    role: z.string().min(1, { message: "Sex is a required field" }),
 
     password: z
       .string()
@@ -130,7 +130,7 @@ export const UpdateUser = z
     id: z.string().optional(),
     email: z.string().email({ message: "Invalid email address" }),
     name: z.string().min(3, { message: "name must be at least 3 characters" }),
-    role: z.string().min(1, { message: "Sex is required." }),
+    role: z.string().min(1, { message: "Sex is a required field" }),
 
     password: z
       .string()

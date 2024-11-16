@@ -206,7 +206,11 @@ export function NewPatientForm({ setOpen, mutate }: NewPatientFormProps) {
             </div>
           ) : (
             <ScrollArea className="h-[200px] w-full">
-              <ToothHistoryCard edit={true} treatments={teethLocations} />
+              <ToothHistoryCard
+                edit={true}
+                treatments={teethLocations}
+                newPatient={true}
+              />
             </ScrollArea>
           )}
           <div className="flex justify-between">

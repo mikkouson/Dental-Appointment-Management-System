@@ -74,6 +74,7 @@ type TeethArrayActions = {
   addTeethLocation: (tooth: TeethLocationState) => void;
   clearTeethLocations: () => void;
   updateToothLocation: (updatedTooth: TeethLocationState) => void;
+  deleteTooth: (toothLocation: number) => void;
 };
 
 export const useTeethArray = create<TeethArray & TeethArrayActions>((set) => ({
@@ -88,6 +89,12 @@ export const useTeethArray = create<TeethArray & TeethArrayActions>((set) => ({
         tooth.patient_id === updatedTooth.patient_id
           ? updatedTooth
           : tooth
+      ),
+    })),
+  deleteTooth: (toothLocation) =>
+    set((state) => ({
+      teethLocations: state.teethLocations.filter(
+        (tooth) => tooth.tooth_location !== toothLocation
       ),
     })),
 }));
