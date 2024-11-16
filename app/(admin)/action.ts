@@ -229,7 +229,7 @@ export async function createNewUser(formData: UserForm) {
   const { error } = await supabase.auth.admin.createUser({
     email: formData.email,
     password: formData.password,
-    user_metadata: { name: formData.name },
+    user_metadata: { name: formData.name, role: formData.role },
     email_confirm: true, // This confirms the email without needing a timestamp
     role: "authenticated",
   });
@@ -267,10 +267,10 @@ export async function updateUser(formData: UpdateUserForm) {
   const updateData: {
     email: string;
     password?: string;
-    user_metadata?: { name: string };
+    user_metadata?: { name: string; role: string };
   } = {
     email: formData.email,
-    user_metadata: { name: formData.name },
+    user_metadata: { name: formData.name, role: formData.role },
   };
 
   if (formData.password && formData.password.length > 0) {

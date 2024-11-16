@@ -19,6 +19,10 @@ interface PatientFieldsProps {
   onSubmit: (data: UserForm) => void;
 }
 
+export const role = [
+  { name: "Admin", id: "admin" },
+  { name: "Super Admin", id: "super_admin" },
+] as const;
 const UserField = ({ form, onSubmit }: PatientFieldsProps) => {
   const { isSubmitting } = form.formState;
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
@@ -70,6 +74,7 @@ const UserField = ({ form, onSubmit }: PatientFieldsProps) => {
               </FormItem>
             )}
           />
+          <Field form={form} name={"role"} label={"Role"} data={role} />
         </div>
         <div className="flex justify-end">
           <Button type="submit" disabled={isSubmitting}>

@@ -1,12 +1,12 @@
 "use client";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-import { links, LogoIcon, Logos } from "../sidebar";
+import { getLinks, LogoIcon, Logos } from "../sidebar";
 import { MobileBody, Sidebar, SidebarLink } from "../ui/sidebar";
 
-const BurgerMenu = () => {
+export const BurgerMenu = () => {
   const [open, setOpen] = useState(false);
-
+  const links = getLinks();
   return (
     <div className={cn("block lg:!hidden")}>
       <div>

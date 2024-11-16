@@ -44,6 +44,7 @@ export function EditUser({ data, mutate }: EditUserProps) {
     form.setValue("id", data.id || "");
     form.setValue("name", data.name || "");
     form.setValue("email", data.email || "");
+    form.setValue("role", data.role || "");
   };
 
   // async function onSubmit(data: z.infer<typeof UpdateUser>) {

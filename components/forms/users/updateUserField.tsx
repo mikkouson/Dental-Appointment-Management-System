@@ -12,8 +12,9 @@ import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 import Field from "../formField";
-import PasswordInput from "./passworInput";
 import { useState } from "react";
+import { role } from "./userField";
+import PasswordInput from "./updatePasswordInput";
 interface PatientFieldsProps {
   form: UseFormReturn<UpdateUserForm>;
   onSubmit: (data: UpdateUserForm) => void;
@@ -72,6 +73,7 @@ const UpdateUserField = ({ form, onSubmit }: PatientFieldsProps) => {
               </FormItem>
             )}
           />
+          <Field form={form} name={"role"} label={"Role"} data={role} />
         </div>
         <div className="flex justify-end">
           <Button type="submit" disabled={isSubmitting}>
