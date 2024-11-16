@@ -161,7 +161,7 @@ export function DataTableDemo({
                     </TableCell>
                   ))}
                   <TableCell>
-                    <DropdownMenu>
+                    <DropdownMenu modal={false}>
                       <DropdownMenuTrigger asChild>
                         <Button
                           variant="ghost"

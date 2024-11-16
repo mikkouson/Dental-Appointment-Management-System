@@ -152,7 +152,7 @@ export function DataTableDemo({ columns, data, mutate }: DataTableProps) {
                 ))}
                 <TableCell>
                   <div className="flex px-2"></div>
-                  <DropdownMenu>
+                  <DropdownMenu modal={false}>
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="ghost"

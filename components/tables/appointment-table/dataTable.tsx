@@ -163,7 +163,7 @@ export function DataTableDemo({
                   ))}
                   <TableCell>
                     <div className="flex px-2"></div>
-                    <DropdownMenu>
+                    <DropdownMenu modal={false}>
                       <DropdownMenuTrigger asChild>
                         <Button
                           variant="ghost"
