@@ -133,6 +133,7 @@ export default function UserClient() {
               isSearchFocused={isSearchFocused}
               setIsSearchFocused={setIsSearchFocused}
               handleSearch={handleSearch}
+              label="Patient"
             />
           </div>
           <TabsContent value="table">

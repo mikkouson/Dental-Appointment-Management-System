@@ -71,8 +71,8 @@ export default function UserClient() {
               Total Appointments ({doctors ? doctors.count : "Loading"})
             </h4>
             <Heading
-              title={`Total Services (${doctors ? doctors.count : "loading"})`}
-              description="Manage Services (Server side table functionalities.)"
+              title={`Total Doctors (${doctors ? doctors.count : "loading"})`}
+              description="Manage Doctors (Server side table functionalities.)"
             />
           </div>
           <div className="flex items-center ">
@@ -101,6 +101,7 @@ export default function UserClient() {
             isSearchFocused={isSearchFocused}
             setIsSearchFocused={setIsSearchFocused}
             handleSearch={handleSearch}
+            label="Doctor"
           />
         </div>
         <Separator />

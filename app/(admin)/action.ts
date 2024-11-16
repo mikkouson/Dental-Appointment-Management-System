@@ -273,8 +273,8 @@ export async function updateUser(formData: UpdateUserForm) {
     user_metadata: { name: formData.name },
   };
 
-  if (formData.newPassword && formData.newPassword.length > 0) {
-    updateData.password = formData.newPassword;
+  if (formData.password && formData.password.length > 0) {
+    updateData.password = formData.password;
   }
 
   const { data: user, error } = await supabase.auth.admin.updateUserById(

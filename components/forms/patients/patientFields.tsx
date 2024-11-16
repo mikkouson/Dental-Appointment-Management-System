@@ -56,7 +56,7 @@ const PatientFields = ({ form, onSubmit }: PatientFieldsProps) => {
                     </p>
                     <Input
                       type="number"
-                      className="w-full rounded-lg bg-background pl-16 "
+                      className="w-full rounded-lg bg-background pl-16 input-no-spin "
                       {...field}
                     />
                   </div>

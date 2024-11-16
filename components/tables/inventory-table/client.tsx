@@ -95,6 +95,7 @@ export default function InventoryClient() {
             isSearchFocused={isSearchFocused}
             setIsSearchFocused={setIsSearchFocused}
             handleSearch={handleSearch}
+            label="Inventory Item"
           />
         </div>
         <Separator />
