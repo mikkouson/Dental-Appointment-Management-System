@@ -32,11 +32,13 @@ export function CompleteAppointment({
   disabled,
   appointmentId,
   patientId,
+  brachId,
 }: {
   text: boolean;
   disabled: boolean;
   appointmentId: any;
   patientId: any;
+  brachId: any;
 }) {
   const [open, setOpen] = useState(false);
   const { clearTeethLocations } = useTeethArray();
@@ -157,6 +159,7 @@ export function CompleteAppointment({
               onSubmit={onSubmit}
               selectedItems={selectedItems}
               setSelectedItems={setSelectedItems}
+              branchId={brachId}
             />
           </TabsContent>
         </Tabs>

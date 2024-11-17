@@ -17,14 +17,12 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
-import { zodResolver } from "@hookform/resolvers/zod";
-import Field from "../formField";
-import { UpdateInventoryFormValues } from "@/app/types";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import FormSkeleton from "./loading";
+import Field from "../formField";
+import { UpdateInventoryFormValues } from "@/app/types";
 
-// Add styles to remove input spinners
 const inputStyles = `
   input::-webkit-outer-spin-button,
   input::-webkit-inner-spin-button {
@@ -55,6 +53,7 @@ interface ItemUsedFieldsProps {
       }[]
     >
   >;
+  branchId: number; // Make sure branchId is required in props
 }
 
 export function ItemUsedField({
@@ -62,10 +61,15 @@ export function ItemUsedField({
   onSubmit,
   setSelectedItems,
   selectedItems,
+  branchId,
 }: ItemUsedFieldsProps) {
   const { inventory, inventoryError, inventoryLoading } = useInventory();
 
   if (inventoryLoading) return <FormSkeleton />;
+  // Filter inventory items by branchId
+  const filteredInventory = inventory?.data?.filter(
+    (item) => item?.branch?.id === branchId
+  );
 
   const { isSubmitting } = form.formState;
 
@@ -77,18 +81,16 @@ export function ItemUsedField({
     setSelectedItems((items) =>
       items.map((item) => {
         if (item.id === id) {
-          const inventoryItem = inventory?.data?.find((inv) => inv.id === id);
+          const inventoryItem = filteredInventory?.find((inv) => inv.id === id);
           const maxQuantity = inventoryItem?.quantity || 0;
 
           let validatedQuantity;
           if (isIncrement) {
-            // Handle increment/decrement
             validatedQuantity = Math.max(
               1,
               Math.min(maxQuantity, item.quantity + (newValue as number))
             );
           } else {
-            // Handle direct input
             const numValue = parseInt(newValue as string) || 0;
             validatedQuantity = Math.max(1, Math.min(maxQuantity, numValue));
           }
@@ -120,7 +122,6 @@ export function ItemUsedField({
     }
   };
 
-  // Update form value when selectedItems change
   form.setValue(
     "selectedItems",
     selectedItems.map((item) => ({
@@ -137,6 +138,7 @@ export function ItemUsedField({
           onSubmit={form.handleSubmit(onSubmit)}
           className="w-full space-y-6"
         >
+          {}
           <div className="w-full space-y-4">
             <div className="hidden">
               <Field form={form} name={"id"} label={"Id"} num={true} disabled />
@@ -163,12 +165,12 @@ export function ItemUsedField({
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 max-h-[300px] overflow-y-auto">
-                        {inventory?.data?.length === 0 ? (
+                        {filteredInventory?.length === 0 ? (
                           <div className="p-4 text-center text-muted-foreground">
-                            No items available
+                            No items available for this branch
                           </div>
                         ) : (
-                          inventory?.data?.map((item) => {
+                          filteredInventory?.map((item) => {
                             const isSelected = selectedItems.some(
                               (selected) => selected.id === item.id
                             );
@@ -209,7 +211,7 @@ export function ItemUsedField({
             />
 
             {selectedItems.map((item) => {
-              const inventoryItem = inventory?.data?.find(
+              const inventoryItem = filteredInventory?.find(
                 (inv) => inv.id === item.id
               );
               const maxQuantity = inventoryItem?.quantity || 0;

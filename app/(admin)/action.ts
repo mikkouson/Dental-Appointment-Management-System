@@ -159,6 +159,7 @@ export async function newInventory(data: InventoryFormValues) {
       name: data.name,
       description: data.description,
       quantity: data.quantity,
+      branch: data.branch,
     },
   ]);
 
@@ -186,6 +187,7 @@ export async function updateInventory(data: InventoryFormValues) {
       name: data.name,
       quantity: data.quantity,
       description: data.description,
+      branch: data.branch,
     })
     .eq("id", data.id);
 

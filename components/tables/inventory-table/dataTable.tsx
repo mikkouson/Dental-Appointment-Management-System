@@ -1,6 +1,5 @@
 "use client";
 import { deleteInventory } from "@/app/(admin)/action";
-import type { Inventory } from "@/app/schema";
 import { useSetActive } from "@/app/store";
 import { toast } from "@/components/hooks/use-toast";
 import { DeleteModal } from "@/components/modal/deleteModal";
@@ -29,7 +28,10 @@ import {
 } from "@tanstack/react-table";
 import * as React from "react";
 import { ScrollArea, ScrollBar } from "../../ui/scroll-area";
-import { EditInventory } from "@/components/modal/inventory/editInvetory";
+import {
+  EditInventory,
+  InventoryColWithBranch,
+} from "@/components/modal/inventory/editInvetory";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,10 +40,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
-type Column = ColumnDef<Inventory>;
+type Column = ColumnDef<InventoryColWithBranch>;
 
 type DataTableProps = {
-  data: Inventory[];
+  data: any[];
   columns: Column[];
   activePatient: Number | undefined;
   mutate: any;
@@ -84,7 +86,7 @@ export function DataTableDemo({
     },
   });
 
-  const handleClick = (row: Row<Inventory>) => {
+  const handleClick = (row: Row<InventoryColWithBranch>) => {
     setActive(row.original.id); // Set the clicked row as active
   };
   const handleDelete = (id?: number) => {

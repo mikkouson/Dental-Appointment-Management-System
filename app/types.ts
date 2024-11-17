@@ -74,6 +74,7 @@ export const InventorySchema = z.object({
   description: z.string().min(1, { message: "Description is required." }),
   name: z.string().min(1, { message: "Name is required." }),
   quantity: z.number(),
+  branch: z.number().min(1, { message: "Name is required." }),
 });
 
 export type InventoryFormValues = z.infer<typeof InventorySchema>;

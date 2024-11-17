@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { updateInventory } from "@/app/(admin)/action";
 import { InventorySchema } from "@/app/types";
-import { Inventory } from "@/app/schema";
+import { InventoryCol } from "@/app/schema";
 import {
   Sheet,
   SheetContent,
@@ -25,37 +25,42 @@ import { Button } from "@/components/ui/button";
 const fetcher = (url: string): Promise<any> =>
   fetch(url).then((res) => res.json());
 
+interface Branch {
+  name: unknown;
+  id: number;
+}
+
+// Update the interface to match InventoryCol's updated_at type
+export interface InventoryColWithBranch extends Omit<InventoryCol, "branch"> {
+  branch: Branch;
+}
+
 type EditInventoryProps = {
-  data: Inventory;
+  data: InventoryColWithBranch;
   mutate: any;
 };
 
 export function EditInventory({ data, mutate }: EditInventoryProps) {
   const { data: responseData, error } = useSWR("/api/inventory/", fetcher);
-
-  // Extract the array of inventory from the response data
   const inventory = responseData?.data || [];
-
   const [open, setOpen] = useState(false);
 
-  // Initialize the form without defaultValues
   const form = useForm<z.infer<typeof InventorySchema>>({
     resolver: zodResolver(InventorySchema),
   });
 
-  // Function to set form values when opening the modal
   const setFormValues = () => {
     form.setValue("id", data.id);
     form.setValue("name", data.name);
     form.setValue("description", data.description);
     form.setValue("quantity", data.quantity);
+    form.setValue("branch", data.branch.id);
   };
 
-  // Function to validate the uniqueness of the inventory name
   async function validateName(name: string): Promise<boolean> {
     const trimmedName = name.trim();
     return inventory.some(
-      (item: Inventory) =>
+      (item: InventoryColWithBranch) =>
         item.id !== data.id &&
         item.name.trim().toLowerCase() === trimmedName.toLowerCase()
     );
@@ -72,34 +77,42 @@ export function EditInventory({ data, mutate }: EditInventoryProps) {
       return;
     }
 
-    // Prepare the updated inventory item
-    const updatedItem: Inventory = {
+    // Create the update payload matching InventorySchema
+    const updatePayload: z.infer<typeof InventorySchema> = {
+      id: data.id,
+      name: formData.name,
+      description: formData.description,
+      quantity: formData.quantity,
+      branch: formData.branch,
+    };
+
+    // For UI updates, include the branch object structure and updated_at
+    const uiUpdateData: InventoryColWithBranch = {
       ...data,
-      ...formData,
-      updated_at: new Date().toISOString(), // Ensure updated_at is set to current time
+      ...updatePayload,
+      branch: {
+        id: formData.branch,
+        name: undefined,
+      },
+      updated_at: new Date().toISOString(),
     };
 
     // Optimistically update the UI
-    mutate(
-      (currentData: { data: Inventory[]; count: number }) => {
-        let updatedData = currentData.data.map((item) =>
-          item.id === updatedItem.id ? updatedItem : item
-        );
+    mutate((currentData: { data: InventoryColWithBranch[]; count: number }) => {
+      let updatedData = currentData.data.map((item) =>
+        item.id === updatePayload.id ? uiUpdateData : item
+      );
 
-        // Reorder the updatedData array based on updated_at descending
-        updatedData = updatedData.sort((a, b) => {
-          return (
-            new Date(b.updated_at ?? "").getTime() -
-            new Date(a.updated_at ?? "").getTime()
-          );
-        });
+      updatedData = updatedData.sort((a, b) => {
+        const bTime = new Date(b.updated_at ?? "").getTime();
+        const aTime = new Date(a.updated_at ?? "").getTime();
+        return bTime - aTime;
+      });
 
-        return { ...currentData, data: updatedData };
-      },
-      false // Do not revalidate yet
-    );
+      return { ...currentData, data: updatedData };
+    }, false);
 
-    setOpen(false); // Close the modal
+    setOpen(false);
 
     toast({
       className: cn(
@@ -111,13 +124,11 @@ export function EditInventory({ data, mutate }: EditInventoryProps) {
     });
 
     try {
-      await updateInventory(updatedItem); // Ensure this function returns a promise and handles updated_at
-
-      mutate(); // Revalidate to ensure data consistency
-    } catch (error: any) {
-      // Revert the optimistic update in case of an error
+      // Send only the schema-compliant payload to the update function
+      await updateInventory(updatePayload);
       mutate();
-
+    } catch (error: any) {
+      mutate();
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
@@ -130,7 +141,6 @@ export function EditInventory({ data, mutate }: EditInventoryProps) {
   }
 
   useEffect(() => {
-    // Optional: Prevent pointer events during certain operations if needed
     setTimeout(() => (document.body.style.pointerEvents = ""), 0);
   }, []);
 
@@ -139,7 +149,7 @@ export function EditInventory({ data, mutate }: EditInventoryProps) {
       <SheetTrigger asChild>
         <Button
           onClick={() => {
-            setFormValues(); // Set form values when opening the modal
+            setFormValues();
             setOpen(true);
           }}
           variant="ghost"
@@ -168,8 +178,7 @@ export function EditInventory({ data, mutate }: EditInventoryProps) {
         <SheetHeader>
           <SheetTitle>Edit Inventory</SheetTitle>
           <SheetDescription>
-            Make changes to the inventory item here. Click save when you’re
-            done.
+            Make changes to the inventory item here. Click save when youre done.
           </SheetDescription>
         </SheetHeader>
         <InventoryField form={form} onSubmit={onSubmit} />
