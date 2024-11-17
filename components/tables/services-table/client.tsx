@@ -83,7 +83,7 @@ export default function UserClient() {
             <DrawerDialogDemo
               open={open}
               setOpen={setOpen}
-              label={"New Inventory Item"}
+              label={"New Service"}
             >
               {" "}
               <NewServiceForm setOpen={setOpen} mutate={mutate} />
