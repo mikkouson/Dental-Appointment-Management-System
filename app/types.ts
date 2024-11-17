@@ -125,6 +125,12 @@ export const DoctorSchema = z.object({
 
 export type DoctorFormValues = z.infer<typeof DoctorSchema>;
 
+export const SelectDoctorSchema = z.object({
+  id: z.number().min(1, { message: "Email is required." }),
+});
+
+export type SelectDoctorFormValues = z.infer<typeof SelectDoctorSchema>;
+
 export const UpdateUser = z
   .object({
     id: z.string().optional(),

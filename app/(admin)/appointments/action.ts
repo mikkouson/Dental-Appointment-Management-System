@@ -1,5 +1,9 @@
 "use server";
-import { UpdateInventoryFormValues, UpdateInventorySchema } from "@/app/types";
+import {
+  SelectDoctorFormValues,
+  UpdateInventoryFormValues,
+  UpdateInventorySchema,
+} from "@/app/types";
 import DentalAppointmentCancellationEmail from "@/components/emailTemplates/cancelAppointment";
 import DentalAppointmentEmail from "@/components/emailTemplates/newAppointment";
 import DentalAppointmentPendingEmail from "@/components/emailTemplates/pendingAppointment";
@@ -16,6 +20,7 @@ import { createMultipleToothHistory } from "../action";
 const resend = new Resend(process.env.RESEND_API_KEY);
 interface AppointmentActionProps {
   aptId: number;
+  data?: SelectDoctorFormValues;
 }
 
 const schema = z.object({
@@ -42,7 +47,10 @@ const schema = z.object({
 
 type Inputs = z.infer<typeof schema>;
 
-export async function acceptAppointment({ aptId }: AppointmentActionProps) {
+export async function acceptAppointment({
+  aptId,
+  data,
+}: AppointmentActionProps) {
   const supabase = createClient();
   const otpGenerator = require("otp-generator");
 
@@ -56,6 +64,7 @@ export async function acceptAppointment({ aptId }: AppointmentActionProps) {
     .update({
       status: 1,
       appointment_ticket: appointmentTicket,
+      doctor: data?.id,
     })
     .eq("id", aptId)
     .select(

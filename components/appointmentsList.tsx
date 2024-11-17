@@ -34,6 +34,7 @@ import {
 import { DeleteToothHistory } from "./modal/patients/deleteToothHistory";
 import { EditToothCondition } from "./modal/patients/edit-tooth-condition";
 import { DeleteModal } from "./modal/deleteModal";
+import { AcceptAppointment } from "./modal/appointment/acceptAppointment";
 
 interface AppointmentsMapProps {
   timeSlots: TimeSlot[];
@@ -220,24 +221,14 @@ export default function AppointmentsMap({
                             </Button>
                           </>
                         )}
+
                         {apt.status?.id === 2 && (
                           <>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              disabled={loading === apt.id}
-                              onClick={() =>
-                                handleAction(
-                                  () => acceptAppointment({ aptId: apt.id }),
-                                  apt.id,
-                                  "accepted"
-                                )
-                              }
-                            >
-                              {loading === apt.id && loadingType === "accepted"
-                                ? "Accepting..."
-                                : "Accept"}
-                            </Button>
+                            <AcceptAppointment
+                              disabled={false}
+                              appointment={apt}
+                              patientId={apt.patients?.id}
+                            />
                             <Button
                               variant="destructive"
                               size="sm"

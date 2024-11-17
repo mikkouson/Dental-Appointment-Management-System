@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import moment from "moment";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { useAppointments } from "./hooks/useAppointment";
+import { useAppointments } from "./hooks/useAppointmentCalendar";
 import PageContainer from "./layout/page-container";
 
 const timeSlots = [
@@ -33,7 +33,7 @@ export default function AppointmentCalendar() {
     appointments,
     appointmentsLoading: isLoading,
     mutate,
-  } = useAppointments(page, query, branch, status, formatDate);
+  } = useAppointments(null, query, branch, status, formatDate);
 
   return (
     <PageContainer>

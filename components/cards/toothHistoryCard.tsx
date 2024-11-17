@@ -38,6 +38,7 @@ interface ToothHistoryProps {
   treatments: Treatment[];
   edit?: boolean;
   newPatient?: boolean;
+  showDropDown?: boolean;
 }
 
 type SortOrder = "asc" | "desc";
@@ -46,6 +47,7 @@ export default function ToothHistoryCard({
   treatments,
   edit = false,
   newPatient = false,
+  showDropDown = true,
 }: ToothHistoryProps) {
   const conditionColors = useConditionColors();
 
@@ -194,35 +196,37 @@ export default function ToothHistoryCard({
                       </div>
                     </div>
 
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-6 w-6 p-0"
-                        >
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <EditToothCondition
-                          treatment={treatment}
-                          form={form}
-                          newPatient={newPatient}
-                        />
-                        {/* <DropdownMenuItem>View Details</DropdownMenuItem> */}
-                        <DropdownMenuSeparator />
-                        {/* <DropdownMenuItem className="text-destructive">
+                    {showDropDown && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-6 w-6 p-0"
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <EditToothCondition
+                            treatment={treatment}
+                            form={form}
+                            newPatient={newPatient}
+                          />
+                          {/* <DropdownMenuItem>View Details</DropdownMenuItem> */}
+                          <DropdownMenuSeparator />
+                          {/* <DropdownMenuItem className="text-destructive">
                          Delete
                        </DropdownMenuItem> */}
-                        <DeleteToothHistory
-                          id={treatment?.id}
-                          form={form}
-                          newPatient={newPatient}
-                          location={treatment.tooth_location}
-                        />
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                          <DeleteToothHistory
+                            id={treatment?.id}
+                            form={form}
+                            newPatient={newPatient}
+                            location={treatment.tooth_location}
+                          />
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
                   </CardContent>
                 </Card>
               </div>
