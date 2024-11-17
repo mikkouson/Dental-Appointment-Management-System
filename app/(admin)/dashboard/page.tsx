@@ -19,6 +19,7 @@ import {
 import moment from "moment";
 import { useSearchParams } from "next/navigation";
 import DashboardLoading from "./loading ";
+import PDFExportButton from "@/components/buttons/exportButtons/dashboardExport";
 
 export default function Page() {
   const searchParams = useSearchParams();
@@ -196,7 +197,9 @@ export default function Page() {
             </h2>
             <div className="hidden items-center space-x-2 md:flex">
               <CalendarDateRangePicker />
-              <Button>Download</Button>
+              <PDFExportButton
+                dateRange={{ start: dateRangeStart, end: dateRangeEnd }}
+              />
             </div>
           </div>
 
@@ -278,14 +281,14 @@ export default function Page() {
             </div>
             <RecentSales />
 
-            <div className="col-span-4">
+            <div className="col-span-4 PatientChart">
               <PatientChart
                 range={{ start: dateRangeStart, end: dateRangeEnd }}
                 data={appointments}
               />
             </div>
 
-            <div className="col-span-4 md:col-span-3">
+            <div className="col-span-4 md:col-span-3 PieGraph">
               <PieGraph />
             </div>
           </div>

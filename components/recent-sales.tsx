@@ -35,7 +35,7 @@ export function RecentSales() {
   const outOfStockPercentage = (outOfStockCount / totalCount) * 100 || 0;
 
   return (
-    <Card className="col-span-4 md:col-span-3">
+    <Card className="col-span-4 md:col-span-3 RecentSales">
       <CardHeader>
         <CardTitle>Inventory Stocks</CardTitle>
         <CardDescription>
