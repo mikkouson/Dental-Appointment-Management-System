@@ -129,7 +129,6 @@ export function EditService({ data, mutate }: EditServiceProps) {
       description: "Service updated successfully.",
       duration: 2000,
     });
-    p;
 
     try {
       await updateService(formData); // Make sure this function returns a promise
