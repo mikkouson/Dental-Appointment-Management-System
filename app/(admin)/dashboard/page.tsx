@@ -86,7 +86,7 @@ export default function Page() {
 
     // Calculate completion rate (completed appointments / total appointments)
     const currentCompletedAppointments = currentPeriodAppointments.filter(
-      (appointment) => appointment.status?.id === 3 // Assuming 3 is the status ID for completed appointments
+      (appointment) => appointment.status?.id === 4 // Assuming 3 is the status ID for completed appointments
     ).length;
 
     const currentCompletionRate =
