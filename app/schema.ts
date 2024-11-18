@@ -55,6 +55,7 @@ export type DoctorCol = Tables<"doctors"> & {
   name: string | null;
   contact_info: string | null;
   email: string | null;
+  branch: Tables<"branch"> | null; // Example: Relationship to branch table
 };
 
 export type Database = {

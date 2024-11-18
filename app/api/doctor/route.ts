@@ -20,7 +20,15 @@ export async function GET(req: NextRequest, res: NextResponse) {
   let query = supabase
     .from("doctors")
 
-    .select("*", { count: "exact" })
+    .select(
+      `
+      *,
+      branch (
+        *
+      )
+      `,
+      { count: "exact" }
+    )
     .is("deleteOn", null)
     .ilike("name", `%${filterParam}%`) // Filter based on 'name' column
     .order("updated_at", { ascending: false });

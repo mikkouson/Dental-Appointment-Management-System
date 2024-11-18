@@ -118,6 +118,7 @@ export const DoctorSchema = z.object({
   id: z.number().optional(),
   email: z.string().min(1, { message: "Email is required." }),
   name: z.string().min(1, { message: "Name is required." }),
+  branch: z.number().min(1, { message: "Name is required." }),
   contact_info: z.coerce
     .number()
     .min(100000000, { message: "Invalid Phone Number" })

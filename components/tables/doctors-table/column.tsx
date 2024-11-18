@@ -25,8 +25,9 @@ export const columns: Column[] = [
     accessorKey: "contact_info",
     header: "CONTACT",
   },
-  // {
-  //   accessorKey: "price",
-  //   header: "PRICE",
-  // },
+  {
+    accessorFn: (row) => row.branch?.name,
+    id: "branch",
+    header: "Branch",
+  },
 ];
