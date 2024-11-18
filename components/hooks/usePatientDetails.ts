@@ -21,7 +21,7 @@ export function usePatientsDetails(id?: string | null) {
 
   useEffect(() => {
     const channel = supabase
-      .channel("realtime tooth_history")
+      .channel(`realtime-tooth_history-${id}`)
 
       .on(
         "postgres_changes",
@@ -35,7 +35,7 @@ export function usePatientsDetails(id?: string | null) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [supabase, mutate]);
+  }, [id, supabase, mutate]);
 
   return { data, error, isLoading, mutate };
 }

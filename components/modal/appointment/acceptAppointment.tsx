@@ -50,7 +50,7 @@ export function AcceptAppointment({
   const { data, error, isLoading, mutate } = usePatientsDetails(patientId);
   const { doctors, doctorError, doctorLoading } = useDoctor();
   const filteredDoctors = doctors?.data?.filter(
-    (doctor: any) => doctor.branch === appointment.branch.id
+    (doctor: any) => doctor.branch.id === appointment.branch.id
   );
 
   console.log(doctors);
@@ -64,6 +64,8 @@ export function AcceptAppointment({
   });
   async function onSubmit(data: z.infer<typeof SelectDoctorSchema>) {
     try {
+      mutate(); // Revalidate to ensure data consistency
+
       await acceptAppointment({ aptId: appointment.id, data });
       toast({
         className: cn(
@@ -74,7 +76,7 @@ export function AcceptAppointment({
         duration: 2000,
       });
       mutate(); // Revalidate to ensure data consistency
-      // setOpen(false); // Close the modal
+      setOpen(false); // Close the modal
     } catch (error: any) {
       // Revert the optimistic update in case of an error
       mutate();
