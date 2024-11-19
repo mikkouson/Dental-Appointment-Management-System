@@ -38,6 +38,7 @@ interface ToothHistoryProps {
   treatments: Treatment[];
   edit?: boolean;
   newPatient?: boolean;
+  showDropDown?: boolean;
 }
 
 type SortOrder = "asc" | "desc";
@@ -46,6 +47,7 @@ export default function ToothHistoryCard({
   treatments,
   edit = false,
   newPatient = false,
+  showDropDown = true,
 }: ToothHistoryProps) {
   const conditionColors = useConditionColors();
 
@@ -193,7 +195,8 @@ export default function ToothHistoryCard({
                         </div>
                       </div>
                     </div>
-                    {!newPatient && (
+
+                    {showDropDown && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
@@ -208,13 +211,19 @@ export default function ToothHistoryCard({
                           <EditToothCondition
                             treatment={treatment}
                             form={form}
+                            newPatient={newPatient}
                           />
                           {/* <DropdownMenuItem>View Details</DropdownMenuItem> */}
                           <DropdownMenuSeparator />
                           {/* <DropdownMenuItem className="text-destructive">
                          Delete
                        </DropdownMenuItem> */}
-                          <DeleteToothHistory id={treatment?.id} form={form} />
+                          <DeleteToothHistory
+                            id={treatment?.id}
+                            form={form}
+                            newPatient={newPatient}
+                            location={treatment.tooth_location}
+                          />
                         </DropdownMenuContent>
                       </DropdownMenu>
                     )}

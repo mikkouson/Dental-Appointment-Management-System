@@ -49,7 +49,7 @@ export const DentalAppointmentEmail = ({
             {/* Approval */}
             <Section className="text-center mt-[20px] mb-[20px]">
               <Heading className="text-[24px] font-semibold m-0">
-                Your dental application has been approved.
+                Your appointment reschedule request has been approved
               </Heading>
               <Text className="mt-2 text-gray-700 m-0">
                 Please take note of your ticket number below:

@@ -17,7 +17,6 @@ import { cn } from "@/lib/utils";
 import { Check, ChevronDownIcon, Loader2 } from "lucide-react";
 import useSWR from "swr";
 import moment from "moment";
-import { TooltipDemo } from "../ToolTip";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -42,23 +41,23 @@ export default function TimeSlot({ branch, field, date }: TimeSlotProps) {
   if (error) return <div>Error loading time slots.</div>;
   if (!data)
     return (
-      <>
-        <Button
-          variant="outline"
-          className="w-full flex justify-between"
-          disabled
-        >
-          Select Time Slot <Loader2 className="animate-spin" />
-        </Button>
-      </>
+      <Button
+        variant="outline"
+        className="w-full flex justify-between"
+        disabled
+      >
+        Select Time Slot <Loader2 className="animate-spin" />
+      </Button>
     );
 
   const handleSelect = (value: number) => {
     field.onChange(value);
   };
+
   const formatTime = (time: string) => {
     return moment(time, "HH:mm:ss").format("hh:mm A");
   };
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -86,52 +85,25 @@ export default function TimeSlot({ branch, field, date }: TimeSlotProps) {
           <CommandList>
             <CommandEmpty>No time slots available.</CommandEmpty>
             <CommandGroup>
-              {data.map(
-                (slot: { id: number; time: string; appointments: any[] }) => {
-                  const isDisabled = slot.appointments.length >= 3;
-                  return (
-                    <div
-                      key={slot.id}
-                      className={cn(
-                        isDisabled
-                          ? "flex flex-row-reverse justify-between"
-                          : ""
-                      )}
-                    >
-                      {isDisabled ? (
-                        <TooltipDemo text={isDisabled ? "Out of slots" : ""} />
-                      ) : (
-                        <></>
-                      )}
-                      <CommandItem
-                        value={slot.id.toString()}
-                        onSelect={() => {
-                          if (!isDisabled) {
-                            handleSelect(slot.id);
-                            setOpen(false);
-                          }
-                        }}
-                        className={cn(
-                          "flex",
-                          field.value === slot.id ? "" : "",
-                          isDisabled && "opacity-50 cursor-not-allowed"
-                        )}
-                        disabled={isDisabled}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            field.value === slot.id
-                              ? "opacity-100"
-                              : "opacity-0"
-                          )}
-                        />
-                        <p>{formatTime(slot.time)}</p>
-                      </CommandItem>
-                    </div>
-                  );
-                }
-              )}
+              {data.map((slot: { id: number; time: string }) => (
+                <CommandItem
+                  key={slot.id}
+                  value={slot.id.toString()}
+                  onSelect={() => {
+                    handleSelect(slot.id);
+                    setOpen(false);
+                  }}
+                  className={cn("flex")}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      field.value === slot.id ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  <p>{formatTime(slot.time)}</p>
+                </CommandItem>
+              ))}
             </CommandGroup>
           </CommandList>
         </Command>

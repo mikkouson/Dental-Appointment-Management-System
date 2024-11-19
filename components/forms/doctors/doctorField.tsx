@@ -11,6 +11,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useBranches } from "@/components/hooks/useBranches";
 interface DoctorFieldsProps {
   form: UseFormReturn<DoctorFormValues>;
   onSubmit: (data: DoctorFormValues) => void;
@@ -26,6 +27,7 @@ const inputStyles = `
   }
 `;
 const DoctorFields = ({ form, onSubmit }: DoctorFieldsProps) => {
+  const { branches, branchLoading } = useBranches();
   const { isSubmitting } = form.formState;
   return (
     <Form {...form}>
@@ -54,6 +56,13 @@ const DoctorFields = ({ form, onSubmit }: DoctorFieldsProps) => {
                 <FormMessage />
               </FormItem>
             )}
+          />
+          <Field
+            form={form}
+            name={"branch"}
+            label={"Branch"}
+            data={branches}
+            num={true}
           />
         </div>
         <div className="flex justify-end">

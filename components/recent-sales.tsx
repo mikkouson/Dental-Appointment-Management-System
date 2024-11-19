@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useInventory } from "./hooks/useInventory";
+import Link from "next/link";
 
 export function RecentSales() {
   const { inventory, inventoryLoading } = useInventory();
@@ -35,7 +36,7 @@ export function RecentSales() {
   const outOfStockPercentage = (outOfStockCount / totalCount) * 100 || 0;
 
   return (
-    <Card className="col-span-4 md:col-span-3">
+    <Card className="col-span-4 md:col-span-3 RecentSales">
       <CardHeader>
         <CardTitle>Inventory Stocks</CardTitle>
         <CardDescription>
@@ -69,7 +70,9 @@ export function RecentSales() {
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold">LOW STOCK</h3>
             <Button variant="link" className="text-blue-600 p-0 h-auto">
-              View all
+              <Link href={`/inventory`} className="w-full">
+                View all
+              </Link>
             </Button>
           </div>
 

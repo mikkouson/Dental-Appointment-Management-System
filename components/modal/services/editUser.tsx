@@ -108,7 +108,7 @@ export function EditUser({ data, mutate }: EditUserProps) {
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         variant: "success",
-        description: "Inventory item updated successfully.",
+        description: "User information updated successfully.",
         duration: 2000,
       });
 
@@ -122,7 +122,7 @@ export function EditUser({ data, mutate }: EditUserProps) {
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         variant: "destructive",
-        description: `Error: ${error.message}`,
+        description: ` Failed to update user information`,
         duration: 2000,
       });
     }

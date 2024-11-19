@@ -1,5 +1,9 @@
 "use server";
-import { UpdateInventoryFormValues, UpdateInventorySchema } from "@/app/types";
+import {
+  SelectDoctorFormValues,
+  UpdateInventoryFormValues,
+  UpdateInventorySchema,
+} from "@/app/types";
 import DentalAppointmentCancellationEmail from "@/components/emailTemplates/cancelAppointment";
 import DentalAppointmentEmail from "@/components/emailTemplates/newAppointment";
 import DentalAppointmentPendingEmail from "@/components/emailTemplates/pendingAppointment";
@@ -12,10 +16,13 @@ import * as React from "react";
 import { Resend } from "resend";
 import { z } from "zod";
 import { createMultipleToothHistory } from "../action";
+import RescheduleAcceptEmail from "@/components/emailTemplates/rescheduleAccept";
+import RejectReschedule from "@/components/emailTemplates/rescheduleReject";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 interface AppointmentActionProps {
   aptId: number;
+  data?: SelectDoctorFormValues;
 }
 
 const schema = z.object({
@@ -42,7 +49,10 @@ const schema = z.object({
 
 type Inputs = z.infer<typeof schema>;
 
-export async function acceptAppointment({ aptId }: AppointmentActionProps) {
+export async function acceptAppointment({
+  aptId,
+  data,
+}: AppointmentActionProps) {
   const supabase = createClient();
   const otpGenerator = require("otp-generator");
 
@@ -56,6 +66,7 @@ export async function acceptAppointment({ aptId }: AppointmentActionProps) {
     .update({
       status: 1,
       appointment_ticket: appointmentTicket,
+      doctor: data?.id,
     })
     .eq("id", aptId)
     .select(
@@ -471,6 +482,157 @@ export async function completeAppointment(
     }
   }
 
+  revalidatePath("/");
+  redirect("/appointments?tab=calendar");
+}
+
+// export async function acceptReschedule(
+//   aptId: number,
+//   date: Date,
+//   time: number
+// ) {
+//   const supabase = createClient();
+
+//   const { error } = await supabase
+//     .from("appointments")
+//     .update({
+//       status: 1,
+//       date: date,
+//       time: time,
+//       reschedule_date: null,
+//       reschedule_time: null,
+//     })
+//     .eq("id", aptId);
+
+//   if (error) {
+//     console.error("Error accepting reschedule:", error.message);
+//     throw new Error(error.message);
+//   }
+
+//   console.log("Reschedule accepted successfully");
+// }
+
+export async function acceptReschedule(
+  aptId: number,
+  date: Date,
+  time: number
+) {
+  const supabase = createClient();
+
+  const { data: appointmentData, error: updateError } = await supabase
+    .from("appointments")
+    .update({
+      status: 1,
+      date: date,
+      time: time,
+      rescheduled_date: null,
+      rescheduled_time: null,
+    })
+    .eq("id", aptId)
+    .select(
+      `
+          *,
+          patients (
+            *
+          ),
+          services (
+            *
+          ),
+          time_slots (
+            *
+          ),
+          status (
+            *
+          ),
+          branch (
+            *
+          )
+        `
+    )
+    .single();
+
+  if (updateError) {
+    console.error("Error accepting reschedule:", updateError.message);
+    throw new Error(updateError.message);
+  }
+
+  const patientEmail = appointmentData.patients?.email;
+
+  if (!patientEmail) {
+    throw new Error(
+      "No email found for the patient associated with this appointment."
+    );
+  }
+
+  const emailResponse = await resend.emails.send({
+    from: "Appointment@email.lobodentdentalclinic.online",
+    to: [patientEmail],
+    subject: "Reschedule Accepted",
+    react: RescheduleAcceptEmail({ appointmentData }) as React.ReactElement,
+  });
+
+  if (emailResponse.error) {
+    throw new Error(
+      `Error sending reschedule acceptance email: ${emailResponse.error.message}`
+    );
+  }
+
+  console.log(
+    "Reschedule accepted successfully and email sent to:",
+    patientEmail
+  );
+  revalidatePath("/");
+  redirect("/appointments?tab=calendar");
+}
+
+export async function rejectReschedule(aptId: number) {
+  const supabase = createClient();
+
+  const { data: appointmentData, error: fetchError } = await supabase
+    .from("appointments")
+    .update({
+      status: 1,
+      rescheduled_date: null,
+      rescheduled_time: null,
+    })
+    .eq("id", aptId)
+    .select(
+      `
+          *,
+          patients (
+            *
+          )
+        `
+    )
+    .single();
+
+  if (fetchError) {
+    console.error("Error rejecting reschedule:", fetchError.message);
+    throw new Error(fetchError.message);
+  }
+
+  const patientEmail = appointmentData.patients?.email;
+
+  if (!patientEmail) {
+    throw new Error(
+      "No email found for the patient associated with this appointment."
+    );
+  }
+
+  const emailResponse = await resend.emails.send({
+    from: "Appointment@email.lobodentdentalclinic.online",
+    to: [patientEmail],
+    subject: "Reschedule Request Rejected",
+    react: RejectReschedule() as React.ReactElement,
+  });
+
+  if (emailResponse.error) {
+    throw new Error(
+      `Error sending reschedule rejection email: ${emailResponse.error.message}`
+    );
+  }
+
+  console.log("Reschedule rejected and email sent to:", patientEmail);
   revalidatePath("/");
   redirect("/appointments?tab=calendar");
 }

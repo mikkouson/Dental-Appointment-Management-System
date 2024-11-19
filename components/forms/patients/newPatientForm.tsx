@@ -158,7 +158,7 @@ export function NewPatientForm({ setOpen, mutate }: NewPatientFormProps) {
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         variant: "destructive",
-        description: `Failed to add patient: ${error.message}`,
+        description: `Failed to add patient`,
         duration: 2000,
       });
     }
@@ -206,7 +206,11 @@ export function NewPatientForm({ setOpen, mutate }: NewPatientFormProps) {
             </div>
           ) : (
             <ScrollArea className="h-[200px] w-full">
-              <ToothHistoryCard edit={true} treatments={teethLocations} />
+              <ToothHistoryCard
+                edit={true}
+                treatments={teethLocations}
+                newPatient={true}
+              />
             </ScrollArea>
           )}
           <div className="flex justify-between">

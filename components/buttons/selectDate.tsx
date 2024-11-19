@@ -13,6 +13,7 @@ import { CalendarIcon } from "lucide-react";
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import { AppointmentSchemaType } from "@/app/types";
+
 type FieldProps = {
   value: Date | null;
   onChange: (date: Date) => void;
@@ -25,9 +26,9 @@ export function CalendarForm({
   dontdis,
 }: {
   field: FieldProps;
-  form: UseFormReturn<AppointmentSchemaType>; // Replace AppointmentSchemaType with your actual form data type
-  patientAppointments: (Date | string)[]; // Adjust type if needed
-  dontdis?: Date; // Optional date that should not be disabled
+  form: UseFormReturn<AppointmentSchemaType>;
+  patientAppointments: (Date | string)[];
+  dontdis?: any;
 }) {
   const [isCalendarOpen, setIsCalendarOpen] = React.useState(false);
   const getDate = useGetDate((state) => state.getDate);
@@ -47,20 +48,19 @@ export function CalendarForm({
 
   const isDateDisabled = (date: Date) => {
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set to midnight to ensure correct comparison
+    today.setHours(0, 0, 0, 0);
     const thirtyDaysFromNow = new Date(today);
     thirtyDaysFromNow.setDate(today.getDate() + 30);
 
     const dateStr = date.toDateString();
     const dontdisStr = dontdis?.toDateString();
-    const isWithinDateRange = date >= today && date <= thirtyDaysFromNow;
 
+    // Only check for existing appointments and dontdis date
     return (
-      !isWithinDateRange || // Disable dates outside the range
       patientAppointments.some(
         (apptDate) => parseDate(apptDate).toDateString() === dateStr
       ) ||
-      dontdisStr === dateStr // Disable specific date if `dontdis` matches
+      (dontdis && dontdisStr === dateStr)
     );
   };
 
@@ -69,7 +69,7 @@ export function CalendarForm({
       <PopoverTrigger asChild>
         <FormControl>
           <Button
-            variant={"outline"}
+            variant="outline"
             className={cn(
               "w-full flex pl-3 text-left font-normal",
               !field.value && "text-muted-foreground"

@@ -14,16 +14,19 @@ import {
   Phone,
   Ticket,
   Hospital,
-  MoreHorizontal,
   MoreVertical,
+  Timer,
+  Calendar,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import {
   acceptAppointment,
+  acceptReschedule,
   cancelAppointment,
   deleteAppointment,
   rejectAppointment,
+  rejectReschedule,
 } from "@/app/(admin)/appointments/action";
 import {
   DropdownMenu,
@@ -31,9 +34,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { DeleteToothHistory } from "./modal/patients/deleteToothHistory";
-import { EditToothCondition } from "./modal/patients/edit-tooth-condition";
 import { DeleteModal } from "./modal/deleteModal";
+import { AcceptAppointment } from "./modal/appointment/acceptAppointment";
+import moment from "moment";
 
 interface AppointmentsMapProps {
   timeSlots: TimeSlot[];
@@ -48,6 +51,7 @@ export default function AppointmentsMap({
 }: AppointmentsMapProps) {
   const [loading, setLoading] = useState<number | null>(null);
   const [loadingType, setLoadingType] = useState<string | null>(null);
+
   const handleAction = async (
     action: () => Promise<void>,
     aptId: number,
@@ -84,6 +88,26 @@ export default function AppointmentsMap({
     }
   };
 
+  const handleAcceptReschedule = async (
+    aptId: number,
+    time: number,
+    date: Date
+  ) => {
+    await handleAction(
+      async () => await acceptReschedule(aptId, date, time),
+      aptId,
+      "rescheduled"
+    );
+  };
+
+  const handleRejectReschedule = async (aptId: number) => {
+    await handleAction(
+      async () => await rejectReschedule(aptId),
+      aptId,
+      "rejected"
+    );
+  };
+
   return (
     <>
       {timeSlots.map((time) => {
@@ -104,7 +128,7 @@ export default function AppointmentsMap({
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {filteredAppointments.map((apt: any) => (
                   <Card key={apt.id}>
-                    <CardHeader className="pb-0 flex flex-row justify-between  items-center text-center  ">
+                    <CardHeader className="pb-0 flex flex-row justify-between items-center text-center">
                       <div>
                         <CardTitle className="text-base flex">
                           Appointment Details
@@ -191,6 +215,64 @@ export default function AppointmentsMap({
                           Phone Number:{" "}
                           {apt.patients?.phone_number || "No phone number"}
                         </span>
+
+                        {apt.status?.id === 6 && (
+                          <>
+                            <Separator />
+                            <h4 className="text-lg font-semibold">
+                              Reschedule Request
+                            </h4>
+                            <span className="text-sm md:text-base flex items-center">
+                              <Calendar className="w-5 h-5 mr-2" />
+                              Rescheduled Date:{" "}
+                              {apt.rescheduled_date
+                                ? moment(apt.rescheduled_date).format(
+                                    "MMMM D, YYYY"
+                                  )
+                                : "No rescheduled date"}
+                            </span>
+                            <span className="text-sm md:text-base flex items-center">
+                              <Timer className="w-5 h-5 mr-2" />
+                              Rescheduled Time:{" "}
+                              {timeSlots.find(
+                                (slot) => slot.id === apt.rescheduled_time
+                              )?.time || "No rescheduled time"}
+                            </span>
+
+                            <Separator />
+
+                            <div className="flex flex-col gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={loading === apt.id}
+                                onClick={() =>
+                                  handleAcceptReschedule(
+                                    apt.id,
+                                    apt.rescheduled_time,
+                                    apt.rescheduled_date
+                                  )
+                                }
+                              >
+                                {loading === apt.id &&
+                                loadingType === "rescheduled"
+                                  ? "Accepting..."
+                                  : "Accept Reschedule"}
+                              </Button>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                disabled={loading === apt.id}
+                                onClick={() => handleRejectReschedule(apt.id)}
+                              >
+                                {loading === apt.id &&
+                                loadingType === "rejected"
+                                  ? "Rejecting..."
+                                  : "Reject Reschedule"}
+                              </Button>
+                            </div>
+                          </>
+                        )}
                       </div>
 
                       <div className="flex flex-wrap items-center justify-end gap-2 mt-4">
@@ -201,6 +283,7 @@ export default function AppointmentsMap({
                               text={false}
                               disabled={loading === apt.id}
                               patientId={apt.patients?.id}
+                              brachId={apt.branch?.id}
                             />
                             <Button
                               variant="destructive"
@@ -220,24 +303,14 @@ export default function AppointmentsMap({
                             </Button>
                           </>
                         )}
+
                         {apt.status?.id === 2 && (
                           <>
-                            <Button
-                              variant="outline"
-                              size="sm"
+                            <AcceptAppointment
                               disabled={loading === apt.id}
-                              onClick={() =>
-                                handleAction(
-                                  () => acceptAppointment({ aptId: apt.id }),
-                                  apt.id,
-                                  "accepted"
-                                )
-                              }
-                            >
-                              {loading === apt.id && loadingType === "accepted"
-                                ? "Accepting..."
-                                : "Accept"}
-                            </Button>
+                              appointment={apt}
+                              patientId={apt.patients?.id}
+                            />
                             <Button
                               variant="destructive"
                               size="sm"

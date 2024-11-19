@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Doctor } from "@/app/schema";
+import { Doctor, DoctorCol } from "@/app/schema";
 import { DoctorSchema } from "@/app/types";
 import DoctorFields from "@/components/forms/doctors/doctorField";
 import {
@@ -27,7 +27,7 @@ import { Button } from "@/components/ui/button";
 const fetcher = (url: string): Promise<any> =>
   fetch(url).then((res) => res.json());
 type EditDoctorProps = {
-  data: Doctor;
+  data: DoctorCol;
   mutate: any;
 };
 export function EditDoctor({ data, mutate }: EditDoctorProps) {
@@ -50,6 +50,8 @@ export function EditDoctor({ data, mutate }: EditDoctorProps) {
     form.setValue("id", data.id || 0);
     form.setValue("name", data.name || "");
     form.setValue("email", data.email || "");
+    form.setValue("contact_info", Number(data.contact_info) || 0);
+    form.setValue("branch", data?.branch?.id || 0);
   };
 
   async function validateName(name: string): Promise<boolean> {
@@ -125,7 +127,7 @@ export function EditDoctor({ data, mutate }: EditDoctorProps) {
         "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
       ),
       variant: "success",
-      description: "Inventory item updated successfully.",
+      description: "Doctor information updated successfully.",
       duration: 2000,
     });
 

@@ -159,6 +159,7 @@ export async function newInventory(data: InventoryFormValues) {
       name: data.name,
       description: data.description,
       quantity: data.quantity,
+      branch: data.branch,
     },
   ]);
 
@@ -186,6 +187,7 @@ export async function updateInventory(data: InventoryFormValues) {
       name: data.name,
       quantity: data.quantity,
       description: data.description,
+      branch: data.branch,
     })
     .eq("id", data.id);
 
@@ -371,6 +373,7 @@ export async function newDoctor(data: DoctorFormValues) {
       name: data.name,
       email: data.email,
       contact_info: data.contact_info,
+      branch: data.branch,
     },
   ]);
 
@@ -412,6 +415,7 @@ export async function updateDoctor(data: DoctorFormValues) {
       name: data.name,
       email: data.email,
       contact_info: data.contact_info,
+      branch: data.branch,
     })
     .eq("id", data.id);
 

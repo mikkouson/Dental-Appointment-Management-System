@@ -19,15 +19,19 @@ import { LiaToothSolid } from "react-icons/lia";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTeethArray } from "@/app/store";
 
 export function EditToothCondition({
   treatment,
   form,
+  newPatient = false,
 }: {
+  newPatient?: boolean;
   treatment: any;
   form: UseFormReturn<ToothHistoryFormValue>;
 }) {
   const [open, setOpen] = useState(false);
+  const { teethLocations, updateToothLocation } = useTeethArray();
 
   const handleClick = () => {
     form.reset();
@@ -66,7 +70,30 @@ export function EditToothCondition({
     //get the type of the history_date
 
     try {
-      await updateToothHistory(data);
+      if (newPatient) {
+        // Check if tooth location already exists for this patient
+        const existingTooth = teethLocations.find(
+          (tooth) =>
+            tooth.tooth_location === data.tooth_location &&
+            tooth.patient_id === Number(data.patient_id)
+        );
+
+        const toothData = {
+          tooth_location: data.tooth_location,
+          tooth_condition: data.tooth_condition,
+          tooth_history: data.tooth_history,
+          history_date: data.history_date,
+          patient_id: Number(data.patient_id),
+        };
+
+        if (existingTooth) {
+          // Update existing tooth
+          updateToothLocation(toothData);
+        }
+      } else {
+        // Save to database if it's an existing patient
+        await updateToothHistory(data);
+      }
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
@@ -82,7 +109,7 @@ export function EditToothCondition({
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         variant: "destructive",
-        description: "An unexpected error occurred",
+        description: " Failed to update patient",
         duration: 3000,
       });
       console.error("Error in onSubmit:", error);

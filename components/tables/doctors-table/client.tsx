@@ -1,28 +1,19 @@
 "use client";
-import { Doctor } from "@/app/schema";
-import { Breadcrumbs } from "@/components/breadcrumb";
+import BurgerMenu from "@/components/buttons/burgerMenu";
+import DoctorExport from "@/components/buttons/exportButtons/doctorExport";
 import { NewDoctorForm } from "@/components/forms/doctors/newDoctorForm";
 import { Heading } from "@/components/heading";
+import { useDoctor } from "@/components/hooks/useDoctor";
 import PageContainer from "@/components/layout/page-container";
 import { DrawerDialogDemo } from "@/components/modal/drawerDialog";
-import { Input } from "@/components/ui/input";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { PaginationDemo } from "@/components/pagination";
+import SearchInput from "@/components/searchInput";
+import TableLoadingSkeleton from "@/components/skeleton/tableskeleton";
 import { Separator } from "@/components/ui/separator";
-import { createClient } from "@/utils/supabase/client";
-import { Search, File } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import React, { useState } from "react";
-import useSWR from "swr";
+import { useState } from "react";
 import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
-import { PaginationDemo } from "@/components/pagination";
-import TableLoadingSkeleton from "@/components/skeleton/tableskeleton";
-import { CSVLink } from "react-csv"; // Import CSVLink for exporting
-import { Button } from "@/components/ui/button";
-import { useDoctor } from "@/components/hooks/useDoctor";
-import BurgerMenu from "@/components/buttons/burgerMenu";
-import SearchInput from "@/components/searchInput";
-import DoctorExport from "@/components/buttons/exportButtons/doctorExport";
 
 export default function UserClient() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -83,7 +74,6 @@ export default function UserClient() {
               setOpen={setOpen}
               label={"New Doctor"}
             >
-              {" "}
               <NewDoctorForm setOpen={setOpen} mutate={mutate} />
             </DrawerDialogDemo>
           </div>

@@ -33,14 +33,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import useSWR from "swr";
 import Loading from "../loading";
-
-const fetcher = async (url: any): Promise<any> => {
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error("Failed to fetch data");
-  }
-  return res.json();
-};
+import { usePatientsDetails } from "@/components/hooks/usePatientDetails";
 
 interface PageProps {
   params: {
@@ -49,34 +42,10 @@ interface PageProps {
 }
 
 export default function Page({ params }: PageProps) {
-  const { data, error, isLoading, mutate } = useSWR(
-    `/api/patientdetails?id=${params.id}`,
-    fetcher
-  );
+  const { data, error, isLoading, mutate } = usePatientsDetails(params.id);
   // Get the current "tabs" parameter from URL
   const searchParams = useSearchParams();
   const currentTab = searchParams.get("tabs") || "appointments";
-
-  const supabase = createClient();
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("realtime tooth_history")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "tooth_history" },
-        () => {
-          mutate();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [supabase, mutate]);
-
-  const active = useSetActiveAppointments((state) => state.selectedAppointment);
 
   if (isLoading) return <Loading />;
   if (error) return <div>Error loading patient data</div>;

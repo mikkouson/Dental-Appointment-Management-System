@@ -37,7 +37,7 @@ export type AppointmentsCol = Tables<"appointments"> & {
   time_slots: Tables<"time_slots"> | null; // Example: Relationship to time_slots table
 };
 export type InventoryCol = Tables<"inventory"> & {
-  branch: Tables<"branch"> | null;
+  branch: Tables<"branch"> | null; // Example: Relationship to branch table
   name: string | null;
   quantity: number | null;
   description: string | null;
@@ -55,9 +55,8 @@ export type DoctorCol = Tables<"doctors"> & {
   name: string | null;
   contact_info: string | null;
   email: string | null;
-  
+  branch: Tables<"branch"> | null; // Example: Relationship to branch table
 };
-
 
 export type Database = {
   public: {

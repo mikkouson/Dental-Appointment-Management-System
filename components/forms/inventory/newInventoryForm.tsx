@@ -6,7 +6,7 @@ import { z } from "zod";
 
 import { newInventory } from "@/app/(admin)/action";
 import { InventorySchema } from "@/app/types";
-import ServicesFields from "./inventoryField";
+import InventoryField from "./inventoryField";
 import { toast } from "@/components/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import useSWR from "swr";
@@ -92,5 +92,5 @@ export function NewInventoryForm({
     }
   }
 
-  return <ServicesFields form={form} onSubmit={onSubmit} />;
+  return <InventoryField form={form} onSubmit={onSubmit} />;
 }

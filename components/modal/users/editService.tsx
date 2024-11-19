@@ -126,7 +126,7 @@ export function EditService({ data, mutate }: EditServiceProps) {
         "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
       ),
       variant: "success",
-      description: "Inventory item updated successfully.",
+      description: "Service updated successfully.",
       duration: 2000,
     });
 
