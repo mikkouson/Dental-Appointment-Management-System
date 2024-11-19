@@ -22,12 +22,8 @@ export const columns: Column[] = [
     header: "EMAIL",
   },
   {
-    accessorKey: "contact_info",
+    accessorFn: (row) => `(+639) ${row.contact_info}`,
+    id: "contact_info",
     header: "CONTACT",
-  },
-  {
-    accessorFn: (row) => row.branch?.name,
-    id: "branch",
-    header: "Branch",
   },
 ];

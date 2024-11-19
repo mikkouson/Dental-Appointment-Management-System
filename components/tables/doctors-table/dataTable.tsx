@@ -108,15 +108,15 @@ export function DataTableDemo({ columns, data, mutate }: DataTableProps) {
   };
 
   return (
-    <ScrollArea className="h-[calc(80vh-20px)] border">
+    <ScrollArea className="h-[calc(80vh-20px)] border rounded-md">
       <Table className="relative">
-        <TableHeader>
+        <TableHeader className=" bg-muted/70 ">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
                 <TableHead key={header.id}>
                   {header.isPlaceholder ? null : (
-                    <div className="truncate">
+                    <div className="truncate p-1 py-2">
                       {flexRender(
                         header.column.columnDef.header,
                         header.getContext()
@@ -142,7 +142,7 @@ export function DataTableDemo({ columns, data, mutate }: DataTableProps) {
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
-                    <div className="truncate">
+                    <div className="truncate p-1 py-2">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

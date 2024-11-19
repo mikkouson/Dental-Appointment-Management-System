@@ -75,7 +75,7 @@ export default function UserClient() {
           onValueChange={handleTabChange}
           className="flex-grow"
         >
-          <div className="flex justify-between items-center mt-0 sm:mt-4">
+          <div className="flex justify-between items-center mt-0 sm:mt-4 ">
             <div className="flex items-center">
               <BurgerMenu />
               <h4 className="scroll-m-20 text-md font-semibold tracking-tight sm:hidden">
@@ -98,24 +98,18 @@ export default function UserClient() {
             </div>
           </div>
           <Separator className="my-2" />
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center pb-2">
             {!isSearchFocused && (
-              <div className="flex justify-end items-center">
-                <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0 mr-2">
-                  <TabsTrigger
-                    value="table"
-                    className="relative rounded-none border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-none focus-visible:ring-0 data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:dark:bg-neutral-800"
-                  >
+              <div className="flex justify-end items-center gap-2">
+                <TabsList className="w-full justify-start ">
+                  <TabsTrigger value="table">
                     <Table2
                       className="md:hidden text-muted-foreground"
                       size={20}
                     />
                     <span className="hidden md:block">Table Mode</span>
                   </TabsTrigger>
-                  <TabsTrigger
-                    value="calendar"
-                    className="relative rounded-none border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-none focus-visible:ring-0 data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:dark:bg-neutral-800"
-                  >
+                  <TabsTrigger value="calendar">
                     <Calendar
                       className="md:hidden text-muted-foreground"
                       size={20}

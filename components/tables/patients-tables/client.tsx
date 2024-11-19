@@ -83,7 +83,7 @@ export default function UserClient() {
           </div>
         </div>
         <Separator className="my-2" />
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center pb-2">
           {!isSearchFocused && (
             <div className="flex justify-end items-center">
               {/* <SelectBranch /> */}
@@ -99,7 +99,6 @@ export default function UserClient() {
             label="Patient"
           />
         </div>
-        <Separator />
         <div className="flex flex-col 2xl:flex-row gap-4">
           <div className="flex-1">
             {patientLoading ? (

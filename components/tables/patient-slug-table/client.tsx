@@ -85,7 +85,7 @@ export default function UserClient() {
             </div>
           </div>
           <Separator className="my-2" />
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center pb-2">
             {/* Hide branch and status selectors on smaller screens only when search is focused */}
             {!isSearchFocused && (
               <div className="flex justify-end items-center">

@@ -83,7 +83,7 @@ export default function InventoryClient() {
           </div>
         </div>
         <Separator className="my-2" />
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center pb-2">
           {!isSearchFocused && (
             <div className="flex justify-end items-center">
               <SelectBranch />
@@ -98,7 +98,6 @@ export default function InventoryClient() {
             label="Inventory Item"
           />
         </div>
-        <Separator />
         {!isLoading ? (
           <div>
             {data && data.data.length ? (

@@ -1,4 +1,5 @@
 import type { PatientCol } from "@/app/schema";
+import { Badge } from "@/components/ui/badge";
 import { ColumnDef } from "@tanstack/react-table";
 
 type Column = ColumnDef<PatientCol>;
@@ -42,9 +43,13 @@ export const columns: Column[] = [
     header: "SEX",
     cell: ({ row }) => {
       const sex = row.original.sex;
-      return sex
-        ? sex.charAt(0).toUpperCase() + sex.slice(1).toLowerCase()
-        : "N/A";
+      return (
+        <Badge variant="outline">
+          {sex
+            ? sex.charAt(0).toUpperCase() + sex.slice(1).toLowerCase()
+            : "N/A"}
+        </Badge>
+      );
     },
   },
 ];
