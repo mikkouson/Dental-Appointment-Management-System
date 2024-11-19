@@ -23,10 +23,6 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import ToothHistoryCard from "@/components/cards/toothHistoryCard";
 import { completeAppointment } from "@/app/(admin)/appointments/action";
 
-type UseTeethArrayReturn = {
-  teethArray: number[];
-  // add other properties returned by the hook
-};
 export function CompleteAppointment({
   text,
   disabled,
@@ -41,7 +37,7 @@ export function CompleteAppointment({
   brachId: any;
 }) {
   const [open, setOpen] = useState(false);
-  const { clearTeethLocations } = useTeethArray();
+  const { clearTeethLocations, teethLocations } = useTeethArray();
   const [selectedItems, setSelectedItems] = useState<
     Array<{
       id: number;
@@ -50,36 +46,46 @@ export function CompleteAppointment({
       quantity: number;
     }>
   >([]);
-  // Fetch patient data
-  useEffect(() => {
-    setTimeout(() => (document.body.style.pointerEvents = ""), 0);
-  });
-  // Use z.infer to derive the type from UpdateInventorySchema
+  const [activeTab, setActiveTab] = useState("chart");
+
+  // Form setup with validation
   const form = useForm<z.infer<typeof UpdateInventorySchema>>({
     resolver: zodResolver(UpdateInventorySchema),
     defaultValues: {
       id: appointmentId,
     },
-    shouldUnregister: false, // Add this line
+    shouldUnregister: false,
     resetOptions: {
-      keepDirtyValues: true, // Keep form values on reset
-      keepValues: true, // Keep values on unmount
+      keepDirtyValues: true,
+      keepValues: true,
     },
   });
-  const { teethLocations } = useTeethArray();
 
   async function onSubmit(formData: z.infer<typeof UpdateInventorySchema>) {
     try {
-      await completeAppointment(formData, teethLocations); // Make sure this function returns a promise
-      // setOpen(false); // Close the modal
-      setOpen(false); // Close the modal
+      // Validate teeth locations
+      if (teethLocations.length === 0) {
+        toast({
+          className: cn(
+            "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
+          ),
+          variant: "destructive",
+          description: "Please select at least one tooth location",
+          duration: 2000,
+        });
+        setActiveTab("chart"); // Switch to chart tab if no teeth are selected
+        return;
+      }
+
+      await completeAppointment(formData, teethLocations);
+      setOpen(false);
 
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         variant: "success",
-        description: `Appointment marked as done successfully.`,
+        description: "Appointment marked as done successfully.",
         duration: 2000,
       });
     } catch (error: any) {
@@ -97,6 +103,7 @@ export function CompleteAppointment({
   useEffect(() => {
     setTimeout(() => (document.body.style.pointerEvents = ""), 0);
   }, []);
+
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
@@ -128,12 +135,21 @@ export function CompleteAppointment({
         <SheetHeader>
           <SheetTitle>Complete Appointment</SheetTitle>
           <SheetDescription>
-            Make changes to the appointment here. Click save when youre done.
+            Please select at least one tooth location and add any items used.
           </SheetDescription>
         </SheetHeader>
-        <Tabs defaultValue="chart" className="w-full mt-2">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="w-full mt-2"
+        >
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="chart">Teeth Chart</TabsTrigger>
+            <TabsTrigger value="chart">
+              Teeth Chart{" "}
+              {teethLocations.length === 0 && (
+                <span className="ml-1 text-red-500">*</span>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="items">Items Used</TabsTrigger>
           </TabsList>
 
@@ -152,6 +168,11 @@ export function CompleteAppointment({
               treatments={teethLocations}
               newPatient={true}
             />
+            {teethLocations.length === 0 && (
+              <p className="text-sm text-red-500">
+                Please select at least one tooth location
+              </p>
+            )}
           </TabsContent>
           <TabsContent value="items">
             <ItemUsedField

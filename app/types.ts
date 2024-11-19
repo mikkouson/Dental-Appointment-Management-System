@@ -82,12 +82,14 @@ export type InventoryFormValues = z.infer<typeof InventorySchema>;
 export const UpdateInventorySchema = z.object({
   id: z.number().optional(),
 
-  selectedItems: z.array(
-    z.object({
-      id: z.number(), // Item ID (required)
-      quantity: z.number().min(1), // Quantity (must be 1 or more)
-    })
-  ),
+  selectedItems: z
+    .array(
+      z.object({
+        id: z.number(), // Item ID (required)
+        quantity: z.number().min(1), // Quantity (must be 1 or more)
+      })
+    )
+    .min(1, { message: "Please select at least one item" }),
 });
 
 export type UpdateInventoryFormValues = z.infer<typeof UpdateInventorySchema>;
