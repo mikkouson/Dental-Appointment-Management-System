@@ -58,7 +58,7 @@ export function TableDemo() {
   return (
     <Table>
       <TableCaption>A list of your recent invoices.</TableCaption>
-      <TableHeader>
+      <TableHeader className=" bg-muted/70 ">
         <TableRow>
           <TableHead className="w-[100px]">Invoice</TableHead>
           <TableHead>Status</TableHead>

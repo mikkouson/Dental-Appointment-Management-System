@@ -1,11 +1,30 @@
 import type { AppointmentsCol } from "@/app/schema";
 import { ColumnDef } from "@tanstack/react-table";
-import { SquarePen } from "lucide-react";
-import { DeleteModal } from "@/components/modal/deleteModal";
-import { EditPatient } from "@/components/modal/patients/editPatient";
+import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import moment from "moment";
 
 type Column = ColumnDef<AppointmentsCol>;
+
+const formatTime = (time: string) => {
+  try {
+    // Assuming time is in format "HH:mm:ss" or "HH:mm"
+    const [hours, minutes] = time.split(":");
+    const date = new Date();
+    date.setHours(parseInt(hours, 10));
+    date.setMinutes(parseInt(minutes, 10));
+
+    return date
+      .toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      })
+      .toUpperCase(); // Convert to uppercase for AM/PM
+  } catch {
+    return time; // Return original value if parsing fails
+  }
+};
 
 export const columns: Column[] = [
   {
@@ -13,7 +32,6 @@ export const columns: Column[] = [
     enableSorting: true,
     enableHiding: false,
   },
-
   {
     accessorFn: (row) => ({
       name: row.patients?.name || "N/A",
@@ -39,40 +57,42 @@ export const columns: Column[] = [
     },
   },
   {
-    accessorKey: "date",
+    accessorFn: (row) => row.date || "N/A",
+    id: "date",
     header: "DATE",
+    cell: ({ row }) => {
+      const date = row.getValue("date") as string;
+      return moment(date).format("dddd, MMM D, YYYY");
+    },
   },
   {
     accessorFn: (row) => row.time_slots?.time || "N/A",
     id: "time",
     header: "TIME",
+    cell: ({ row }) => {
+      const time = row.getValue("time") as string;
+      return formatTime(time);
+    },
   },
   {
     accessorFn: (row) => row.services?.name || "N/A",
     id: "services",
     header: "SERVICE",
   },
-
   {
-    accessorFn: (row) => row.status?.name || "N/A",
+    accessorFn: (row) => ({
+      name: row.status?.name || "N/A",
+      id: row.status?.id,
+    }),
     id: "status",
     header: "STATUS",
+    cell: ({ row }) => {
+      const status = row.getValue("status") as { name: string; id: number };
+      return (
+        <Badge variant="outline" className="ml-2">
+          {status.name}
+        </Badge>
+      );
+    },
   },
-
-  // {
-  //   id: "actions",
-  //   enableHiding: false,
-  //   header: "Actions",
-  //   cell: ({ row }) => {
-  //     const id = row.original.id;
-  //     const patient = row.original;
-
-  //     return (
-  //       <div className="flex px-2">
-  //         <DeleteModal id={id} />
-  //         <EditPatient patient={patient} />
-  //       </div>
-  //     );
-  //   },
-  // },
 ];
