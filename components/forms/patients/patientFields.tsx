@@ -29,9 +29,14 @@ const status = [
 interface PatientFieldsProps {
   form: UseFormReturn<PatientFormValues>;
   onSubmit: (data: PatientFormValues) => void;
+  next?: boolean;
 }
 
-const PatientFields = ({ form, onSubmit }: PatientFieldsProps) => {
+const PatientFields = ({
+  form,
+  onSubmit,
+  next = false,
+}: PatientFieldsProps) => {
   const { isSubmitting } = form.formState;
 
   console.log(form);
@@ -109,7 +114,7 @@ const PatientFields = ({ form, onSubmit }: PatientFieldsProps) => {
         </div>
         <div className="flex justify-end">
           <Button type="submit" disabled={isSubmitting} variant="outline">
-            {isSubmitting ? "Submitting..." : "Next"}
+            {next ? "Next" : isSubmitting ? "Submitting..." : "Submit"}
           </Button>
         </div>
       </form>

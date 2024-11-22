@@ -17,6 +17,10 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
+import useSWR from "swr";
+
+const fetcher = (url: string): Promise<any> =>
+  fetch(url).then((res) => res.json());
 
 export default function InventoryClient() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -34,6 +38,7 @@ export default function InventoryClient() {
   const branch = searchParams.get("branches") || "";
   const limit = parseInt(searchParams.get("limit") || "10", 10);
   const { branches, branchLoading } = useBranches();
+  const { data: predict } = useSWR("/api/predict/", fetcher);
   const {
     inventory: data,
     inventoryLoading: isLoading,
@@ -58,6 +63,7 @@ export default function InventoryClient() {
 
   return (
     <PageContainer>
+      {JSON.stringify(predict)}
       <div className="flex flex-col h-[calc(100svh-20px)] ">
         <div className="flex justify-between items-center mt-0 sm:mt-4">
           <div className="flex items-center">
