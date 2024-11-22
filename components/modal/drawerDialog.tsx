@@ -49,7 +49,11 @@ export function DrawerDialogDemo({
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button className="bg-primary " onClick={() => clearTeethLocations()}>
+          <Button
+            className="bg-primary "
+            onClick={() => clearTeethLocations()}
+            size="sm"
+          >
             <Plus size={20} className="mr-2 " />
             {label}
           </Button>

@@ -189,3 +189,38 @@ export async function updatePatient(data: PatientFormValues) {
     console.log("Patient data updated successfully");
   }
 }
+
+export async function uploadImage(patientId: string, formData: FormData) {
+  const supabase = createClient();
+  const file = formData.get("file") as File;
+
+  if (!file) {
+    throw new Error("No file provided");
+  }
+
+  const fileExt = file.name.split(".").pop();
+  const fileName = `${Math.random()}.${fileExt}`;
+  const filePath = `${patientId}/${fileName}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("patients")
+    .upload(filePath, file, {
+      cacheControl: "3600",
+      upsert: false,
+    });
+
+  if (uploadError) {
+    throw new Error(`Error uploading image: ${uploadError.message}`);
+  }
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("patients").getPublicUrl(filePath);
+
+  revalidatePath(`/patients/${patientId}`);
+
+  return {
+    url: publicUrl,
+    path: filePath,
+  };
+}

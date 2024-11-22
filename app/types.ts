@@ -171,3 +171,14 @@ export const ToothHistory = z.object({
 });
 
 export type ToothHistoryFormValue = z.infer<typeof ToothHistory>;
+
+export const FileUploadSchema = z.object({
+  patient_id: z.number({
+    required_error: "Patient ID is required.",
+  }),
+  file: z.object({
+    name: z.string(),
+  }),
+});
+
+export type FileUploadFormValues = z.infer<typeof FileUploadSchema>;
