@@ -162,13 +162,16 @@ const PageExportButton = ({ dateRange }: { dateRange: DateRange }) => {
       onClick={handleExport}
       className="flex items-center gap-2"
       disabled={isLoading}
+      size="sm"
     >
       {isLoading ? (
         <Loader2 className="h-4 w-4 animate-spin" />
       ) : (
         <Download className="h-4 w-4" />
       )}
-      {isLoading ? "Downloading Report..." : "Download Report"}
+      <span className="hidden md:block">
+        {isLoading ? "Downloading Report..." : "Download Report"}
+      </span>
     </Button>
   );
 };

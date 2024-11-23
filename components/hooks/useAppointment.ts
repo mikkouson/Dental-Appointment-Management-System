@@ -20,7 +20,7 @@ const fetcher = async (
 
 export function useAppointments(
   page?: number | null,
-  query?: string,
+  query?: string | null,
   branches?: string | null,
   status?: string | null,
   date?: string | null,

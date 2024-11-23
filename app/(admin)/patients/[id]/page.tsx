@@ -33,6 +33,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import useSWR from "swr";
 import Loading from "../loading";
+import { BurgerMenu } from "@/components/buttons/burgerMenu";
 interface PageProps {
   params: {
     id: string;
@@ -88,8 +89,10 @@ export default function Page({ params }: PageProps) {
     <div className="flex min-h-screen w-full flex-col">
       <div className="flex flex-col sm:gap-4">
         {/* Header with Breadcrumb */}
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-          <Breadcrumb className="hidden md:flex mt-4">
+        <header className=" text-center sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+          <BurgerMenu />
+
+          <Breadcrumb className=" mt-4">
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
@@ -111,7 +114,7 @@ export default function Page({ params }: PageProps) {
         </header>
 
         {/* Main Content */}
-        <main className="grid flex-1 items-start gap-4 sm:px-6 sm:py-0 md:gap-8">
+        <main className="grid flex-1 items-start gap-4 px-2 sm:px-10 sm:py-0 md:gap-8">
           {/* Profile Cards Row */}
           <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3">
             {/* Profile Card */}
@@ -260,16 +263,22 @@ export default function Page({ params }: PageProps) {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex">
+                  <div className="flex flex-col md:flex-row md:items-center">
                     {/* Static TeethChart Component */}
-                    <div className="mr-4">
+                    <div className="mr-4 md:mr-4 items-center flex justify-center pb-10 md:pb-0">
                       <TeethChart
                         history={data?.tooth_history}
                         id={params.id}
                       />
                     </div>
-                    {/* Scrollable ToothHistory Component */}
-                    <ToothHistoryCard treatments={data?.tooth_history} />
+                    {/* Conditional Rendering for ToothHistoryCard */}
+                    {data?.tooth_history && data.tooth_history.length > 0 ? (
+                      <ToothHistoryCard treatments={data.tooth_history} />
+                    ) : (
+                      <div className="text-center text-gray-500 flex items-center justify-center w-full">
+                        No tooth history available.
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>

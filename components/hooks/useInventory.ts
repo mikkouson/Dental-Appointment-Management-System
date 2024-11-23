@@ -18,29 +18,31 @@ const fetcher = async (
 };
 
 export function useInventory(
-  page?: number,
-  query?: string,
+  page?: number | null,
+  query?: string | null,
   branches?: string | null,
   limit?: number | null
 ) {
   const queryString = new URLSearchParams();
 
-  if (query !== undefined) {
+  if (query != null) {
     queryString.append("query", query);
   }
 
-  if (branches) {
+  if (branches != null) {
+    // Now TypeScript knows branches is not undefined when we use it
     const branchArray = branches.split(",");
     queryString.append("branch", branchArray.join(","));
   }
 
-  if (page !== undefined) {
+  if (page != null) {
     queryString.append("page", String(page));
   }
 
-  if (limit) {
-    queryString.append("limit", String(limit)); // Add limit to query string
+  if (limit != null) {
+    queryString.append("limit", String(limit));
   }
+
   const {
     data: inventory,
     error: inventoryError,
@@ -55,7 +57,7 @@ export function useInventory(
 
   useEffect(() => {
     const channel = supabase
-      .channel(`realtime-items-${page}`)
+      .channel(`realtime-items-${page ?? 1}`) // Provide a default value if page is undefined
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "inventory" },

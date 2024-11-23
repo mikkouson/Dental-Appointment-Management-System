@@ -50,25 +50,28 @@ export function CalendarDateRangePicker({
         <PopoverTrigger asChild>
           <Button
             id="date"
-            variant={"outline"}
+            variant="outline"
             className={cn(
-              "w-[260px] justify-start text-left font-normal",
+              "justify-start text-left font-normal w-full sm:w-[260px]",
               !date && "text-muted-foreground"
             )}
+            size="sm"
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {date?.from ? (
-              date?.to ? (
-                <>
-                  {format(date.from, "MMM dd, yyyy")} -{" "}
-                  {format(date.to, "MMM dd, yyyy")}
-                </>
+            <span className="hidden sm:block">
+              {date?.from ? (
+                date?.to ? (
+                  <>
+                    {format(date.from, "MMM dd, yyyy")} -{" "}
+                    {format(date.to, "MMM dd, yyyy")}
+                  </>
+                ) : (
+                  format(date.from, "MMM dd, yyyy")
+                )
               ) : (
-                format(date.from, "MMM dd, yyyy")
-              )
-            ) : (
-              <span>Pick a date</span>
-            )}
+                "Pick a date"
+              )}
+            </span>
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="end">

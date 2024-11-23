@@ -6,7 +6,7 @@ import { CalendarDateRangePicker } from "@/components/date-range-picker";
 import { useAppointments } from "@/components/hooks/useAppointment";
 import { usePatients } from "@/components/hooks/usePatient";
 import PageContainer from "@/components/layout/page-container";
-import { RecentSales } from "@/components/recent-sales";
+import { InventoryStocksChart } from "@/components/recent-sales";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -20,11 +20,13 @@ import moment from "moment";
 import { useSearchParams } from "next/navigation";
 import DashboardLoading from "./loading ";
 import PDFExportButton from "@/components/buttons/exportButtons/dashboardExport";
+import BurgerMenu from "@/components/buttons/burgerMenu";
+import SelectBranch from "@/components/buttons/selectBranch";
 
 export default function Page() {
   const searchParams = useSearchParams();
   const dates = searchParams.get("date")?.split(",") || [];
-
+  const branch = searchParams.get("branches") || "";
   let dateRangeStart;
   let dateRangeEnd;
 
@@ -40,7 +42,16 @@ export default function Page() {
     dateRangeEnd = moment().endOf("month").format("YYYY-MM-DD");
   }
 
-  const { appointments, appointmentsLoading } = useAppointments();
+  const { appointments, appointmentsLoading } = useAppointments(
+    null,
+    null,
+    branch,
+    null,
+    null,
+    null,
+    null,
+    null
+  );
   const { patients, patientLoading } = usePatients();
 
   if (patientLoading || appointmentsLoading) return <DashboardLoading />;
@@ -191,11 +202,13 @@ export default function Page() {
     <main className="overflow-auto rounded-tl-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 flex flex-col gap-2 flex-1 w-full h-full">
       <PageContainer>
         <div className="space-y-2">
-          <div className="flex items-center justify-between space-y-2">
-            <h2 className="text-2xl font-bold tracking-tight">
-              Hi, Welcome back 👋
+          <div className="flex md:items-center space-y-2 flex-col md:flex-row md:justify-between">
+            <h2 className="text-2xl font-bold tracking-tight flex items-center">
+              <BurgerMenu />
+              Welcome back 👋
             </h2>
-            <div className="hidden items-center space-x-2 md:flex">
+            <div className="flex items-center space-x-2 ">
+              <SelectBranch />
               <CalendarDateRangePicker />
               <PDFExportButton
                 dateRange={{ start: dateRangeStart, end: dateRangeEnd }}
@@ -279,7 +292,7 @@ export default function Page() {
                 metrics={metrics}
               />
             </div>
-            <RecentSales />
+            <InventoryStocksChart branch={branch} />
 
             <div className="col-span-4 PatientChart">
               <PatientChart
@@ -289,7 +302,7 @@ export default function Page() {
             </div>
 
             <div className="col-span-4 md:col-span-3 PieGraph">
-              <PieGraph />
+              <PieGraph branch={branch} />
             </div>
           </div>
         </div>
