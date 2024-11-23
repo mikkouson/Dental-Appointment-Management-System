@@ -33,16 +33,43 @@ import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import useSWR from "swr";
 import Loading from "../loading";
-import { usePatientsDetails } from "@/components/hooks/usePatientDetails";
-
 interface PageProps {
   params: {
     id: string;
   };
 }
+const fetcher = async (url: any): Promise<any> => {
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error("Failed to fetch data");
+  }
+  return res.json();
+};
 
 export default function Page({ params }: PageProps) {
-  const { data, error, isLoading, mutate } = usePatientsDetails(params.id);
+  const { data, error, isLoading, mutate } = useSWR(
+    `/api/patientdetails?id=${params.id}`,
+    fetcher
+  );
+  const supabase = createClient();
+
+  useEffect(() => {
+    const channel = supabase
+      .channel(`realtime tooth-history`)
+
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "tooth_history" },
+        () => {
+          mutate();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [supabase, mutate]);
   // Get the current "tabs" parameter from URL
   const searchParams = useSearchParams();
   const currentTab = searchParams.get("tabs") || "appointments";
