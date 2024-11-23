@@ -38,9 +38,14 @@ export interface InventoryColWithBranch extends Omit<InventoryCol, "branch"> {
 type EditInventoryProps = {
   data: InventoryColWithBranch;
   mutate: any;
+  predictMutate: any;
 };
 
-export function EditInventory({ data, mutate }: EditInventoryProps) {
+export function EditInventory({
+  data,
+  mutate,
+  predictMutate,
+}: EditInventoryProps) {
   const { data: responseData, error } = useSWR("/api/inventory/", fetcher);
   const inventory = responseData?.data || [];
   const [open, setOpen] = useState(false);
@@ -62,6 +67,7 @@ export function EditInventory({ data, mutate }: EditInventoryProps) {
     return inventory.some(
       (item: InventoryColWithBranch) =>
         item.id !== data.id &&
+        item.branch.id === data.branch.id && // Compare branch IDs
         item.name.trim().toLowerCase() === trimmedName.toLowerCase()
     );
   }
@@ -113,18 +119,18 @@ export function EditInventory({ data, mutate }: EditInventoryProps) {
     }, false);
 
     setOpen(false);
-
-    toast({
-      className: cn(
-        "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
-      ),
-      variant: "success",
-      description: "Inventory item updated successfully.",
-      duration: 2000,
-    });
-
+    predictMutate();
     try {
       // Send only the schema-compliant payload to the update function
+      toast({
+        className: cn(
+          "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
+        ),
+        variant: "success",
+        description: "Inventory item updated successfully.",
+        duration: 2000,
+      });
+      predictMutate();
       await updateInventory(updatePayload);
       mutate();
     } catch (error: any) {
