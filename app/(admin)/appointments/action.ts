@@ -326,16 +326,19 @@ export async function rescheduleAppointment(data: Inputs) {
 
   const statusChanged = existingAppointment.status !== data.status;
 
-  // Format date using native JavaScript Date
-  const dateObj = new Date(data.date);
-  if (isNaN(dateObj.getTime())) {
+  // Format date using Moment.js with PHT timezone
+  const moment = require("moment-timezone");
+  const dateInPHT = moment(data.date).tz("Asia/Manila");
+
+  if (!dateInPHT.isValid()) {
     throw new Error("Invalid date provided");
   }
 
-  const month = String(dateObj.getMonth() + 1).padStart(2, "0");
-  const day = String(dateObj.getDate()).padStart(2, "0");
-  const year = dateObj.getFullYear();
-  const formattedDate = `${month}-${day}-${year}`;
+  console.log("Original date:", data.date);
+  console.log("PHT date:", dateInPHT.format());
+
+  // Format date as MM-DD-YYYY in PHT
+  const formattedDate = dateInPHT.format("MM-DD-YYYY");
 
   const { error } = await supabase
     .from("appointments")
