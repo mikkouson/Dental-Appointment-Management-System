@@ -20,6 +20,16 @@ import RescheduleAcceptEmail from "@/components/emailTemplates/rescheduleAccept"
 import RejectReschedule from "@/components/emailTemplates/rescheduleReject";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+
+export const formatAppointmentDate = (date: Date | string) => {
+  // Always work with the date in local time
+  return moment(date).local().format("MM-DD-YYYY");
+};
+
+export const parseAppointmentDate = (dateString: string) => {
+  // When parsing dates from the database or form
+  return moment(dateString, "MM-DD-YYYY").local().toDate();
+};
 interface AppointmentActionProps {
   aptId: number;
   data?: SelectDoctorFormValues;
@@ -325,7 +335,7 @@ export async function rescheduleAppointment(data: Inputs) {
   const statusChanged = existingAppointment.status !== data.status;
 
   // Fix: Use local date string instead of UTC conversion
-  const formattedDate = moment(data.date).format("MM-DD-YYYY");
+  const formattedDate = formatAppointmentDate(data.date);
 
   const { error } = await supabase
     .from("appointments")
@@ -384,8 +394,7 @@ export async function newApp(data: Inputs) {
   const supabase = createClient();
 
   // Fix: Use local date format instead of UTC conversion
-  const formattedDate = moment(data.date).format("MM/DD/YYYY");
-
+  const formattedDate = formatAppointmentDate(data.date);
   const { error, data: newAppointmentData } = await supabase
     .from("appointments")
     .insert([
