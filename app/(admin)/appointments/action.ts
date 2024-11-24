@@ -120,7 +120,7 @@ export async function acceptAppointment({
   );
 
   revalidatePath("/");
-  redirect("/appointments?tab=calendar");
+  // redirect("/appointments?tab=calendar");
 }
 
 export async function cancelAppointment({ aptId }: AppointmentActionProps) {
@@ -176,7 +176,7 @@ export async function cancelAppointment({ aptId }: AppointmentActionProps) {
   // Revalidate the path to update the cache
   revalidatePath("/");
   // Redirect after all the async operations are complete
-  redirect("/appointments?tab=calendar");
+  // redirect("/appointments?tab=calendar");
 }
 
 export async function pendingAppointment({ aptId }: AppointmentActionProps) {
@@ -239,7 +239,7 @@ export async function pendingAppointment({ aptId }: AppointmentActionProps) {
   revalidatePath("/");
 
   // Redirect after all the async operations are complete
-  redirect("/appointments?tab=calendar");
+  // redirect("/appointments?tab=calendar");
 }
 
 export async function rejectAppointment({ aptId }: AppointmentActionProps) {
@@ -284,7 +284,7 @@ export async function rejectAppointment({ aptId }: AppointmentActionProps) {
   }
   revalidatePath("/");
 
-  redirect("/appointments?tab=calendar");
+  // redirect("/appointments?tab=calendar");
 }
 export async function deleteAppointment(id: number) {
   const supabase = createClient();
@@ -298,7 +298,6 @@ export async function deleteAppointment(id: number) {
     console.log("Error deleting appointment", error.message);
   }
 }
-
 export async function rescheduleAppointment(data: Inputs) {
   const result = schema.safeParse(data);
   if (!result.success) {
@@ -312,7 +311,6 @@ export async function rescheduleAppointment(data: Inputs) {
 
   const supabase = createClient();
 
-  // Fetch the existing appointment to check if status has changed
   const { data: existingAppointment, error: fetchError } = await supabase
     .from("appointments")
     .select("status")
@@ -324,13 +322,10 @@ export async function rescheduleAppointment(data: Inputs) {
     return;
   }
 
-  // Check if status has changed
   const statusChanged = existingAppointment.status !== data.status;
 
-  const formattedDate = moment
-    .utc(data.date)
-    .add(8, "hours")
-    .format("MM-DD-YYYY");
+  // Fix: Use local date string instead of UTC conversion
+  const formattedDate = moment(data.date).format("MM-DD-YYYY");
 
   const { error } = await supabase
     .from("appointments")
@@ -349,22 +344,22 @@ export async function rescheduleAppointment(data: Inputs) {
     return;
   }
 
-  // If status has changed, proceed to call the appropriate function
+  // Rest of the status handling code remains the same
   if (statusChanged) {
     switch (data.status) {
-      case 1: // Accepted
+      case 1:
         console.log("Calling acceptAppointment");
         await acceptAppointment({ aptId: data.id });
         break;
-      case 2: // Accepted
-        console.log("Calling pendinga");
+      case 2:
+        console.log("Calling pending");
         await pendingAppointment({ aptId: data.id });
         break;
-      case 3: // Cancelled
+      case 3:
         console.log("Calling cancelAppointment");
         await cancelAppointment({ aptId: data.id });
         break;
-      case 5: // Rejected
+      case 5:
         console.log("Calling rejectAppointment");
         await rejectAppointment({ aptId: data.id });
         break;
@@ -375,9 +370,7 @@ export async function rescheduleAppointment(data: Inputs) {
     console.log("Status has not changed, no further actions required.");
   }
 
-  // Revalidate the path and redirect
   revalidatePath("/");
-  redirect("/appointments?tab=calendar");
 }
 
 export async function newApp(data: Inputs) {
@@ -390,6 +383,9 @@ export async function newApp(data: Inputs) {
 
   const supabase = createClient();
 
+  // Fix: Use local date format instead of UTC conversion
+  const formattedDate = moment(data.date).format("MM/DD/YYYY");
+
   const { error, data: newAppointmentData } = await supabase
     .from("appointments")
     .insert([
@@ -397,14 +393,14 @@ export async function newApp(data: Inputs) {
         patient_id: data.id,
         service: data.service,
         branch: data.branch,
-        date: moment(data.date).format("MM/DD/YYYY"),
+        date: formattedDate,
         time: data.time,
         status: data.status,
         type: data.type,
       },
     ])
     .select("id")
-    .single(); // Fetch the inserted appointment data with its ID
+    .single();
 
   if (error) {
     console.error("Error inserting data:", error.message);
@@ -413,7 +409,6 @@ export async function newApp(data: Inputs) {
 
   console.log("Data inserted successfully");
 
-  // If the status is 2 (pending), call the pendingAppointment function
   if (data.status === 2 && newAppointmentData) {
     await pendingAppointment({ aptId: newAppointmentData.id });
   }
@@ -483,7 +478,7 @@ export async function completeAppointment(
   }
 
   revalidatePath("/");
-  redirect("/appointments?tab=calendar");
+  // redirect("/appointments?tab=calendar");
 }
 
 // export async function acceptReschedule(
@@ -519,11 +514,14 @@ export async function acceptReschedule(
 ) {
   const supabase = createClient();
 
+  // Fix: Format the date properly without UTC conversion
+  const formattedDate = moment(date).format("MM-DD-YYYY");
+
   const { data: appointmentData, error: updateError } = await supabase
     .from("appointments")
     .update({
       status: 1,
-      date: date,
+      date: formattedDate,
       time: time,
       rescheduled_date: null,
       rescheduled_time: null,
@@ -531,26 +529,17 @@ export async function acceptReschedule(
     .eq("id", aptId)
     .select(
       `
-          *,
-          patients (
-            *
-          ),
-          services (
-            *
-          ),
-          time_slots (
-            *
-          ),
-          status (
-            *
-          ),
-          branch (
-            *
-          )
-        `
+      *,
+      patients (*),
+      services (*),
+      time_slots (*),
+      status (*),
+      branch (*)
+    `
     )
     .single();
 
+  // Rest of the code remains the same
   if (updateError) {
     console.error("Error accepting reschedule:", updateError.message);
     throw new Error(updateError.message);
@@ -582,9 +571,7 @@ export async function acceptReschedule(
     patientEmail
   );
   revalidatePath("/");
-  redirect("/appointments?tab=calendar");
 }
-
 export async function rejectReschedule(aptId: number) {
   const supabase = createClient();
 
@@ -634,5 +621,5 @@ export async function rejectReschedule(aptId: number) {
 
   console.log("Reschedule rejected and email sent to:", patientEmail);
   revalidatePath("/");
-  redirect("/appointments?tab=calendar");
+  // redirect("/appointments?tab=calendar");
 }
