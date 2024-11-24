@@ -20,16 +20,6 @@ import RescheduleAcceptEmail from "@/components/emailTemplates/rescheduleAccept"
 import RejectReschedule from "@/components/emailTemplates/rescheduleReject";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-
-export const formatAppointmentDate = (date: Date | string) => {
-  // Always work with the date in local time
-  return moment(date).local().format("MM-DD-YYYY");
-};
-
-export const parseAppointmentDate = (dateString: string) => {
-  // When parsing dates from the database or form
-  return moment(dateString, "MM-DD-YYYY").local().toDate();
-};
 interface AppointmentActionProps {
   aptId: number;
   data?: SelectDoctorFormValues;
@@ -311,12 +301,13 @@ export async function deleteAppointment(id: number) {
 export async function rescheduleAppointment(data: Inputs) {
   const result = schema.safeParse(data);
   if (!result.success) {
-    console.log("Validation errors:", result.error.format());
-    return;
+    throw new Error(
+      `Validation failed: ${JSON.stringify(result.error.format())}`
+    );
   }
+
   if (data.id === undefined) {
-    console.error("Appointment ID is missing or undefined.");
-    return;
+    throw new Error("Appointment ID is missing or undefined");
   }
 
   const supabase = createClient();
@@ -328,14 +319,23 @@ export async function rescheduleAppointment(data: Inputs) {
     .single();
 
   if (fetchError) {
-    console.error("Error fetching existing appointment:", fetchError.message);
-    return;
+    throw new Error(
+      `Failed to fetch existing appointment: ${fetchError.message}`
+    );
   }
 
   const statusChanged = existingAppointment.status !== data.status;
 
-  // Fix: Use local date string instead of UTC conversion
-  const formattedDate = formatAppointmentDate(data.date);
+  // Format date using native JavaScript Date
+  const dateObj = new Date(data.date);
+  if (isNaN(dateObj.getTime())) {
+    throw new Error("Invalid date provided");
+  }
+
+  const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+  const day = String(dateObj.getDate()).padStart(2, "0");
+  const year = dateObj.getFullYear();
+  const formattedDate = `${month}-${day}-${year}`;
 
   const { error } = await supabase
     .from("appointments")
@@ -350,37 +350,41 @@ export async function rescheduleAppointment(data: Inputs) {
     .eq("id", data.id);
 
   if (error) {
-    console.error("Error updating appointment:", error.message);
-    return;
+    throw new Error(`Failed to update appointment: ${error.message}`);
   }
 
-  // Rest of the status handling code remains the same
-  if (statusChanged) {
-    switch (data.status) {
-      case 1:
-        console.log("Calling acceptAppointment");
-        await acceptAppointment({ aptId: data.id });
-        break;
-      case 2:
-        console.log("Calling pending");
-        await pendingAppointment({ aptId: data.id });
-        break;
-      case 3:
-        console.log("Calling cancelAppointment");
-        await cancelAppointment({ aptId: data.id });
-        break;
-      case 5:
-        console.log("Calling rejectAppointment");
-        await rejectAppointment({ aptId: data.id });
-        break;
-      default:
-        console.log("No additional actions required for status:", data.status);
+  try {
+    // Status handling code
+    if (statusChanged) {
+      switch (data.status) {
+        case 1:
+          await acceptAppointment({ aptId: data.id });
+          break;
+        case 2:
+          await pendingAppointment({ aptId: data.id });
+          break;
+        case 3:
+          await cancelAppointment({ aptId: data.id });
+          break;
+        case 5:
+          await rejectAppointment({ aptId: data.id });
+          break;
+        default:
+          console.log(
+            "No additional actions required for status:",
+            data.status
+          );
+      }
     }
-  } else {
-    console.log("Status has not changed, no further actions required.");
-  }
 
-  revalidatePath("/");
+    revalidatePath("/");
+  } catch (error) {
+    throw new Error(
+      `Failed to process status change: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`
+    );
+  }
 }
 
 export async function newApp(data: Inputs) {
@@ -394,7 +398,8 @@ export async function newApp(data: Inputs) {
   const supabase = createClient();
 
   // Fix: Use local date format instead of UTC conversion
-  const formattedDate = formatAppointmentDate(data.date);
+  const formattedDate = moment(data.date).format("MM/DD/YYYY");
+
   const { error, data: newAppointmentData } = await supabase
     .from("appointments")
     .insert([
