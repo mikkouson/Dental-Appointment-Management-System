@@ -37,7 +37,7 @@ export const DentalAppointmentEmail = ({
             <Section className="text-center">
               <Img
                 src={
-                  "https://scontent.fpag2-1.fna.fbcdn.net/v/t39.30808-6/372982805_277309235049873_634404805512807765_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeF0OqUbhPySIINyy245U74LHEJ4EZGwXwMcQngRkbBfAz791wG9ovFGHs8totzlrR0Wgj8nf7BhdtJFQVWj4GPX&_nc_ohc=uYACGUPadNoQ7kNvgGLNcpa&_nc_ht=scontent.fpag2-1.fna&_nc_gid=AVzaZOWIEGZGzq4MDZ7e8n_&oh=00_AYDbWugqRee3QbhGTE9NwEO0v_O8D6Mb8jnuakjLyDmuIA&oe=670E691B"
+                  "https://raw.githubusercontent.com/mikkouson/Dental-Appointment-Management-System/3f305f58652de14b5b9c1a2267c4d001dea0d348/public/372982805_277309235049873_634404805512807765_n.jpg"
                 }
                 width="150"
                 height="150"

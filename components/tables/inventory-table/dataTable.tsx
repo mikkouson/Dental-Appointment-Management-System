@@ -47,6 +47,10 @@ type DataTableProps = {
   columns: Column[];
   activePatient: Number | undefined;
   mutate: any;
+  meta?: {
+    predictions: any;
+  };
+  predictMutate: any;
 };
 
 export function DataTableDemo({
@@ -54,6 +58,8 @@ export function DataTableDemo({
   data,
   activePatient,
   mutate,
+  meta,
+  predictMutate,
 }: DataTableProps) {
   const setActive = useSetActive((state) => state.setActive);
 
@@ -84,6 +90,7 @@ export function DataTableDemo({
       columnVisibility,
       rowSelection,
     },
+    meta,
   });
 
   const handleClick = (row: Row<InventoryColWithBranch>) => {
@@ -171,7 +178,11 @@ export function DataTableDemo({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <EditInventory data={row.original} mutate={mutate} />
+                      <EditInventory
+                        data={row.original}
+                        mutate={mutate}
+                        predictMutate={predictMutate}
+                      />
 
                       <DropdownMenuSeparator />
                       <DeleteModal

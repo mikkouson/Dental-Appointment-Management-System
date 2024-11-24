@@ -88,7 +88,7 @@ export function PatientChart({ range, data }: AreaGraphProps) {
           {range.end}.
         </CardDescription>
 
-        <div className="mt-4 flex space-x-12 items-center">
+        <div className="flex flex-wrap gap-2 sm:gap-3 items-center">
           <div className="flex items-center space-x-2">
             <span
               className="inline-block w-4 h-4 rounded-full"

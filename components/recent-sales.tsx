@@ -10,8 +10,13 @@ import { Button } from "@/components/ui/button";
 import { useInventory } from "./hooks/useInventory";
 import Link from "next/link";
 
-export function RecentSales() {
-  const { inventory, inventoryLoading } = useInventory();
+export function InventoryStocksChart({ branch }: { branch: string }) {
+  const { inventory, inventoryLoading } = useInventory(
+    null,
+    null,
+    branch,
+    null
+  );
 
   const lowStockItems =
     inventory?.data
@@ -36,7 +41,7 @@ export function RecentSales() {
   const outOfStockPercentage = (outOfStockCount / totalCount) * 100 || 0;
 
   return (
-    <Card className="col-span-4 md:col-span-3 RecentSales">
+    <Card className="col-span-4 md:col-span-3 RecentSales  ">
       <CardHeader>
         <CardTitle>Inventory Stocks</CardTitle>
         <CardDescription>

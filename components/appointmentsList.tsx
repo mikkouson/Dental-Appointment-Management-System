@@ -125,7 +125,7 @@ export default function AppointmentsMap({
             </div>
 
             {filteredAppointments.length > 0 ? (
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-3">
                 {filteredAppointments.map((apt: any) => (
                   <Card key={apt.id}>
                     <CardHeader className="pb-0 flex flex-row justify-between items-center text-center">

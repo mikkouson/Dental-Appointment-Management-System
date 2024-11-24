@@ -60,7 +60,7 @@ export function EditAppointment({
 
   async function onSubmit(formData: z.infer<typeof AppointmentSchema>) {
     mutate();
-
+    console.log(formData.date);
     try {
       await rescheduleAppointment(formData); // Make sure this function returns a promise
       setOpen(false); // Close the modal

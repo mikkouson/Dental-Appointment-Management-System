@@ -49,8 +49,17 @@ const barColors = [
   "hsl(var(--chart-5))", // Additional color for the fifth service
 ];
 
-export function PieGraph() {
-  const { appointments, appointmentsLoading } = useAppointments();
+export function PieGraph({ branch }: { branch: string }) {
+  const { appointments, appointmentsLoading } = useAppointments(
+    null,
+    null,
+    branch,
+    null,
+    null,
+    null,
+    null,
+    null
+  );
 
   if (appointmentsLoading) return <>loading</>;
 

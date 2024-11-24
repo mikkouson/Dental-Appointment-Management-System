@@ -174,27 +174,32 @@ export async function updateInventory(data: InventoryFormValues) {
   const result = InventorySchema.safeParse(data);
 
   if (!result.success) {
-    console.log("Validation errors:", result.error.format());
-    return;
+    console.error("Validation errors:", result.error.format());
+    throw new Error("Validation failed. Please check the input data.");
   }
 
   const supabase = createClient();
 
-  // Update patient
-  const { error } = await supabase
-    .from("inventory")
-    .update({
-      name: data.name,
-      quantity: data.quantity,
-      description: data.description,
-      branch: data.branch,
-    })
-    .eq("id", data.id);
+  try {
+    const { error } = await supabase
+      .from("inventory")
+      .update({
+        name: data.name,
+        quantity: data.quantity,
+        description: data.description,
+        branch: data.branch,
+      })
+      .eq("id", data.id);
 
-  if (error) {
-    console.error("Error updating patient:", error.message);
-  } else {
-    console.log("Patient data updated successfully");
+    if (error) {
+      console.error("Error updating inventory:", error.message);
+      throw new Error("Failed to update inventory. Please try again later.");
+    }
+
+    console.log("Inventory updated successfully");
+  } catch (err) {
+    console.error("An unexpected error occurred:", err);
+    throw err; // Re-throwing for further handling upstream
   }
 }
 

@@ -38,7 +38,10 @@ export default function InventoryClient() {
   const branch = searchParams.get("branches") || "";
   const limit = parseInt(searchParams.get("limit") || "10", 10);
   const { branches, branchLoading } = useBranches();
-  const { data: predict } = useSWR("/api/predict/", fetcher);
+  const { data: predict, mutate: predictMutate } = useSWR(
+    "https://test1-34297954426.asia-east1.run.app/api/predictions",
+    fetcher
+  );
   const {
     inventory: data,
     inventoryLoading: isLoading,
@@ -63,7 +66,6 @@ export default function InventoryClient() {
 
   return (
     <PageContainer>
-      {JSON.stringify(predict)}
       <div className="flex flex-col h-[calc(100svh-20px)] ">
         <div className="flex justify-between items-center mt-0 sm:mt-4">
           <div className="flex items-center">
@@ -113,6 +115,8 @@ export default function InventoryClient() {
                   data={data.data}
                   mutate={mutate}
                   activePatient={undefined}
+                  meta={{ predictions: predict }}
+                  predictMutate={predictMutate}
                 />
                 <PaginationDemo totalPages={totalPages} />
               </>
