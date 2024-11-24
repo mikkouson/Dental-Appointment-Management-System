@@ -417,7 +417,6 @@ export async function newApp(data: Inputs) {
         time: data.time,
         status: data.status,
         type: data.type,
-        created_at: currentDatePHT.toDate(),
       },
     ])
     .select("id")
