@@ -29,12 +29,14 @@ export function CompleteAppointment({
   appointmentId,
   patientId,
   brachId,
+  mutate,
 }: {
   text: boolean;
   disabled: boolean;
   appointmentId: any;
   patientId: any;
   brachId: any;
+  mutate: any;
 }) {
   const [open, setOpen] = useState(false);
   const { clearTeethLocations, teethLocations } = useTeethArray();
@@ -62,7 +64,10 @@ export function CompleteAppointment({
   });
 
   async function onSubmit(formData: z.infer<typeof UpdateInventorySchema>) {
+    mutate();
+
     try {
+      mutate();
       // Validate teeth locations
       if (teethLocations.length === 0) {
         toast({
@@ -79,6 +84,7 @@ export function CompleteAppointment({
 
       await completeAppointment(formData, teethLocations);
       setOpen(false);
+      mutate();
 
       toast({
         className: cn(
@@ -89,6 +95,8 @@ export function CompleteAppointment({
         duration: 2000,
       });
     } catch (error: any) {
+      mutate();
+
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
