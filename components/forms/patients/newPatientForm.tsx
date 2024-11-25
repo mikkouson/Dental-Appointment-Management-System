@@ -136,8 +136,8 @@ export function NewPatientForm({ setOpen, mutate }: NewPatientFormProps) {
     setOpen(false); // Close the modal
 
     try {
-      await newPatient(data, teethLocations); // Ensure this function returns a promise
-      // Show success toast immediately
+      await newPatient(data, teethLocations);
+
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
@@ -147,20 +147,56 @@ export function NewPatientForm({ setOpen, mutate }: NewPatientFormProps) {
         duration: 2000,
       });
 
-      mutate(); // Revalidate to ensure data consistency
-    } catch (error: any) {
-      // Revert the optimistic update in case of an error
+      mutate();
+    } catch (error) {
       mutate();
 
-      // Show error toast below the success message
+      // Handle different types of errors
+      let errorMessage = "Failed to add patient";
+
+      if (error instanceof Error) {
+        // Handle specific error cases
+        switch (error.message) {
+          case "User already exists":
+            errorMessage = "A user with this email already exists";
+            break;
+          case "Invalid email":
+            errorMessage = "Please enter a valid email address";
+            break;
+          case "Password too weak":
+            errorMessage =
+              "Password is too weak. Please choose a stronger password";
+            break;
+          case "Validation failed":
+            errorMessage = "Please check all required fields";
+            break;
+          default:
+            // If it's an Error object but not one of our specific cases
+            errorMessage = error.message || "Failed to add patient";
+        }
+      } else if (typeof error === "object" && error !== null) {
+        // Handle potential Supabase or other errors that might have a different structure
+        const errorObj = error as {
+          message?: string;
+          error_description?: string;
+        };
+        errorMessage =
+          errorObj.message ||
+          errorObj.error_description ||
+          "Failed to add patient";
+      }
+
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         variant: "destructive",
-        description: `Failed to add patient`,
-        duration: 2000,
+        description: errorMessage,
+        duration: 3000, // Slightly longer duration for error messages
       });
+
+      // Optionally log the error for debugging
+      console.error("Patient creation error:", error);
     }
   }
 

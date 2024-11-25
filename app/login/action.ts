@@ -2,9 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-
 import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
+
 export async function login(formData: FormData) {
   const supabase = createClient();
 
@@ -12,13 +12,41 @@ export async function login(formData: FormData) {
     email: formData.get("email") as string,
     password: formData.get("password") as string,
   };
-  const { error } = await supabase.auth.signInWithPassword(data);
 
-  if (error) {
+  // First, attempt to sign in
+  const { data: signInData, error: signInError } =
+    await supabase.auth.signInWithPassword(data);
+
+  if (signInError) {
     redirect(
-      "/login?message=  Please check your password and account name and try again."
+      "/login?message=Please check your password and account name and try again."
     );
   }
+
+  // Check user metadata
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    // Handle the error case
+    await supabase.auth.signOut(); // Sign out if we can't verify the user role
+    redirect("/login?message=Unable to verify user permissions.");
+  }
+
+  // Check if user has patient role/metadata
+  const isPatient = user.user_metadata?.role === "patient";
+
+  if (isPatient) {
+    // If user is a patient, sign them out and redirect with message
+    await supabase.auth.signOut();
+    redirect(
+      "/login?message=Access denied. Patient accounts cannot access this area."
+    );
+  }
+
+  // If we get here, the user is not a patient and can proceed
   revalidatePath("/", "layout");
   redirect("/dashboard");
 }

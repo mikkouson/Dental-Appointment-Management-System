@@ -1,91 +1,73 @@
 "use server";
-import {
-  DoctorFormValues,
-  DoctorSchema,
-  InventoryFormValues,
-  InventorySchema,
-  PatientFormValues,
-  PatientSchema,
-  ServiceFormValues,
-  ServiceSchema,
-  ToothHistoryFormValue,
-  UpdateInventoryFormValues,
-  UpdateInventorySchema,
-  UpdateUser,
-  UpdateUserForm,
-  UserForm,
-} from "@/app/types";
-import DentalAppointmentCancellationEmail from "@/components/emailTemplates/cancelAppointment";
-import DentalAppointmentEmail from "@/components/emailTemplates/newAppointment";
-import DentalAppointmentPendingEmail from "@/components/emailTemplates/pendingAppointment";
-import DentalAppointmentRejectionEmail from "@/components/emailTemplates/rejectAppointment";
+import { PatientFormValues, PatientSchema } from "@/app/types";
 import { createAdminClient, createClient } from "@/utils/supabase/server";
-import moment from "moment";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import * as React from "react";
-import { Resend } from "resend";
 import { z } from "zod";
 import { createMultipleToothHistory } from "../action";
 
-type patientInput = z.infer<typeof PatientSchema>;
+export async function newPatient(
+  data: PatientFormValues,
+  teethLocations?: any
+) {
+  if (!data) throw new Error("Form data is required");
 
-export async function newPatient(data: patientInput, teethLocations?: any) {
   const result = PatientSchema.safeParse(data);
 
   if (!result.success) {
-    const validationErrors = result.error.format();
-    console.log("Validation errors:", validationErrors);
-    throw new Error("Validation errors occurred.");
+    console.log("Validation errors:", result.error.format());
+    throw new Error("Validation failed");
   }
 
-  const supabase = createClient();
+  const supabase = createAdminClient();
 
-  // Step 1: Insert address and get the ID
-  const { data: addressData, error: addressError } = await supabase
-    .from("addresses")
-    .insert([
-      {
-        address: data.address.address,
-        latitude: data.address.latitude,
-        longitude: data.address.longitude,
-      },
-    ])
-    .select("id")
-    .single();
-
-  if (addressError || !addressData) {
-    const errorMessage = addressError
-      ? addressError.message
-      : "Failed to insert address.";
-    throw new Error(`Error inserting address: ${errorMessage}`);
-  }
-
-  const addressId = addressData.id;
-
-  // Step 2: Insert patient with the address ID and get the patient ID
-  const { data: patientData, error: patientError } = await supabase
-    .from("patients")
-    .insert([
-      {
+  // Step 1: Create user with Supabase Auth - this will trigger patient creation
+  const { data: userData, error: userError } =
+    await supabase.auth.admin.createUser({
+      email: data.email,
+      password: data.password,
+      user_metadata: {
         name: data.name,
+        role: "patient",
+        address: {
+          address: data.address.address,
+          latitude: data.address.latitude,
+          longitude: data.address.longitude,
+        },
+        phoneNumber: data.phoneNumber,
         email: data.email,
         sex: data.sex,
-        address: addressId,
-        phone_number: data.phoneNumber,
         dob: data.dob,
         status: data.status,
       },
-    ])
+      email_confirm: true,
+      role: "authenticated",
+    });
+
+  if (userError) {
+    if (userError.message.includes("duplicate"))
+      throw new Error("User already exists");
+    if (userError.message.includes("invalid_email"))
+      throw new Error("Invalid email");
+    if (userError.message.includes("weak_password"))
+      throw new Error("Password too weak");
+    throw userError;
+  }
+
+  if (!userData?.user) throw new Error("Failed to create user");
+
+  // Step 2: Get the patient ID that was created by the trigger
+  const { data: patientData, error: patientError } = await supabase
+    .from("patients")
     .select("id")
+    .eq("user_id", userData.user.id)
     .single();
 
-  if (patientError) {
-    throw new Error(`Error inserting patient: ${patientError.message}`);
+  if (patientError || !patientData) {
+    throw new Error("Failed to retrieve patient record");
   }
 
   // Step 3: Create tooth history records if teethLocations are provided
-  // Step 3: If teethLocations are provided, call createMultipleToothHistory
   if (teethLocations && teethLocations.length > 0) {
     const toothHistoryData = teethLocations.map((location: any) => ({
       tooth_location: location.tooth_location,
@@ -99,10 +81,11 @@ export async function newPatient(data: patientInput, teethLocations?: any) {
       await createMultipleToothHistory(toothHistoryData);
     } catch (error) {
       console.error("Error creating multiple tooth history records:", error);
-      // Continue execution even if tooth history creation fails
+      // Consider implementing a cleanup mechanism here
     }
   }
-  console.log("Patient data inserted successfully");
+
+  console.log("Patient created successfully with auth and tooth history");
   revalidatePath("/", "layout");
   redirect(`/patients/${patientData.id}`);
 }
