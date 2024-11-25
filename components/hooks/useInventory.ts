@@ -1,8 +1,14 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState, useCallback } from "react";
 import useSWR from "swr";
 import { createClient } from "@/utils/supabase/client";
 import { InventoryCol } from "@/app/schema";
+import { RealtimeChannel, RealtimeChannelOptions } from "@supabase/supabase-js";
+
+// Define custom types for realtime states
+type RealtimeStatus = "SUBSCRIBED" | "TIMED_OUT" | "CLOSED" | "CHANNEL_ERROR";
+
+const RECONNECT_TIMEOUT = 5000; // 5 seconds
 
 const fetcher = async (
   url: string
@@ -23,6 +29,14 @@ export function useInventory(
   branches?: string | null,
   limit?: number | null
 ) {
+  const [realtimeStatus, setRealtimeStatus] = useState<{
+    status: RealtimeStatus;
+    error: Error | null;
+  }>({
+    status: "CLOSED",
+    error: null,
+  });
+
   const queryString = new URLSearchParams();
 
   if (query != null) {
@@ -30,7 +44,6 @@ export function useInventory(
   }
 
   if (branches != null) {
-    // Now TypeScript knows branches is not undefined when we use it
     const branchArray = branches.split(",");
     queryString.append("branch", branchArray.join(","));
   }
@@ -55,22 +68,85 @@ export function useInventory(
 
   const supabase = createClient();
 
-  useEffect(() => {
-    const channel = supabase
-      .channel(`realtime-items-${page ?? 1}`) // Provide a default value if page is undefined
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "inventory" },
-        () => {
-          mutate();
+  const setupRealtimeSubscription = useCallback(
+    (channelName: string): RealtimeChannel => {
+      const channel = supabase
+        .channel(channelName)
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "inventory" },
+          (payload) => {
+            console.log("Received realtime update:", payload);
+            mutate();
+          }
+        )
+        .on("presence", { event: "sync" }, () => {
+          console.log("Presence sync occurred");
+        })
+        .on("broadcast", { event: "*" }, (payload: unknown) => {
+          console.log("Broadcast event:", payload);
+        });
+
+      // Handle subscription status changes
+      channel.subscribe((status: RealtimeStatus, err?: Error) => {
+        setRealtimeStatus({
+          status,
+          error: err || null,
+        });
+
+        if (status === "CLOSED" && !err) {
+          console.log("Channel closed, attempting to reconnect...");
+          // Attempt to reconnect after timeout
+          setTimeout(() => {
+            setupRealtimeSubscription(channelName);
+          }, RECONNECT_TIMEOUT);
         }
-      )
-      .subscribe();
 
+        if (err) {
+          console.error("Subscription error:", err);
+          // Attempt to reconnect after timeout
+          setTimeout(() => {
+            setupRealtimeSubscription(channelName);
+          }, RECONNECT_TIMEOUT);
+        }
+      });
+
+      return channel;
+    },
+    [supabase, mutate]
+  );
+
+  useEffect(() => {
+    const channelName = `realtime-items-${page ?? 1}-${Date.now()}`;
+    let channel: RealtimeChannel | null = null;
+
+    try {
+      channel = setupRealtimeSubscription(channelName);
+    } catch (error) {
+      console.error("Error setting up realtime subscription:", error);
+      setRealtimeStatus({
+        status: "CHANNEL_ERROR",
+        error:
+          error instanceof Error ? error : new Error("Unknown error occurred"),
+      });
+    }
+
+    // Cleanup function
     return () => {
-      supabase.removeChannel(channel);
+      if (channel) {
+        console.log("Cleaning up channel:", channelName);
+        supabase.removeChannel(channel).catch((error) => {
+          console.error("Error removing channel:", error);
+        });
+      }
     };
-  }, [page, supabase, mutate]);
+  }, [page, setupRealtimeSubscription, supabase]);
 
-  return { inventory, inventoryError, inventoryLoading, mutate };
+  return {
+    inventory,
+    inventoryError,
+    inventoryLoading,
+    mutate,
+    realtimeStatus,
+  };
 }

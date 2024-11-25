@@ -41,13 +41,15 @@ export function AcceptAppointment({
   disabled,
   appointment,
   patientId,
+  mutate,
 }: {
   disabled: boolean;
   appointment: any;
   patientId: any;
+  mutate: any;
 }) {
   const [open, setOpen] = useState(false);
-  const { data, error, isLoading, mutate } = usePatientsDetails(patientId);
+  const { data, error, isLoading } = usePatientsDetails(patientId);
   const { doctors, doctorError, doctorLoading } = useDoctor();
   const filteredDoctors = doctors?.data?.filter(
     (doctor: any) => doctor.branch.id === appointment.branch.id
@@ -63,6 +65,8 @@ export function AcceptAppointment({
     setTimeout(() => (document.body.style.pointerEvents = ""), 0);
   });
   async function onSubmit(data: z.infer<typeof SelectDoctorSchema>) {
+    mutate(); // Revalidate to ensure data consistency
+
     try {
       mutate(); // Revalidate to ensure data consistency
 

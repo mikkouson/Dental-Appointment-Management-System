@@ -22,41 +22,55 @@ export const AppointmentSchema = z.object({
   }),
 });
 export type AppointmentSchemaType = z.infer<typeof AppointmentSchema>;
-export const PatientSchema = z.object({
-  id: z.number().optional(),
-  name: z.string().min(1, { message: "Name is required." }),
-  phoneNumber: z.coerce
-    .number()
-    .min(100000000, { message: "Invalid Phone Number" })
-    .max(999999999, { message: "Invalid Phone Number" }),
-  email: z.string().email().min(1, {
-    message: "Invalid email address.",
-  }),
-
-  address: z
-    .object({
-      id: z.number().optional(),
-      address: z.string({
-        required_error: "Address is required.",
-      }),
-      latitude: z.number({
-        required_error: "Invalid Address",
-      }),
-      longitude: z.number({
-        required_error: "Invalid Address",
-      }),
-    })
-    .refine((data) => data.address.trim().length > 0, {
-      message: "Address must be provided.",
+export const PatientSchema = z
+  .object({
+    id: z.number().optional(),
+    name: z.string().min(1, { message: "Name is required." }),
+    phoneNumber: z.coerce
+      .number()
+      .min(100000000, { message: "Invalid Phone Number" })
+      .max(999999999, { message: "Invalid Phone Number" }),
+    email: z.string().email().min(1, {
+      message: "Invalid email address.",
     }),
-  sex: z.string().min(1, { message: "Sex is a required field" }),
-  dob: z.date({
-    required_error: "A date of birth is required.",
-  }),
-  status: z.string({
-    required_error: "A status is required.",
-  }),
-});
+
+    address: z
+      .object({
+        id: z.number().optional(),
+        address: z.string({
+          required_error: "Address is required.",
+        }),
+        latitude: z.number({
+          required_error: "Invalid Address",
+        }),
+        longitude: z.number({
+          required_error: "Invalid Address",
+        }),
+      })
+      .refine((data) => data.address.trim().length > 0, {
+        message: "Address must be provided.",
+      }),
+    sex: z.string().min(1, { message: "Sex is a required field" }),
+    dob: z.date({
+      required_error: "A date of birth is required.",
+    }),
+    status: z.string({
+      required_error: "A status is required.",
+    }),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[0-9]/, "Password must contain at least 1 number")
+      .regex(/[a-z]/, "Password must contain at least 1 lowercase letter")
+      .regex(/[A-Z]/, "Password must contain at least 1 uppercase letter"),
+    confirmPassword: z
+      .string()
+      .min(1, { message: "Confirm password is required" }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
 export type PatientFormValues = z.infer<typeof PatientSchema>;
 
@@ -165,7 +179,7 @@ export const ToothHistory = z.object({
   tooth_condition: z
     .string()
     .min(1, { message: "Tooth Condition is required." }),
-  tooth_history: z.string().min(1, { message: "Description is required." }),
+  tooth_history: z.string(),
   history_date: z.date(),
   patient_id: z.number().optional(),
 });

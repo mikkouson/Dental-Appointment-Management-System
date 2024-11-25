@@ -1,5 +1,6 @@
-import React from "react";
-import Field from "../formField";
+import { PatientFormValues } from "@/app/types";
+import Maps from "@/components/gmaps";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -8,13 +9,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import Maps from "@/components/gmaps";
-import { Button } from "@/components/ui/button";
-import { UseFormReturn } from "react-hook-form";
-import { PatientFormValues } from "@/app/types";
 import { Input } from "@/components/ui/input";
-import { CalendarForm } from "@/components/calendarInput";
-
+import { Eye, EyeOff, Lock } from "lucide-react";
+import { useState } from "react";
+import { UseFormReturn } from "react-hook-form";
+import Field from "../formField";
+import PasswordInput from "./passworInput";
 const sex = [
   { name: "Male", id: "male" },
   { name: "Female", id: "female" },
@@ -38,8 +38,11 @@ const PatientFields = ({
   next = false,
 }: PatientFieldsProps) => {
   const { isSubmitting } = form.formState;
+  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
+  const [isConfirmVisible, setIsConfirmVisible] = useState<boolean>(false);
 
-  console.log(form);
+  const togglePasswordVisibility = () => setIsPasswordVisible((prev) => !prev);
+  const toggleConfirmVisibility = () => setIsConfirmVisible((prev) => !prev);
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full p-2">
@@ -107,6 +110,41 @@ const PatientFields = ({
                 <FormControl>
                   <Maps field={field} />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <PasswordInput form={form} name="password" label="Password" />
+          <FormField
+            control={form.control}
+            name="confirmPassword"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-2">
+                  <Lock size={16} />
+                  Confirm Password
+                </FormLabel>
+                <div className="relative">
+                  <FormControl>
+                    <Input
+                      className="pr-10"
+                      placeholder="Confirm your password"
+                      type={isConfirmVisible ? "text" : "password"}
+                      {...field}
+                    />
+                  </FormControl>
+                  <button
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                    type="button"
+                    onClick={toggleConfirmVisibility}
+                  >
+                    {isConfirmVisible ? (
+                      <EyeOff size={16} className="text-muted-foreground" />
+                    ) : (
+                      <Eye size={16} className="text-muted-foreground" />
+                    )}
+                  </button>
+                </div>
                 <FormMessage />
               </FormItem>
             )}

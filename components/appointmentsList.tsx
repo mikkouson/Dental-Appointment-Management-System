@@ -284,6 +284,7 @@ export default function AppointmentsMap({
                               disabled={loading === apt.id}
                               patientId={apt.patients?.id}
                               brachId={apt.branch?.id}
+                              mutate={mutate}
                             />
                             <Button
                               variant="destructive"
@@ -310,6 +311,7 @@ export default function AppointmentsMap({
                               disabled={loading === apt.id}
                               appointment={apt}
                               patientId={apt.patients?.id}
+                              mutate={mutate}
                             />
                             <Button
                               variant="destructive"
