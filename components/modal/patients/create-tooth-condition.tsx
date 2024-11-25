@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+
 import { createToothHistory, updateToothHistory } from "@/app/(admin)/action";
 import { ToothHistory, ToothHistoryFormValue } from "@/app/types";
 import ToothConditionFields from "@/components/forms/patients/tooth-condition-field";
@@ -26,15 +27,6 @@ interface NewToothConditionProps {
   form: UseFormReturn<ToothHistoryFormValue>;
   newPatient?: boolean;
   showTitle?: boolean;
-}
-
-// Define a type for the tooth data that matches TeethLocationState
-interface ToothLocationData {
-  tooth_location: number;
-  tooth_condition: string;
-  tooth_history: string; // No longer optional
-  history_date: Date;
-  patient_id: number;
 }
 
 export function NewToothCondition({
@@ -75,11 +67,10 @@ export function NewToothCondition({
             tooth.patient_id === Number(data.patient_id)
         );
 
-        // Ensure tooth_history is never undefined by providing a default value
-        const toothData: ToothLocationData = {
+        const toothData = {
           tooth_location: data.tooth_location,
           tooth_condition: data.tooth_condition,
-          tooth_history: data.tooth_history || "", // Provide empty string as fallback
+          tooth_history: data.tooth_history,
           history_date: data.history_date,
           patient_id: Number(data.patient_id),
         };
@@ -122,7 +113,6 @@ export function NewToothCondition({
   const historyForTooth = history.filter(
     (h: any) => h.tooth_location === tooth_location
   );
-
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>{children}</SheetTrigger>
@@ -145,17 +135,35 @@ export function NewToothCondition({
         <SheetHeader>
           <SheetTitle>Tooth History</SheetTitle>
           <Separator className="my-2" />
+
           <div className="font-thin italic">
             {formatToothTitle(tooth_location)}
           </div>
+          {/* <SheetDescription>
+            Make changes to your profile here. Click save when you&apos;re done.
+          </SheetDescription> */}
         </SheetHeader>
         <Separator className="my-2" />
         <ToothConditionFields form={form} onSubmit={onSubmit} />
+        {/* {historyForTooth ||
+          (history.length > 0 && (
+            <div>
+              <Separator className="my-2" />
 
+              <div className="flex items-center  gap-2">
+                <LiaToothSolid size={20} />
+                <p className="font-medium text-sm">Treatment History</p>
+              </div>
+              <Separator className="my-2" />
+
+              <ToothHistoryCard treatments={historyForTooth} edit={true} />
+            </div>
+          ))} */}
         {showTitle && (
           <>
             <Separator className="my-2" />
-            <div className="flex items-center gap-2">
+
+            <div className="flex items-center  gap-2">
               <LiaToothSolid size={20} />
               <p className="font-medium text-sm">Treatment History</p>
             </div>
@@ -163,6 +171,14 @@ export function NewToothCondition({
             <ToothHistoryCard treatments={historyForTooth} />
           </>
         )}
+
+        {/* {history.length < 0 ? (
+          <ToothHistoryCard treatments={historyForTooth} edit={true} />
+        ) : (
+          <div className="flex justify-center items-center w-full text-muted-foreground">
+            No treatment history found.
+          </div>
+        )} */}
       </SheetContent>
     </Sheet>
   );

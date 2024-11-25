@@ -179,7 +179,7 @@ export const ToothHistory = z.object({
   tooth_condition: z
     .string()
     .min(1, { message: "Tooth Condition is required." }),
-  tooth_history: z.string().optional(),
+  tooth_history: z.string(),
   history_date: z.date(),
   patient_id: z.number().optional(),
 });
