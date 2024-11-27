@@ -83,11 +83,14 @@ export function DataTableDemo({ columns, data, mutate }: DataTableProps) {
   };
 
   const handleDelete = (id?: number) => {
+    mutate();
+
     try {
       if (!id) return;
 
       // Optimistically update the UI
       const filteredDoctors = data.filter((doctor: any) => doctor.id !== id);
+      mutate();
       mutate({ data: filteredDoctors }, false);
       deleteDoctor(id); // Update delete function for doctors
       toast({
@@ -98,6 +101,8 @@ export function DataTableDemo({ columns, data, mutate }: DataTableProps) {
         description: "Doctor deleted successfully.",
       });
     } catch (error: any) {
+      mutate();
+
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"

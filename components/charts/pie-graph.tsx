@@ -1,8 +1,6 @@
-"use client";
-
 import React from "react";
-import { TrendingUp } from "lucide-react";
 import { Bar, BarChart, Cell, XAxis, YAxis } from "recharts";
+import moment from "moment";
 
 import {
   Card,
@@ -26,6 +24,11 @@ interface ServiceUsage {
   totalPrice: number;
 }
 
+interface DateRange {
+  start: string;
+  end: string;
+}
+
 const chartConfig: ChartConfig = {
   desktop: {
     label: "Desktop",
@@ -40,16 +43,21 @@ const chartConfig: ChartConfig = {
   },
 };
 
-// Define an array of colors for the bars
 const barColors = [
-  chartConfig.desktop.color, // Desktop color
-  chartConfig.mobile.color, // Mobile color
-  "hsl(var(--chart-3))", // Additional color for the third service
-  "hsl(var(--chart-4))", // Additional color for the fourth service
-  "hsl(var(--chart-5))", // Additional color for the fifth service
+  chartConfig.desktop.color,
+  chartConfig.mobile.color,
+  "hsl(var(--chart-3))",
+  "hsl(var(--chart-4))",
+  "hsl(var(--chart-5))",
 ];
 
-export function PieGraph({ branch }: { branch: string }) {
+export function PieGraph({
+  branch,
+  range,
+}: {
+  branch: string;
+  range: DateRange;
+}) {
   const { appointments, appointmentsLoading } = useAppointments(
     null,
     null,
@@ -65,7 +73,20 @@ export function PieGraph({ branch }: { branch: string }) {
 
   const serviceUsage: Record<string, ServiceUsage> = {};
 
-  appointments?.data.forEach((appointment) => {
+  // Filter appointments by date range and status equals 4
+  const filteredAppointments = appointments?.data.filter((appointment) => {
+    const appointmentDate = moment(appointment.date);
+    const isInRange = appointmentDate.isBetween(
+      moment(range.start),
+      moment(range.end),
+      "day",
+      "[]"
+    );
+    return isInRange && appointment?.status?.id === 4;
+  });
+
+  // Process only the filtered appointments
+  filteredAppointments?.forEach((appointment) => {
     const service = appointment.services;
     if (service) {
       const serviceId = service.id;
@@ -86,14 +107,17 @@ export function PieGraph({ branch }: { branch: string }) {
   });
 
   const chartData: ServiceUsage[] = Object.values(serviceUsage);
-
   const top5Services = chartData.sort((a, b) => b.count - a.count).slice(0, 5);
 
   return (
     <Card className="h-full">
       <CardHeader>
-        <CardTitle>Top 5 Services</CardTitle>
-        <CardDescription>Usage of top 5 services</CardDescription>
+        <CardTitle>Top 5 Services </CardTitle>
+        <CardDescription>
+          Usage of top 5 services for status 4 appointments between{" "}
+          {moment(range.start).format("MMM D, YYYY")} and{" "}
+          {moment(range.end).format("MMM D, YYYY")}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer
@@ -105,7 +129,10 @@ export function PieGraph({ branch }: { branch: string }) {
             data={top5Services}
             layout="vertical"
             margin={{
-              left: 0,
+              left: 50,
+              right: 20,
+              top: 10,
+              bottom: 10,
             }}
           >
             <YAxis
@@ -129,13 +156,13 @@ export function PieGraph({ branch }: { branch: string }) {
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
-        {/* <div className="flex gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-        </div> */}
         <div className="leading-none text-muted-foreground">
-          Showing usage of the top 5 services
+          Showing usage of the top 5 services for appointments with completed
+          within the selected date range
         </div>
       </CardFooter>
     </Card>
   );
 }
+
+export default PieGraph;

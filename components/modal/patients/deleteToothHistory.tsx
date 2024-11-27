@@ -83,7 +83,7 @@ export function DeleteToothHistory({
           <DialogHeader>
             <DialogTitle>Confirm Deletion</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this patient?
+              Are you sure you want to perform delete action?
             </DialogDescription>
           </DialogHeader>
 

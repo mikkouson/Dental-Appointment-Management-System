@@ -74,6 +74,44 @@ export const PatientSchema = z
 
 export type PatientFormValues = z.infer<typeof PatientSchema>;
 
+export const UpdatePatientSchema = z.object({
+  id: z.number().optional(),
+  name: z.string().min(1, { message: "Name is required." }),
+  phoneNumber: z.coerce
+    .number()
+    .min(100000000, { message: "Invalid Phone Number" })
+    .max(999999999, { message: "Invalid Phone Number" }),
+  email: z.string().email().min(1, {
+    message: "Invalid email address.",
+  }),
+
+  address: z
+    .object({
+      id: z.number().optional(),
+      address: z.string({
+        required_error: "Address is required.",
+      }),
+      latitude: z.number({
+        required_error: "Invalid Address",
+      }),
+      longitude: z.number({
+        required_error: "Invalid Address",
+      }),
+    })
+    .refine((data) => data.address.trim().length > 0, {
+      message: "Address must be provided.",
+    }),
+  sex: z.string().min(1, { message: "Sex is a required field" }),
+  dob: z.date({
+    required_error: "A date of birth is required.",
+  }),
+  status: z.string({
+    required_error: "A status is required.",
+  }),
+});
+
+export type UpdatePatientFormValues = z.infer<typeof UpdatePatientSchema>;
+
 export const ServiceSchema = z.object({
   id: z.number().optional(),
   description: z.string().min(1, { message: "Description is required." }),
@@ -96,14 +134,12 @@ export type InventoryFormValues = z.infer<typeof InventorySchema>;
 export const UpdateInventorySchema = z.object({
   id: z.number().optional(),
 
-  selectedItems: z
-    .array(
-      z.object({
-        id: z.number(), // Item ID (required)
-        quantity: z.number().min(1), // Quantity (must be 1 or more)
-      })
-    )
-    .min(1, { message: "Please select at least one item" }),
+  selectedItems: z.array(
+    z.object({
+      id: z.number(), // Item ID (required)
+      quantity: z.number().min(1), // Quantity (must be 1 or more)
+    })
+  ),
 });
 
 export type UpdateInventoryFormValues = z.infer<typeof UpdateInventorySchema>;
@@ -144,7 +180,7 @@ export const DoctorSchema = z.object({
 export type DoctorFormValues = z.infer<typeof DoctorSchema>;
 
 export const SelectDoctorSchema = z.object({
-  id: z.number().min(1, { message: "Email is required." }),
+  id: z.number().optional(),
 });
 
 export type SelectDoctorFormValues = z.infer<typeof SelectDoctorSchema>;

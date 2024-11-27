@@ -38,8 +38,12 @@ export default function InventoryClient() {
   const branch = searchParams.get("branches") || "";
   const limit = parseInt(searchParams.get("limit") || "10", 10);
   const { branches, branchLoading } = useBranches();
-  const { data: predict, mutate: predictMutate } = useSWR(
-    "https://test1-34297954426.asia-east1.run.app/api/predictions",
+  const {
+    data: predict,
+    mutate: predictMutate,
+    isLoading: isPredictLoading,
+  } = useSWR(
+    "https://test8-34297954426.asia-southeast1.run.app/api/predictions",
     fetcher
   );
   const {
@@ -117,6 +121,7 @@ export default function InventoryClient() {
                   activePatient={undefined}
                   meta={{ predictions: predict }}
                   predictMutate={predictMutate}
+                  isPredictLoading={isPredictLoading} // Add this prop
                 />
                 <PaginationDemo totalPages={totalPages} />
               </>
