@@ -39,7 +39,7 @@ export default function InventoryClient() {
   const limit = parseInt(searchParams.get("limit") || "10", 10);
   const { branches, branchLoading } = useBranches();
   const { data: predict, mutate: predictMutate } = useSWR(
-    "https://test1-34297954426.asia-east1.run.app/api/predictions",
+    "https://test8-34297954426.asia-southeast1.run.app/api/predictions",
     fetcher
   );
   const {
