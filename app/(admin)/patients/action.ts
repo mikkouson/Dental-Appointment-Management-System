@@ -94,17 +94,82 @@ export async function newPatient(
   revalidatePath("/", "layout");
   redirect(`/patients/${patientData.id}`);
 }
-export async function deletePatient(id: number) {
-  const supabase = createClient();
-  const { error } = await supabase
+export async function deletePatient(patientId: number) {
+  const supabase = createAdminClient();
+
+  // First, get the user_id from the patient record
+  const { data: patient, error: fetchError } = await supabase
+    .from("patients")
+    .select("user_id")
+    .eq("id", patientId)
+    .single();
+
+  if (fetchError) {
+    console.error("Error fetching patient:", fetchError.message);
+    return { error: fetchError };
+  }
+
+  if (!patient) {
+    console.error("Patient not found");
+    return { error: new Error("Patient not found") };
+  }
+
+  if (!patient.user_id) {
+    console.error("Patient has no associated user_id");
+    return { error: new Error("Patient has no associated user_id") };
+  }
+
+  // Update patient record with deletion timestamp
+  const { error: updateError } = await supabase
     .from("patients")
     .update({
       deleteOn: new Date().toISOString(),
     })
-    .eq("id", id);
-  if (error) {
-    console.log("Error deleting patient", error.message);
+    .eq("id", patientId);
+
+  if (updateError) {
+    console.error("Error updating patient:", updateError.message);
+    return { error: updateError };
   }
+
+  // Insert record into deleteuser table using the patient's user_id
+  const { data: deleteUserData, error: insertError } = await supabase
+    .from("deleteuser")
+    .insert({
+      uuid: patient.user_id,
+    })
+    .select()
+    .single();
+
+  if (insertError) {
+    console.error("Error inserting into deleteuser:", insertError.message);
+    return { error: insertError };
+  }
+
+  // Update patient record to set user_id to null
+  const { error: nullifyError } = await supabase
+    .from("patients")
+    .update({
+      user_id: null,
+    })
+    .eq("id", patientId);
+
+  if (nullifyError) {
+    console.error("Error nullifying user_id:", nullifyError.message);
+    return { error: nullifyError };
+  }
+
+  // Delete the user from auth
+  const { error: deleteError } = await supabase.auth.admin.deleteUser(
+    patient.user_id
+  );
+
+  if (deleteError) {
+    console.error("Error deleting user from auth:", deleteError.message);
+    return { error: deleteError };
+  }
+
+  return { success: true };
 }
 
 export async function updatePatient(data: UpdatePatientFormValues) {

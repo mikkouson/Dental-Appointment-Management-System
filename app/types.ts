@@ -141,7 +141,7 @@ export const UpdateInventorySchema = z.object({
         quantity: z.number().min(1), // Quantity (must be 1 or more)
       })
     )
-    .min(1, { message: "Please select at least one item" }),
+    .optional(),
 });
 
 export type UpdateInventoryFormValues = z.infer<typeof UpdateInventorySchema>;

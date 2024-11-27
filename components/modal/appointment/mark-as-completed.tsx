@@ -68,19 +68,6 @@ export function CompleteAppointment({
 
     try {
       mutate();
-      // Validate teeth locations
-      if (teethLocations.length === 0) {
-        toast({
-          className: cn(
-            "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
-          ),
-          variant: "destructive",
-          description: "Please select at least one tooth location",
-          duration: 2000,
-        });
-        setActiveTab("chart"); // Switch to chart tab if no teeth are selected
-        return;
-      }
 
       await completeAppointment(formData, teethLocations);
       setOpen(false);
@@ -142,9 +129,6 @@ export function CompleteAppointment({
       >
         <SheetHeader>
           <SheetTitle>Complete Appointment</SheetTitle>
-          <SheetDescription>
-            Please select at least one tooth location and add any items used.
-          </SheetDescription>
         </SheetHeader>
         <Tabs
           value={activeTab}
@@ -176,11 +160,6 @@ export function CompleteAppointment({
               treatments={teethLocations}
               newPatient={true}
             />
-            {teethLocations.length === 0 && (
-              <p className="text-sm text-red-500">
-                Please select at least one tooth location
-              </p>
-            )}
           </TabsContent>
           <TabsContent value="items">
             <ItemUsedField
