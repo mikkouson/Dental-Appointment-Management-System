@@ -51,18 +51,6 @@ export const DentalAppointmentEmail = ({
               <Heading className="text-[24px] font-semibold m-0">
                 Your dental application has been approved.
               </Heading>
-              <Text className="mt-2 text-gray-700 m-0">
-                Please take note of your ticket number below:
-              </Text>
-              <Heading
-                className="
-    text-[28px] font-bold  mt-4 p-[20px] 
-    bg-black/5 rounded-md mx-auto mb-[14px] 
-    align-middle w-[280px]
-  "
-              >
-                {appointmentData.appointment_ticket}
-              </Heading>
             </Section>
 
             {/* Appointment Details */}
