@@ -91,15 +91,15 @@ export function EditPatient({ patient, mutate }: EditPatientProps) {
   // }
 
   async function onSubmit(formData: z.infer<typeof UpdatePatientSchema>) {
-    const emailExists = await checkEmailExists(formData.email);
+    // const emailExists = await checkEmailExists(formData.email);
 
-    if (emailExists) {
-      form.setError("email", {
-        type: "manual",
-        message: "Email already exists",
-      });
-      return;
-    }
+    // if (emailExists) {
+    //   form.setError("email", {
+    //     type: "manual",
+    //     message: "Email already exists",
+    //   });
+    //   return;
+    // }
 
     // Prepare the updated inventory item
     const updatedItem: any = {

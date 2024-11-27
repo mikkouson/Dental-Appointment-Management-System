@@ -37,6 +37,9 @@ import {
 import { DeleteModal } from "./modal/deleteModal";
 import { AcceptAppointment } from "./modal/appointment/acceptAppointment";
 import moment from "moment";
+import RejectionConfirmationDialog from "./modal/appointment/rejectAppointment";
+import CancelConfirmationDialog from "./modal/appointment/cancelAppointment";
+import RejectConfirmationDialog from "./modal/appointment/rejectAppointment";
 
 interface AppointmentsMapProps {
   timeSlots: TimeSlot[];
@@ -206,10 +209,7 @@ export default function AppointmentsMap({
                           <Hospital className="w-5 h-5 mr-2" />
                           Branch: {apt.branch?.name || "No branch specified"}
                         </span>
-                        <span className="text-sm md:text-base flex items-center">
-                          <Ticket className="w-5 h-5 mr-2" />
-                          Appointment Ticket: {apt.appointment_ticket || "N/A"}
-                        </span>
+
                         <span className="text-sm md:text-base flex items-center">
                           <Phone className="w-5 h-5 mr-2" />
                           Phone Number:{" "}
@@ -286,22 +286,21 @@ export default function AppointmentsMap({
                               brachId={apt.branch?.id}
                               mutate={mutate}
                             />
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              disabled={loading === apt.id}
-                              onClick={() =>
+                            <CancelConfirmationDialog
+                              onConfirm={() =>
                                 handleAction(
                                   () => cancelAppointment({ aptId: apt.id }),
                                   apt.id,
                                   "cancelled"
                                 )
                               }
-                            >
-                              {loading === apt.id && loadingType === "cancelled"
-                                ? "Cancelling..."
-                                : "Cancel"}
-                            </Button>
+                              appointmentDate={apt.date}
+                              appointmentTime={
+                                timeSlots.find((slot) => slot.id === apt.time)
+                                  ?.time
+                              }
+                              disabled={loading === apt.id}
+                            />
                           </>
                         )}
 
@@ -313,22 +312,22 @@ export default function AppointmentsMap({
                               patientId={apt.patients?.id}
                               mutate={mutate}
                             />
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              disabled={loading === apt.id}
-                              onClick={() =>
+                            <RejectConfirmationDialog
+                              onConfirm={() =>
                                 handleAction(
                                   () => rejectAppointment({ aptId: apt.id }),
                                   apt.id,
                                   "rejected"
                                 )
                               }
-                            >
-                              {loading === apt.id && loadingType === "rejected"
-                                ? "Rejecting..."
-                                : "Reject"}
-                            </Button>
+                              appointmentDate={apt.date}
+                              appointmentTime={
+                                timeSlots.find((slot) => slot.id === apt.time)
+                                  ?.time
+                              }
+                              disabled={loading === apt.id}
+                              patientName={apt.patients?.name}
+                            />
                           </>
                         )}
                       </div>
