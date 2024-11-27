@@ -74,6 +74,44 @@ export const PatientSchema = z
 
 export type PatientFormValues = z.infer<typeof PatientSchema>;
 
+export const UpdatePatientSchema = z.object({
+  id: z.number().optional(),
+  name: z.string().min(1, { message: "Name is required." }),
+  phoneNumber: z.coerce
+    .number()
+    .min(100000000, { message: "Invalid Phone Number" })
+    .max(999999999, { message: "Invalid Phone Number" }),
+  email: z.string().email().min(1, {
+    message: "Invalid email address.",
+  }),
+
+  address: z
+    .object({
+      id: z.number().optional(),
+      address: z.string({
+        required_error: "Address is required.",
+      }),
+      latitude: z.number({
+        required_error: "Invalid Address",
+      }),
+      longitude: z.number({
+        required_error: "Invalid Address",
+      }),
+    })
+    .refine((data) => data.address.trim().length > 0, {
+      message: "Address must be provided.",
+    }),
+  sex: z.string().min(1, { message: "Sex is a required field" }),
+  dob: z.date({
+    required_error: "A date of birth is required.",
+  }),
+  status: z.string({
+    required_error: "A status is required.",
+  }),
+});
+
+export type UpdatePatientFormValues = z.infer<typeof UpdatePatientSchema>;
+
 export const ServiceSchema = z.object({
   id: z.number().optional(),
   description: z.string().min(1, { message: "Description is required." }),

@@ -23,6 +23,21 @@ import PDFExportButton from "@/components/buttons/exportButtons/dashboardExport"
 import BurgerMenu from "@/components/buttons/burgerMenu";
 import SelectBranch from "@/components/buttons/selectBranch";
 
+interface Appointment {
+  date: string;
+  patient_id: string;
+  status?: {
+    id: number;
+  };
+  services?: {
+    price: number;
+  };
+}
+
+interface Patient {
+  status?: string;
+}
+
 export default function Page() {
   const searchParams = useSearchParams();
   const dates = searchParams.get("date")?.split(",") || [];
@@ -56,13 +71,21 @@ export default function Page() {
 
   if (patientLoading || appointmentsLoading) return <DashboardLoading />;
 
+  // Filter out appointments with status.id 3 or 5
+  const filteredAppointments = {
+    ...appointments,
+    data:
+      appointments?.data?.filter(
+        (appointment: any) =>
+          appointment?.status?.id !== 3 && appointment?.status?.id !== 5
+      ) || [],
+  };
+
   const calculateMetrics = () => {
     if (!appointments?.data?.length || !patients?.data?.length)
       return {
         revenue: 0,
         revenueChange: 0,
-        newPatients: 0,
-        newPatientsChange: 0,
         appointmentCompletionRate: 0,
         appointmentCompletionRateChange: 0,
         periodLength: 0,
@@ -75,30 +98,23 @@ export default function Page() {
     const startDate = moment(dateRangeStart);
     const daysDiff = endDate.diff(startDate, "days") + 1;
 
+    // Ensure appointments data is typed correctly
+    const appointmentsData = appointments.data as Appointment[];
+
     // Current period calculations
-    const currentPeriodAppointments = appointments.data.filter(
-      (appointment) => {
-        if (!appointment.date) return false;
-        const appointmentDate = moment(appointment.date);
-        return appointmentDate.isBetween(startDate, endDate, "day", "[]");
-      }
-    );
-
-    // Get unique patient IDs with appointments in the period
-    const currentActivePatientIds = new Set(
-      currentPeriodAppointments.map((appointment) => appointment.patient_id)
-    );
-
-    // New patients are those created within the period
-    const currentNewPatients = patients.data.filter((patient) => {
-      if (!patient.created_at) return false;
-      const patientDate = moment(patient.created_at);
-      return patientDate.isBetween(startDate, endDate, "day", "[]");
+    const currentPeriodAppointments = appointmentsData.filter((appointment) => {
+      if (!appointment.date) return false;
+      const appointmentDate = moment(appointment.date);
+      return appointmentDate.isBetween(startDate, endDate, "day", "[]");
     });
+
+    const currentActivePatients = (patients.data as Patient[]).filter(
+      (patient) => patient.status && patient.status.toLowerCase() === "active"
+    );
 
     // Calculate completion rate (completed appointments / total appointments)
     const currentCompletedAppointments = currentPeriodAppointments.filter(
-      (appointment) => appointment.status?.id === 4 // Assuming 3 is the status ID for completed appointments
+      (appointment) => appointment.status?.id === 4
     ).length;
 
     const currentCompletionRate =
@@ -107,16 +123,17 @@ export default function Page() {
           100
         : 0;
 
-    const revenueCurrentPeriod = currentPeriodAppointments.reduce(
-      (total, appointment) => total + (appointment?.services?.price || 0),
-      0
-    );
+    const revenueCurrentPeriod = currentPeriodAppointments
+      .filter((appointment) => appointment.status?.id === 4)
+      .reduce(
+        (total, appointment) => total + (appointment.services?.price || 0),
+        0
+      );
 
     // Previous period calculations
     const previousStartDate = startDate.clone().subtract(daysDiff, "days");
     const previousEndDate = endDate.clone().subtract(daysDiff, "days");
-
-    const previousPeriodAppointments = appointments.data.filter(
+    const previousPeriodAppointments = appointmentsData.filter(
       (appointment) => {
         if (!appointment.date) return false;
         const appointmentDate = moment(appointment.date);
@@ -129,23 +146,8 @@ export default function Page() {
       }
     );
 
-    const previousActivePatientIds = new Set(
-      previousPeriodAppointments.map((appointment) => appointment.patient_id)
-    );
-
-    const previousNewPatients = patients.data.filter((patient) => {
-      if (!patient.created_at) return false;
-      const patientDate = moment(patient.created_at);
-      return patientDate.isBetween(
-        previousStartDate,
-        previousEndDate,
-        "day",
-        "[]"
-      );
-    });
-
     const previousCompletedAppointments = previousPeriodAppointments.filter(
-      (appointment) => appointment.status?.id === 3
+      (appointment) => appointment.status?.id === 4
     ).length;
 
     const previousCompletionRate =
@@ -154,23 +156,17 @@ export default function Page() {
           100
         : 0;
 
-    const revenuePreviousPeriod = previousPeriodAppointments.reduce(
-      (total, appointment) => total + (appointment?.services?.price || 0),
-      0
-    );
+    const revenuePreviousPeriod = previousPeriodAppointments
+      .filter((appointment) => appointment.status?.id === 4)
+      .reduce(
+        (total, appointment) => total + (appointment.services?.price || 0),
+        0
+      );
 
     // Calculate percentage changes
     const revenueChange = calculatePercentageChange(
       revenuePreviousPeriod,
       revenueCurrentPeriod
-    );
-    const newPatientsChange = calculatePercentageChange(
-      previousNewPatients.length,
-      currentNewPatients.length
-    );
-    const activePatientsChange = calculatePercentageChange(
-      previousActivePatientIds.size,
-      currentActivePatientIds.size
     );
     const completionRateChange = calculatePercentageChange(
       previousCompletionRate,
@@ -180,10 +176,8 @@ export default function Page() {
     return {
       revenue: Number(revenueCurrentPeriod.toFixed(2)),
       revenueChange: Number(revenueChange.toFixed(2)),
-      newPatients: currentNewPatients.length,
-      newPatientsChange: Number(newPatientsChange.toFixed(2)),
-      activePatients: currentActivePatientIds.size,
-      activePatientsChange: Number(activePatientsChange.toFixed(2)),
+      activePatients: currentActivePatients.length,
+      activePatientsChange: 0,
       appointmentCompletionRate: Number(currentCompletionRate.toFixed(1)),
       appointmentCompletionRateChange: Number(completionRateChange.toFixed(1)),
       totalAppointments: currentPeriodAppointments.length,
@@ -216,7 +210,7 @@ export default function Page() {
             </div>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
@@ -225,7 +219,10 @@ export default function Page() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  ₱{metrics.revenue.toFixed(2)}
+                  {metrics.revenue.toLocaleString("en-PH", {
+                    style: "currency",
+                    currency: "PHP",
+                  })}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   {metrics.revenueChange > 0 ? "+" : ""}
@@ -245,24 +242,7 @@ export default function Page() {
                   {metrics.activePatients}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {metrics.activePatientsChange > 0 ? "+" : ""}
-                  {metrics.activePatientsChange}% from previous{" "}
-                  {metrics.periodLength} days
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  New Patients
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{metrics.newPatients}</div>
-                <p className="text-xs text-muted-foreground">
-                  {metrics.newPatientsChange > 0 ? "+" : ""}
-                  {metrics.newPatientsChange}% from previous{" "}
-                  {metrics.periodLength} days
+                  Total number of patients with Active status
                 </p>
               </CardContent>
             </Card>
@@ -297,12 +277,15 @@ export default function Page() {
             <div className="col-span-4 PatientChart">
               <PatientChart
                 range={{ start: dateRangeStart, end: dateRangeEnd }}
-                data={appointments}
+                data={filteredAppointments}
               />
             </div>
 
             <div className="col-span-4 md:col-span-3 PieGraph">
-              <PieGraph branch={branch} />
+              <PieGraph
+                branch={branch}
+                range={{ start: dateRangeStart, end: dateRangeEnd }}
+              />
             </div>
           </div>
         </div>

@@ -29,6 +29,7 @@ const chartConfig: ChartConfig = {
     color: "hsl(var(--chart-1))",
   },
 };
+
 interface DateRange {
   start: string;
   end: string;
@@ -36,8 +37,9 @@ interface DateRange {
 
 interface RevenueGraphProps {
   range: DateRange;
-  metrics: any; // Replace 'any' with the appropriate type
+  metrics: any;
 }
+
 export function RevenueGraph({ range, metrics }: RevenueGraphProps) {
   const { appointments, appointmentsLoading } = useAppointments();
 
@@ -45,12 +47,16 @@ export function RevenueGraph({ range, metrics }: RevenueGraphProps) {
 
   const revenueData: Record<string, number> = {};
 
+  // Filter for completed appointments (status.id === 4) and within date range
   appointments?.data
-    .filter((appointment) => {
+    ?.filter((appointment) => {
       const date = moment(appointment.date);
       const startDate = moment(range.start);
       const endDate = moment(range.end);
-      return date.isBetween(startDate, endDate, "day", "[]");
+      return (
+        date.isBetween(startDate, endDate, "day", "[]") &&
+        appointment.status?.id === 4 // Only include completed appointments
+      );
     })
     .forEach((appointment) => {
       const date = moment(appointment.date).format("YYYY-MM-DD");
@@ -61,6 +67,19 @@ export function RevenueGraph({ range, metrics }: RevenueGraphProps) {
       }
       revenueData[date] += price;
     });
+
+  // Fill in missing dates with zero revenue
+  const startDate = moment(range.start);
+  const endDate = moment(range.end);
+  const currentDate = startDate.clone();
+
+  while (currentDate.isSameOrBefore(endDate)) {
+    const dateStr = currentDate.format("YYYY-MM-DD");
+    if (!revenueData[dateStr]) {
+      revenueData[dateStr] = 0;
+    }
+    currentDate.add(1, "day");
+  }
 
   const chartData: revenueData[] = Object.entries(revenueData)
     .map(([date, revenue]) => ({
@@ -76,8 +95,9 @@ export function RevenueGraph({ range, metrics }: RevenueGraphProps) {
           Total Revenue Over {moment(range.start).format("MMMM D")} to{" "}
           {moment(range.end).format("MMMM D")}
         </CardTitle>
-
-        <CardDescription>Revenue by day</CardDescription>
+        <CardDescription>
+          Revenue from completed appointments by day
+        </CardDescription>
       </CardHeader>
       <CardContent className="p-2">
         <ChartContainer
@@ -132,10 +152,13 @@ export function RevenueGraph({ range, metrics }: RevenueGraphProps) {
           )}
         </div>
         <div className="leading-none text-muted-foreground">
-          Showing total revenue from {moment(range.start).format("MMMM D")} to{" "}
+          Showing completed appointment revenue from{" "}
+          {moment(range.start).format("MMMM D")} to{" "}
           {moment(range.end).format("MMMM D")}
         </div>
       </CardFooter>
     </Card>
   );
 }
+
+export default RevenueGraph;

@@ -88,14 +88,17 @@ export function DataTableDemo({
   const handleClick = (row: Row<PatientCol>) => {
     setActive(row.original.id); // Set the clicked row as active
   };
-  const handleDelete = (id?: number) => {
+  const handleDelete = async (id?: number) => {
     try {
       if (!id) return;
 
-      // Optimistically update the UI
+      // Wait for the server response before updating UI
+      await deletePatient(id);
+
+      // Only update UI after successful deletion
       const filteredPatients = data.filter((patient) => patient.id !== id);
       mutate({ data: filteredPatients }, false);
-      deletePatient(id);
+
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
@@ -104,12 +107,14 @@ export function DataTableDemo({
         description: "Patient deleted successfully.",
         duration: 2000,
       });
-    } catch (error: any) {
+    } catch (error) {
+      // Simple error toast for failed deletion
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
-        description: `Failed to delete the patient: ${error.message}`,
+        variant: "destructive",
+        description: "Failed to delete patient",
         duration: 2000,
       });
     }

@@ -5,8 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { PatientCol } from "@/app/schema";
-import { PatientSchema } from "@/app/types";
-import PatientFields from "@/components/forms/patients/patientFields";
+import { UpdatePatientSchema } from "@/app/types";
 import { toast } from "@/components/hooks/use-toast";
 import { usePatients } from "@/components/hooks/usePatient";
 import {
@@ -22,6 +21,7 @@ import { SquarePen } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { updatePatient } from "@/app/(admin)/patients/action";
+import PatientFields from "@/components/forms/patients/updatepatientField";
 
 type EditPatientProps = {
   patient: PatientCol;
@@ -42,9 +42,9 @@ export function EditPatient({ patient, mutate }: EditPatientProps) {
     setTimeout(() => (document.body.style.pointerEvents = ""), 0);
   });
 
-  // Use z.infer to derive the type from PatientSchema
-  const form = useForm<z.infer<typeof PatientSchema>>({
-    resolver: zodResolver(PatientSchema),
+  // Use z.infer to derive the type from UpdatePatientSchema
+  const form = useForm<z.infer<typeof UpdatePatientSchema>>({
+    resolver: zodResolver(UpdatePatientSchema),
   });
 
   const set = () => {
@@ -67,7 +67,7 @@ export function EditPatient({ patient, mutate }: EditPatientProps) {
     );
     return filteredPatients.some((p: PatientCol) => p.email === email);
   }
-  // async function onSubmit(data: z.infer<typeof PatientSchema>) {
+  // async function onSubmit(data: z.infer<typeof UpdatePatientSchema>) {
   //   const emailExists = await checkEmailExists(data.email);
 
   //   if (emailExists) {
@@ -90,7 +90,7 @@ export function EditPatient({ patient, mutate }: EditPatientProps) {
   //   // });
   // }
 
-  async function onSubmit(formData: z.infer<typeof PatientSchema>) {
+  async function onSubmit(formData: z.infer<typeof UpdatePatientSchema>) {
     const emailExists = await checkEmailExists(formData.email);
 
     if (emailExists) {

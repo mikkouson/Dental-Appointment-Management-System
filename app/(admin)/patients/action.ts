@@ -1,5 +1,10 @@
 "use server";
-import { PatientFormValues, PatientSchema } from "@/app/types";
+import {
+  PatientFormValues,
+  PatientSchema,
+  UpdatePatientFormValues,
+  UpdatePatientSchema,
+} from "@/app/types";
 import { createAdminClient, createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -89,7 +94,6 @@ export async function newPatient(
   revalidatePath("/", "layout");
   redirect(`/patients/${patientData.id}`);
 }
-
 export async function deletePatient(id: number) {
   const supabase = createClient();
   const { error } = await supabase
@@ -103,8 +107,8 @@ export async function deletePatient(id: number) {
   }
 }
 
-export async function updatePatient(data: PatientFormValues) {
-  const result = PatientSchema.safeParse(data);
+export async function updatePatient(data: UpdatePatientFormValues) {
+  const result = UpdatePatientSchema.safeParse(data);
 
   if (!result.success) {
     console.log("Validation errors:", result.error.format());
@@ -157,7 +161,6 @@ export async function updatePatient(data: PatientFormValues) {
     .from("patients")
     .update({
       name: data.name,
-      email: data.email,
       sex: data.sex,
       phone_number: data.phoneNumber,
       dob: data.dob,
@@ -172,7 +175,6 @@ export async function updatePatient(data: PatientFormValues) {
     console.log("Patient data updated successfully");
   }
 }
-
 export async function uploadImage(patientId: string, formData: FormData) {
   const supabase = createClient();
   const file = formData.get("file") as File;
