@@ -60,7 +60,9 @@ export function NewToothCondition({
   };
 
   async function onSubmit(data: z.infer<typeof ToothHistory>) {
-    mutate();
+    if (mutate) {
+      mutate();
+    }
 
     try {
       if (newPatient) {
@@ -90,7 +92,9 @@ export function NewToothCondition({
         // Save to database if it's an existing patient
         await createToothHistory(data);
       }
-      mutate();
+      if (mutate) {
+        mutate();
+      }
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
@@ -101,8 +105,9 @@ export function NewToothCondition({
       });
       setOpen(false);
     } catch (error) {
-      mutate();
-
+      if (mutate) {
+        mutate();
+      }
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
