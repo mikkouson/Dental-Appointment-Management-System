@@ -213,7 +213,10 @@ export default function AppointmentsMap({
                         <span className="text-sm md:text-base flex items-center">
                           <Phone className="w-5 h-5 mr-2" />
                           Phone Number:{" "}
-                          {apt.patients?.phone_number || "No phone number"}
+                          <span className="flex gap-1">
+                            <span className="text-gray-600">(+639)</span>
+                            {apt.patients?.phone_number || "No phone number"}
+                          </span>
                         </span>
 
                         {apt.status?.id === 6 && (

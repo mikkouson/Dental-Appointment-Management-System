@@ -45,7 +45,7 @@ export default function AppointmentCalendar() {
   const {
     appointments: allAppointments,
     appointmentsLoading: allAppointmentsIsLoading,
-  } = useAppointments();
+  } = useAppointments(null, query, branch, status);
 
   // Process appointments data for calendar coloring using allAppointments
   const { appointmentsByDate, fullBookedDates, hasAppointmentDates } =
