@@ -88,11 +88,14 @@ export function DataTableDemo({
   };
 
   const handleDelete = (id?: number) => {
+    mutate();
+
     try {
       if (!id) return;
 
       // Optimistically update the UI
       const filteredPatients = data.filter((patient) => patient.id !== id);
+      mutate();
       mutate({ data: filteredPatients }, false);
       deleteUser(id);
       toast({
@@ -103,6 +106,8 @@ export function DataTableDemo({
         description: "User deleted successfully.",
       });
     } catch (error: any) {
+      mutate();
+
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
