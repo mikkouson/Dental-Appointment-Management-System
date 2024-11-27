@@ -60,7 +60,8 @@ export function DataTableDemo({
   mutate,
   meta,
   predictMutate,
-}: DataTableProps) {
+  isPredictLoading, // Add this prop
+}: DataTableProps & { isPredictLoading?: boolean }) {
   const setActive = useSetActive((state) => state.setActive);
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -90,7 +91,10 @@ export function DataTableDemo({
       columnVisibility,
       rowSelection,
     },
-    meta,
+    meta: {
+      ...meta,
+      isLoading: isPredictLoading, // Pass the loading state to the table
+    },
   });
 
   const handleClick = (row: Row<InventoryColWithBranch>) => {

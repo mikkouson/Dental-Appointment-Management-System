@@ -168,10 +168,10 @@ export function AcceptAppointment({
                     </div>
                   </div>
                   <Separator />
-                  <h4 className="text-sm font-semibold">Assign a doctor</h4>
+                  {/* <h4 className="text-sm font-semibold">Assign a doctor</h4>
 
-                  <div className="flex items-center space-x-4">
-                    {/* <Avatar className="w-16 h-16">
+                  <div className="flex items-center space-x-4"> */}
+                  {/* <Avatar className="w-16 h-16">
                   <AvatarImage
                     src="/placeholder.svg?height=64&width=64"
                     alt="Dr. Smith"
@@ -182,7 +182,7 @@ export function AcceptAppointment({
                   <h3 className="text-lg font-semibold">{data?.name}</h3>
                   <p className="text-sm text-muted-foreground">{data?.email}</p>
                 </div> */}
-                    <div className="w-full">
+                  {/* <div className="w-full">
                       {filteredDoctors?.length === 0 ? (
                         <p className="text-sm text-muted-foreground">
                           No doctors available for this branch.
@@ -196,7 +196,7 @@ export function AcceptAppointment({
                         />
                       )}
                     </div>
-                  </div>
+                  </div> */}
 
                   <Separator />
                   <div className="space-y-2">

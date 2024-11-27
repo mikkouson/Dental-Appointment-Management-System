@@ -64,14 +64,14 @@ export default function AppointmentCalendar() {
       }
 
       // Process each appointment from allAppointments
-      allAppointments.data.forEach((apt) => {
+      allAppointments.data.forEach((apt: any) => {
         if (!apt?.date || !apt?.status) return;
 
         const dateKey = moment(apt.date).format("YYYY-MM-DD");
 
         // Skip if status is in excluded list or excluded numbers
         if (
-          EXCLUDED_STATUSES.includes(apt.status.id) ||
+          EXCLUDED_STATUSES.includes(apt?.status.id) ||
           EXCLUDED_STATUS_NUMBERS.includes(apt.status.id)
         )
           return;

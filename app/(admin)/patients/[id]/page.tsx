@@ -269,6 +269,7 @@ export default function Page({ params }: PageProps) {
                       <TeethChart
                         history={data?.tooth_history}
                         id={params.id}
+                        mutate={mutate}
                       />
                     </div>
                     {/* Conditional Rendering for ToothHistoryCard */}

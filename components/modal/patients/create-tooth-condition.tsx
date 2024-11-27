@@ -27,6 +27,7 @@ interface NewToothConditionProps {
   form: UseFormReturn<ToothHistoryFormValue>;
   newPatient?: boolean;
   showTitle?: boolean;
+  mutate: any;
 }
 
 export function NewToothCondition({
@@ -35,6 +36,7 @@ export function NewToothCondition({
   history,
   showTitle,
   newPatient = false,
+  mutate,
 }: NewToothConditionProps) {
   const [open, setOpen] = useState(false);
   const { teethLocations, addTeethLocation, updateToothLocation } =
@@ -58,6 +60,8 @@ export function NewToothCondition({
   };
 
   async function onSubmit(data: z.infer<typeof ToothHistory>) {
+    mutate();
+
     try {
       if (newPatient) {
         // Check if tooth location already exists for this patient
@@ -86,7 +90,7 @@ export function NewToothCondition({
         // Save to database if it's an existing patient
         await createToothHistory(data);
       }
-
+      mutate();
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
@@ -97,6 +101,8 @@ export function NewToothCondition({
       });
       setOpen(false);
     } catch (error) {
+      mutate();
+
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"

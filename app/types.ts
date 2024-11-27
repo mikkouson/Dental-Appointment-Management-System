@@ -134,14 +134,12 @@ export type InventoryFormValues = z.infer<typeof InventorySchema>;
 export const UpdateInventorySchema = z.object({
   id: z.number().optional(),
 
-  selectedItems: z
-    .array(
-      z.object({
-        id: z.number(), // Item ID (required)
-        quantity: z.number().min(1), // Quantity (must be 1 or more)
-      })
-    )
-    .optional(),
+  selectedItems: z.array(
+    z.object({
+      id: z.number(), // Item ID (required)
+      quantity: z.number().min(1), // Quantity (must be 1 or more)
+    })
+  ),
 });
 
 export type UpdateInventoryFormValues = z.infer<typeof UpdateInventorySchema>;
@@ -182,7 +180,7 @@ export const DoctorSchema = z.object({
 export type DoctorFormValues = z.infer<typeof DoctorSchema>;
 
 export const SelectDoctorSchema = z.object({
-  id: z.number().min(1, { message: "Email is required." }),
+  id: z.number().optional(),
 });
 
 export type SelectDoctorFormValues = z.infer<typeof SelectDoctorSchema>;

@@ -114,11 +114,24 @@ export async function deletePatient(patientId: number) {
     return { error: new Error("Patient not found") };
   }
 
+  // If patient has no user_id, just set deleteOn timestamp
   if (!patient.user_id) {
-    console.error("Patient has no associated user_id");
-    return { error: new Error("Patient has no associated user_id") };
+    const { error: updateError } = await supabase
+      .from("patients")
+      .update({
+        deleteOn: new Date().toISOString(),
+      })
+      .eq("id", patientId);
+
+    if (updateError) {
+      console.error("Error updating patient:", updateError.message);
+      return { error: updateError };
+    }
+
+    return { success: true };
   }
 
+  // Full deletion process for patients with user_id
   // Update patient record with deletion timestamp
   const { error: updateError } = await supabase
     .from("patients")
@@ -159,7 +172,6 @@ export async function deletePatient(patientId: number) {
     return { error: nullifyError };
   }
 
-  // Delete the user from auth
   const { error: deleteError } = await supabase.auth.admin.deleteUser(
     patient.user_id
   );
@@ -171,7 +183,6 @@ export async function deletePatient(patientId: number) {
 
   return { success: true };
 }
-
 export async function updatePatient(data: UpdatePatientFormValues) {
   const result = UpdatePatientSchema.safeParse(data);
 

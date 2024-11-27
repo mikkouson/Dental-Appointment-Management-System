@@ -89,6 +89,8 @@ export function DataTableDemo({
     setActive(row.original.id); // Set the clicked row as active
   };
   const handleDelete = async (id?: number) => {
+    mutate();
+
     try {
       if (!id) return;
 
@@ -107,6 +109,7 @@ export function DataTableDemo({
         description: "Patient deleted successfully.",
         duration: 2000,
       });
+      mutate();
     } catch (error) {
       // Simple error toast for failed deletion
       toast({
@@ -117,6 +120,7 @@ export function DataTableDemo({
         description: "Failed to delete patient",
         duration: 2000,
       });
+      mutate();
     }
   };
 
