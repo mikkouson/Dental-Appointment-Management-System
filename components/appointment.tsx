@@ -4,9 +4,10 @@ import { Calendar } from "@/components/ui/calendar";
 import { Skeleton } from "@/components/ui/skeleton";
 import moment from "moment";
 import { useSearchParams } from "next/navigation";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useAppointments } from "./hooks/useAppointmentCalendar";
 import PageContainer from "./layout/page-container";
+import { createClient } from "@/utils/supabase/client";
 
 const FULLBOOKED_THRESHOLD = 8;
 const BUSY_THRESHOLD = 5;
@@ -21,7 +22,6 @@ const timeSlots = [
   { id: 7, time: "2:00 PM" },
   { id: 8, time: "3:00 PM" },
   { id: 9, time: "4:00 PM" },
-  { id: 10, time: "5:00 PM" },
 ];
 
 export default function AppointmentCalendar() {
@@ -46,6 +46,26 @@ export default function AppointmentCalendar() {
     appointments: allAppointments,
     appointmentsLoading: allAppointmentsIsLoading,
   } = useAppointments(null, query, branch, status);
+
+  const supabase = createClient();
+
+  // Subscribe to realtime updates for appointments
+  useEffect(() => {
+    const channel = supabase
+      .channel(`realtime-appointment-calendar`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "appointments" },
+        () => {
+          mutate();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [page, supabase, mutate]);
 
   // Process appointments data for calendar coloring using allAppointments
   const { appointmentsByDate, fullBookedDates, hasAppointmentDates } =

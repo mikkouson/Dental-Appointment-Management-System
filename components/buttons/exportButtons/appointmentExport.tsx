@@ -21,7 +21,7 @@ export default function AppointmentExport() {
 
   const mappedData = (data?.data || []).map((apt: AppointmentsCol) => ({
     patient_name: apt?.patients?.name || "null",
-    appointment_ticket: apt.appointment_ticket || "null",
+    // appointment_ticket: apt.appointment_ticket || "null",
     branch: apt?.branch?.name || "null",
     status: apt?.status?.name || "null",
     services: apt?.services?.name || "null",

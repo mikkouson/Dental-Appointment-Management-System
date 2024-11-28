@@ -66,13 +66,13 @@ export const getLinks = (userData?: any) => {
         <BriefcaseMedical className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
     },
-    {
-      label: "Doctors",
-      href: "/doctors",
-      icon: (
-        <LiaUserNurseSolid className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-      ),
-    },
+    // {
+    //   label: "Doctors",
+    //   href: "/doctors",
+    //   icon: (
+    //     <LiaUserNurseSolid className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+    //   ),
+    // },
 
     // Only show Users link if role is super_admin
     ...(userRole === "super_admin"

@@ -1,6 +1,7 @@
 import type { PatientCol } from "@/app/schema";
 import { Badge } from "@/components/ui/badge";
 import { ColumnDef } from "@tanstack/react-table";
+import Link from "next/link";
 
 type Column = ColumnDef<PatientCol>;
 
@@ -15,9 +16,20 @@ export const columns: Column[] = [
     header: "NAME",
     cell: ({ row }) => {
       const name = row.original.name;
-      return name
+      const formattedName = name
         ? name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
         : "N/A";
+
+      return row.original.id ? (
+        <Link
+          href={`/patients/${row.original.id}`}
+          className="text-blue-600 hover:underline cursor-pointer"
+        >
+          {formattedName}
+        </Link>
+      ) : (
+        formattedName
+      );
     },
   },
   {

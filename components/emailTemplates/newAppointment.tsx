@@ -142,7 +142,7 @@ export const DentalAppointmentEmail = ({
               </Text>
               <Button
                 className="bg-blue-600 rounded text-white text-[14px] font-semibold no-underline text-center px-5 py-3 mt-4"
-                href="https://www.lobodentdentalclinic.online/appointment/login"
+                href="https://www.lobodentdentalclinic.online/login"
               >
                 Manage Appointment
               </Button>
