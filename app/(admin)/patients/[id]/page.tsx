@@ -73,7 +73,7 @@ export default function Page({ params }: PageProps) {
   }, [supabase, mutate]);
   // Get the current "tabs" parameter from URL
   const searchParams = useSearchParams();
-  const currentTab = searchParams.get("tabs") || "appointments";
+  const currentTab = searchParams.get("tabs") || "medical";
 
   if (isLoading) return <Loading />;
   if (error) return <div>Error loading patient data</div>;
@@ -257,13 +257,13 @@ export default function Page({ params }: PageProps) {
           {/* Tabs Section */}
           <Tabs value={currentTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-4">
-              <TabsLinkTrigger href="?tabs=appointments" value="appointments">
-                <ClipboardList className="h-4 w-4" />
-                Appointment History
-              </TabsLinkTrigger>
               <TabsLinkTrigger href="?tabs=medical" value="medical">
                 <Activity className="h-4 w-4" />
                 Medical History
+              </TabsLinkTrigger>
+              <TabsLinkTrigger href="?tabs=appointments" value="appointments">
+                <ClipboardList className="h-4 w-4" />
+                Appointment History
               </TabsLinkTrigger>
             </TabsList>
 
