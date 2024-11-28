@@ -7,8 +7,6 @@ import { useAppointments } from "@/components/hooks/useAppointment";
 import { usePatients } from "@/components/hooks/usePatient";
 import PageContainer from "@/components/layout/page-container";
 import { InventoryStocksChart } from "@/components/recent-sales";
-import { Button } from "@/components/ui/button";
-
 import {
   Card,
   CardContent,
@@ -86,12 +84,12 @@ export default function Page() {
       return {
         revenue: 0,
         revenueChange: 0,
-        appointmentCompletionRate: 0,
-        appointmentCompletionRateChange: 0,
+        completedAppointments: 0,
+        completedAppointmentsChange: 0,
         periodLength: 0,
-        activePatients: 0,
-        activePatientsChange: 0,
         totalAppointments: 0,
+        pendingAppointments: 0,
+        pendingRescheduleAppointments: 0,
       };
 
     const endDate = moment(dateRangeEnd);
@@ -108,20 +106,20 @@ export default function Page() {
       return appointmentDate.isBetween(startDate, endDate, "day", "[]");
     });
 
-    const currentActivePatients = (patients.data as Patient[]).filter(
-      (patient) => patient.status && patient.status.toLowerCase() === "active"
-    );
-
-    // Calculate completion rate (completed appointments / total appointments)
+    // Count completed appointments
     const currentCompletedAppointments = currentPeriodAppointments.filter(
       (appointment) => appointment.status?.id === 4
     ).length;
 
-    const currentCompletionRate =
-      currentPeriodAppointments.length > 0
-        ? (currentCompletedAppointments / currentPeriodAppointments.length) *
-          100
-        : 0;
+    // Count pending appointments (status id = 2)
+    const pendingAppointments = currentPeriodAppointments.filter(
+      (appointment) => appointment.status?.id === 2
+    ).length;
+
+    // Count pending reschedule appointments (status id = 6)
+    const pendingRescheduleAppointments = currentPeriodAppointments.filter(
+      (appointment) => appointment.status?.id === 6
+    ).length;
 
     const revenueCurrentPeriod = currentPeriodAppointments
       .filter((appointment) => appointment.status?.id === 4)
@@ -150,12 +148,6 @@ export default function Page() {
       (appointment) => appointment.status?.id === 4
     ).length;
 
-    const previousCompletionRate =
-      previousPeriodAppointments.length > 0
-        ? (previousCompletedAppointments / previousPeriodAppointments.length) *
-          100
-        : 0;
-
     const revenuePreviousPeriod = previousPeriodAppointments
       .filter((appointment) => appointment.status?.id === 4)
       .reduce(
@@ -168,20 +160,22 @@ export default function Page() {
       revenuePreviousPeriod,
       revenueCurrentPeriod
     );
-    const completionRateChange = calculatePercentageChange(
-      previousCompletionRate,
-      currentCompletionRate
+    const completedAppointmentsChange = calculatePercentageChange(
+      previousCompletedAppointments,
+      currentCompletedAppointments
     );
 
     return {
       revenue: Number(revenueCurrentPeriod.toFixed(2)),
       revenueChange: Number(revenueChange.toFixed(2)),
-      activePatients: currentActivePatients.length,
-      activePatientsChange: 0,
-      appointmentCompletionRate: Number(currentCompletionRate.toFixed(1)),
-      appointmentCompletionRateChange: Number(completionRateChange.toFixed(1)),
+      completedAppointments: currentCompletedAppointments,
+      completedAppointmentsChange: Number(
+        completedAppointmentsChange.toFixed(1)
+      ),
       totalAppointments: currentPeriodAppointments.length,
       periodLength: daysDiff,
+      pendingAppointments,
+      pendingRescheduleAppointments,
     };
   };
 
@@ -210,7 +204,7 @@ export default function Page() {
             </div>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
@@ -224,43 +218,46 @@ export default function Page() {
                     currency: "PHP",
                   })}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  {metrics.revenueChange > 0 ? "+" : ""}
-                  {metrics.revenueChange}% from previous {metrics.periodLength}{" "}
-                  days
-                </p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Active Patients
+                  Completed Appointments
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {metrics.activePatients}
+                  {metrics.completedAppointments}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Total number of patients with Active status
-                </p>
+                {/* <p className="text-xs text-muted-foreground">
+                  {metrics.completedAppointmentsChange > 0 ? "+" : ""}
+                  {metrics.completedAppointmentsChange}% from previous period
+                </p> */}
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Appointment Completion Rate
+                  Pending Appointments
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {metrics.appointmentCompletionRate}%
+                  {metrics.pendingAppointments}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  {metrics.appointmentCompletionRateChange > 0 ? "+" : ""}
-                  {metrics.appointmentCompletionRateChange}% from previous
-                  period
-                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Pending Reschedule
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {metrics.pendingRescheduleAppointments}
+                </div>
               </CardContent>
             </Card>
           </div>
