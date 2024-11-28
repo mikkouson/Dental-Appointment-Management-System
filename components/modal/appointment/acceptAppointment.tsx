@@ -76,7 +76,7 @@ export function AcceptAppointment({
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         variant: "success",
-        description: "Doctor added successfully.",
+        description: "Appointment accepted successfully.",
         duration: 2000,
       });
       mutate(); // Revalidate to ensure data consistency
