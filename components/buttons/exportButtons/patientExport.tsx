@@ -14,9 +14,9 @@ export default function PatientExport() {
     name: patient.name || "null",
     sex: patient.sex || "null",
     email: patient.email || "null",
-    address: patient.address?.toString() || "null", // Convert number to string if needed
+    // address: patient.address?.toString() || "null", // Convert number to string if needed
     birthdate: patient.dob || "null",
-    age: patient.age?.toString() || "null",
+    // age: patient.age?.toString() || "null",
     phone_number: patient.phone_number?.toString() || "null",
   }));
 

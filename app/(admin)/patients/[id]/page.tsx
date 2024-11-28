@@ -84,6 +84,43 @@ export default function Page({ params }: PageProps) {
   const completedAppointments = data?.appointments.filter(
     (appointment: { status?: { id?: number } }) => appointment.status?.id === 4
   );
+  const getInitials = (fullName: any) => {
+    if (!fullName) return "";
+
+    // Split the name into parts
+    const nameParts = fullName.trim().split(" ");
+
+    // If only one name, return first two letters
+    if (nameParts.length === 1) {
+      return nameParts[0].substring(0, 2).toUpperCase();
+    }
+
+    // Otherwise return first letter of first and last name
+    return (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
+  };
+  const getAvatarColor = (name: string) => {
+    // Predefined colors that work well with white text
+    const colors = [
+      "bg-blue-500",
+      "bg-green-500",
+      "bg-purple-500",
+      "bg-pink-500",
+      "bg-indigo-500",
+      "bg-rose-500",
+      "bg-cyan-500",
+      "bg-emerald-500",
+    ];
+
+    // Create a hash of the name to consistently get the same color for the same name
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+
+    // Use the hash to select a color
+    const colorIndex = Math.abs(hash) % colors.length;
+    return colors[colorIndex];
+  };
 
   return (
     <div className="flex min-h-screen w-full flex-col">
@@ -122,11 +159,13 @@ export default function Page({ params }: PageProps) {
               <CardHeader className="pb-2 text-center">
                 <div className="flex flex-col items-center">
                   <Avatar className="w-16 h-16 mb-4">
-                    <AvatarImage
-                      src="https://github.com/shadcn.png"
-                      alt="@shadcn"
-                    />
-                    <AvatarFallback>CN</AvatarFallback>
+                    <AvatarFallback
+                      className={` font-bold text-white ${getAvatarColor(
+                        data?.name
+                      )}`}
+                    >
+                      {getInitials(data?.name)}
+                    </AvatarFallback>
                   </Avatar>
                   <CardTitle>{data?.name}</CardTitle>
                   <CardDescription className="mb-2">
