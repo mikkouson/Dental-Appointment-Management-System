@@ -20,7 +20,7 @@ export function InventoryStocksChart({ branch }: { branch: string }) {
 
   const lowStockItems =
     inventory?.data
-      .filter((item) => item.quantity <= 3)
+      .filter((item) => item.quantity <= 15)
       .sort((a, b) => a.quantity - b.quantity)
       .slice(0, 5) || [];
 
@@ -28,9 +28,9 @@ export function InventoryStocksChart({ branch }: { branch: string }) {
     inventory?.data.reduce((acc, item) => acc + item.quantity, 0) || 0;
 
   const availableCount =
-    inventory?.data.filter((item) => item.quantity > 3).length || 0;
+    inventory?.data.filter((item) => item.quantity > 15).length || 0;
   const lowStockCount =
-    inventory?.data.filter((item) => item.quantity > 0 && item.quantity <= 3)
+    inventory?.data.filter((item) => item.quantity > 0 && item.quantity <= 15)
       .length || 0;
   const outOfStockCount =
     inventory?.data.filter((item) => item.quantity === 0).length || 0;
@@ -41,7 +41,7 @@ export function InventoryStocksChart({ branch }: { branch: string }) {
   const outOfStockPercentage = (outOfStockCount / totalCount) * 100 || 0;
 
   return (
-    <Card className="col-span-4 md:col-span-3 RecentSales  ">
+    <Card className="col-span-4 md:col-span-3 RecentSales">
       <CardHeader>
         <CardTitle>Inventory Stocks</CardTitle>
         <CardDescription>
