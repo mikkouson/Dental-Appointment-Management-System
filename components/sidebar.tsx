@@ -2,7 +2,7 @@
 import React, { ReactNode, Suspense, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import useSWR from "swr";
 import { motion } from "framer-motion";
 import {
@@ -16,12 +16,19 @@ import {
   ChevronLeft,
   Package,
   UserCog,
+  History,
+  ChevronRight,
 } from "lucide-react";
 import { LiaUserNurseSolid } from "react-icons/lia";
 import { cn } from "@/lib/utils";
 import { NavUser } from "./nav-user";
 import { Sidebar, SidebarBody, SidebarLink } from "./ui/sidebar";
 import Logo from "@/images/logo.png";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 const fetcher = (url: string): Promise<any> =>
   fetch(url).then((res) => res.json());
@@ -58,6 +65,15 @@ export const getLinks = (userData?: any) => {
       icon: (
         <Package className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
+      children: [
+        {
+          label: "Inventory History",
+          href: "/inventory/history",
+          icon: (
+            <History className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />
+          ),
+        },
+      ],
     },
     {
       label: "Services",
@@ -66,14 +82,6 @@ export const getLinks = (userData?: any) => {
         <BriefcaseMedical className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
     },
-    // {
-    //   label: "Doctors",
-    //   href: "/doctors",
-    //   icon: (
-    //     <LiaUserNurseSolid className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-    //   ),
-    // },
-
     // Only show Users link if role is super_admin
     ...(userRole === "super_admin"
       ? [
@@ -93,6 +101,112 @@ interface Props {
   children?: ReactNode;
   user: any;
 }
+
+const SidebarItem = ({
+  link,
+  path,
+  open,
+}: {
+  link: any;
+  path: string;
+  open: boolean;
+}) => {
+  const [isOpen, setIsOpen] = useState(() => {
+    if (
+      link.href === "/inventory" &&
+      (path === "/inventory" || path?.startsWith("/inventory"))
+    ) {
+      return true;
+    }
+    return false;
+  });
+  const router = useRouter();
+
+  // Update isOpen when path changes
+  React.useEffect(() => {
+    if (link.href === "/inventory") {
+      if (path === "/inventory" || path?.startsWith("/inventory")) {
+        setIsOpen(true);
+      } else {
+        setIsOpen(false);
+      }
+    }
+  }, [path, link.href]);
+
+  if (link.children) {
+    return (
+      <Collapsible open={isOpen} onOpenChange={setIsOpen} className="w-full">
+        <div className="w-full">
+          <div
+            onClick={() => router.push(link.href)}
+            className={cn(
+              "flex items-center justify-between w-full px-2 py-2 rounded-lg transition-colors cursor-pointer",
+              path === link.href || path?.startsWith(link.href)
+                ? "dark:bg-[#1c1c21] border dark:border-neutral-700 bg-white border-input"
+                : "hover:bg-neutral-100 dark:hover:bg-neutral-800",
+              "opacity-80"
+            )}
+          >
+            <div className="flex items-center gap-2">
+              {link.icon}
+              {open && <span>{link.label}</span>}
+            </div>
+            {open && (
+              <CollapsibleTrigger
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                <ChevronRight
+                  className={cn(
+                    "h-4 w-4 transition-transform duration-200",
+                    isOpen && "transform rotate-90"
+                  )}
+                />
+              </CollapsibleTrigger>
+            )}
+          </div>
+        </div>
+        <CollapsibleContent className="transition-all duration-200 ease-in-out">
+          {open &&
+            link.children.map((child: any, idx: number) => (
+              <Link
+                key={idx}
+                href={child.href}
+                className={cn(
+                  "flex items-center gap-2 px-2 py-2 ml-4 rounded-lg transition-all duration-200 ease-in-out transform",
+                  path === child.href
+                    ? "dark:bg-[#1c1c21] border dark:border-neutral-700 bg-white border-input"
+                    : "hover:bg-neutral-100 dark:hover:bg-neutral-800",
+                  "opacity-80"
+                )}
+              >
+                {child.icon}
+                <span className="text-sm">{child.label}</span>
+              </Link>
+            ))}
+        </CollapsibleContent>
+      </Collapsible>
+    );
+  }
+
+  return (
+    <Link href={link.href}>
+      <div
+        className={cn(
+          "flex items-center gap-2 px-2 py-2 rounded-lg transition-colors",
+          path === link.href
+            ? "dark:bg-[#1c1c21] border dark:border-neutral-700 bg-white border-input"
+            : "hover:bg-neutral-100 dark:hover:bg-neutral-800",
+          "opacity-80"
+        )}
+      >
+        {link.icon}
+        {open && <span>{link.label}</span>}
+      </div>
+    </Link>
+  );
+};
 
 export function SidebarDemo({ user, children, ...props }: Props) {
   const [open, setOpen] = useState(true);
@@ -120,19 +234,7 @@ export function SidebarDemo({ user, children, ...props }: Props) {
             {open ? <Logos /> : <LogoIcon />}
             <div className="mt-8 flex flex-col gap-1">
               {links.map((link, idx) => (
-                <div
-                  key={idx}
-                  className={cn(
-                    "px-2 rounded-lg",
-                    path === link.href ||
-                      (link.href !== "/" && path?.startsWith(link.href))
-                      ? "dark:bg-[#1c1c21] border dark:border-neutral-700 bg-white border-input"
-                      : "transparent",
-                    "opacity-80"
-                  )}
-                >
-                  <SidebarLink key={idx} link={link} />
-                </div>
+                <SidebarItem key={idx} link={link} path={path} open={open} />
               ))}
             </div>
           </div>

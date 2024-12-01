@@ -17,19 +17,21 @@ import {
 } from "@/components/ui/sheet";
 import { SquarePen } from "lucide-react";
 import { useEffect, useState } from "react";
-import { updateService } from "@/app/(admin)/action";
 import useSWR from "swr";
 import { toast } from "@/components/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useService } from "@/components/hooks/useService";
 import { Button } from "@/components/ui/button";
+import { updateService } from "@/app/(admin)/services/action";
 
 const fetcher = (url: string): Promise<any> =>
   fetch(url).then((res) => res.json());
+
 type EditServiceProps = {
-  data: Service;
+  data: Service & { service_url?: string }; // Add service_url to the type
   mutate: any;
 };
+
 export function EditService({ data, mutate }: EditServiceProps) {
   const { services, serviceError, serviceLoading } = useService();
 
@@ -51,99 +53,44 @@ export function EditService({ data, mutate }: EditServiceProps) {
     form.setValue("name", data.name || "");
     form.setValue("description", data.description || "");
     form.setValue("price", data.price || 0);
+    form.setValue("image", data.service_url || "");
   };
 
-  async function validateName(name: string): Promise<boolean> {
-    const filteredService = service.filter((i: Service) => i.id !== data.id);
-
-    return filteredService.some((i: Service) => i.name === name);
-  }
-  // async function onSubmit(data: z.infer<typeof ServiceSchema>) {
-  //   const nameExists = await validateName(data.name);
-
-  //   if (nameExists) {
-  //     form.setError("name", {
-  //       type: "manual",
-  //       message: "Service already exists",
-  //     });
-  //     return;
-  //   }
-
-  //   setOpen(false);
-  //   updateService(data);
-  //   // toast({
-  //   //   title: "You submitted the following values:",
-  //   //   description: (
-  //   //     <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-  //   //       <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-  //   //     </pre>
-  //   //   ),
-  //   // });
-  // }
-  // Inside your EditService component
-
-  async function onSubmit(formData: z.infer<typeof ServiceSchema>) {
-    const nameExists = await validateName(formData.name);
-
-    if (nameExists) {
-      form.setError("name", {
-        type: "manual",
-        message: "Service item already exists.",
-      });
-      return;
-    }
-
-    // Prepare the updated inventory item
-    const updatedItem: Service = {
-      ...data,
-      ...formData,
-      updated_at: new Date().toISOString(), // Update the timestamp
-    };
-
-    // Optimistically update the UI
-    mutate(
-      (currentData: { data: Service[]; count: number }) => {
-        let updatedData = currentData.data.map((item) =>
-          item.id === updatedItem.id ? updatedItem : item
-        );
-
-        updatedData = updatedData.sort((a, b) => {
-          return (
-            new Date(b.updated_at ?? "").getTime() -
-            new Date(a.updated_at ?? "").getTime()
-          );
-        });
-
-        return { ...currentData, data: updatedData };
-      },
-      false // Do not revalidate yet
-    );
-
-    setOpen(false); // Close the modal
-
-    toast({
-      className: cn(
-        "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
-      ),
-      variant: "success",
-      description: "Service updated successfully.",
-      duration: 2000,
-    });
-
+  async function onSubmit(values: z.infer<typeof ServiceSchema>) {
     try {
-      await updateService(formData); // Make sure this function returns a promise
+      const formData = new FormData();
 
-      mutate(); // Revalidate to ensure data consistency
-    } catch (error: any) {
-      // Revert the optimistic update in case of an error
-      mutate();
+      formData.append("name", values.name);
+      formData.append("id", String(values.id)); // Convert number to string for FormData
+      formData.append("description", values.description);
+      formData.append("price", String(values.price)); // Convert number to string for FormData
+      if (values.image) {
+        formData.append("image", values.image);
+      }
 
+      const result = await updateService(formData);
+
+      if (result) {
+        form.reset();
+      }
+      setOpen(false); // Close the modal
+      toast({
+        className: cn(
+          "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
+        ),
+        variant: "success",
+        description: "Service updated successfully.",
+        duration: 2000,
+      });
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "An unknown error occurred";
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         variant: "destructive",
-        description: `Failed to update service item: ${error.message}`,
+        description: `Failed to update service item: ${errorMessage}`,
         duration: 2000,
       });
     }

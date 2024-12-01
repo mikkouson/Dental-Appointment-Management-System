@@ -112,11 +112,42 @@ export const UpdatePatientSchema = z.object({
 
 export type UpdatePatientFormValues = z.infer<typeof UpdatePatientSchema>;
 
+// Constants for image validation
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB in bytes
+const ACCEPTED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/gif",
+];
+
 export const ServiceSchema = z.object({
   id: z.number().optional(),
   description: z.string().min(1, { message: "Description is required." }),
   name: z.string().min(1, { message: "Name is required." }),
   price: z.number().min(1, { message: "Price is required." }),
+  image: z.union([
+    z
+      .string()
+      .min(1, { message: "Image URL is required." })
+      .refine(
+        (url) => {
+          const imageExtensions = [".jpg", ".jpeg", ".png"];
+          return imageExtensions.some((ext) => url.toLowerCase().endsWith(ext));
+        },
+        {
+          message: "Only .jpg, .jpeg, .png formats are supported",
+        }
+      ),
+    z
+      .instanceof(File)
+      .refine((file) => file.size <= MAX_FILE_SIZE, {
+        message: "File size must be less than 2MB",
+      })
+      .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), {
+        message: "Only .jpg, .jpeg, .png formats are supported",
+      }),
+  ]),
 });
 
 export type ServiceFormValues = z.infer<typeof ServiceSchema>;
