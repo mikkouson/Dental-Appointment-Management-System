@@ -18,6 +18,7 @@ import { useState } from "react";
 import { columns } from "./column";
 import { DataTableDemo } from "./dataTable";
 import useSWR from "swr";
+import FilterInventoryCategory from "@/components/buttons/inventory-category-filter";
 
 const fetcher = (url: string): Promise<any> =>
   fetch(url).then((res) => res.json());
@@ -36,6 +37,8 @@ export default function InventoryClient() {
   const page = parseInt(searchParams.get("page") || "1", 10);
   const query = searchParams.get("query") || "";
   const branch = searchParams.get("branches") || "";
+  const category = searchParams.get("category") || "";
+  console.log("category", category);
   const limit = parseInt(searchParams.get("limit") || "10", 10);
   const { branches, branchLoading } = useBranches();
   const {
@@ -46,11 +49,12 @@ export default function InventoryClient() {
     "https://test8-34297954426.asia-southeast1.run.app/api/predictions",
     fetcher
   );
+
   const {
     inventory: data,
     inventoryLoading: isLoading,
     mutate,
-  } = useInventory(page, query, branch, limit);
+  } = useInventory(page, query, branch, limit, category);
 
   const handleSearch = (term: string) => {
     const params = new URLSearchParams(searchParams);
@@ -97,7 +101,9 @@ export default function InventoryClient() {
         <Separator className="my-2" />
         <div className="flex justify-between items-center pb-2">
           {!isSearchFocused && (
-            <div className="flex justify-end items-center">
+            <div className="flex justify-end items-center gap-2">
+              <FilterInventoryCategory />
+
               <SelectBranch />
             </div>
           )}

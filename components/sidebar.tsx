@@ -34,7 +34,6 @@ const fetcher = (url: string): Promise<any> =>
   fetch(url).then((res) => res.json());
 
 export const getLinks = (userData?: any) => {
-  // Check if userData exists and has the correct nested structure
   const userRole = userData?.user_metadata?.role;
 
   return [
@@ -82,7 +81,6 @@ export const getLinks = (userData?: any) => {
         <BriefcaseMedical className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
     },
-    // Only show Users link if role is super_admin
     ...(userRole === "super_admin"
       ? [
           {
@@ -112,11 +110,9 @@ const SidebarItem = ({
   open: boolean;
 }) => {
   const [isOpen, setIsOpen] = useState(() => {
-    if (
-      link.href === "/inventory" &&
-      (path === "/inventory" || path?.startsWith("/inventory"))
-    ) {
-      return true;
+    // Only open if we're on a child route and not the parent
+    if (link.children) {
+      return link.children.some((child: any) => path === child.href);
     }
     return false;
   });
@@ -124,14 +120,18 @@ const SidebarItem = ({
 
   // Update isOpen when path changes
   React.useEffect(() => {
-    if (link.href === "/inventory") {
-      if (path === "/inventory" || path?.startsWith("/inventory")) {
-        setIsOpen(true);
-      } else {
-        setIsOpen(false);
-      }
+    if (link.children) {
+      const isChildActive = link.children.some(
+        (child: any) => path === child.href
+      );
+      setIsOpen(isChildActive);
     }
-  }, [path, link.href]);
+  }, [path, link.children]);
+
+  const isParentActive = path === link.href;
+  const isChildActive = link.children?.some(
+    (child: any) => path === child.href
+  );
 
   if (link.children) {
     return (
@@ -141,7 +141,7 @@ const SidebarItem = ({
             onClick={() => router.push(link.href)}
             className={cn(
               "flex items-center justify-between w-full px-2 py-2 rounded-lg transition-colors cursor-pointer",
-              path === link.href || path?.startsWith(link.href)
+              isParentActive && !isChildActive
                 ? "dark:bg-[#1c1c21] border dark:border-neutral-700 bg-white border-input"
                 : "hover:bg-neutral-100 dark:hover:bg-neutral-800",
               "opacity-80"

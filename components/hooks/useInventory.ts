@@ -10,6 +10,15 @@ type RealtimeStatus = "SUBSCRIBED" | "TIMED_OUT" | "CLOSED" | "CHANNEL_ERROR";
 
 const RECONNECT_TIMEOUT = 5000; // 5 seconds
 
+// Add valid categories type
+export type ValidCategory =
+  | "Medical Instruments"
+  | "Orthodontic Supplies"
+  | "Disposable Supplies"
+  | "Dental Tools"
+  | "Protective Equipment"
+  | string;
+
 const fetcher = async (
   url: string
 ): Promise<{
@@ -27,7 +36,8 @@ export function useInventory(
   page?: number | null,
   query?: string | null,
   branches?: string | null,
-  limit?: number | null
+  limit?: number | null,
+  category?: ValidCategory | null
 ) {
   const [realtimeStatus, setRealtimeStatus] = useState<{
     status: RealtimeStatus;
@@ -46,6 +56,11 @@ export function useInventory(
   if (branches != null) {
     const branchArray = branches.split(",");
     queryString.append("branch", branchArray.join(","));
+  }
+
+  // Enhanced category handling with type safety
+  if (category != null && category !== "") {
+    queryString.append("category", category);
   }
 
   if (page != null) {
@@ -74,7 +89,13 @@ export function useInventory(
         .channel(channelName)
         .on(
           "postgres_changes",
-          { event: "*", schema: "public", table: "inventory" },
+          {
+            event: "*",
+            schema: "public",
+            table: "inventory",
+            // Add filter for category if provided
+            filter: category ? `category=eq.${category}` : undefined,
+          },
           (payload) => {
             console.log("Received realtime update:", payload);
             mutate();
@@ -96,7 +117,6 @@ export function useInventory(
 
         if (status === "CLOSED" && !err) {
           console.log("Channel closed, attempting to reconnect...");
-          // Attempt to reconnect after timeout
           setTimeout(() => {
             setupRealtimeSubscription(channelName);
           }, RECONNECT_TIMEOUT);
@@ -104,7 +124,6 @@ export function useInventory(
 
         if (err) {
           console.error("Subscription error:", err);
-          // Attempt to reconnect after timeout
           setTimeout(() => {
             setupRealtimeSubscription(channelName);
           }, RECONNECT_TIMEOUT);
@@ -113,11 +132,14 @@ export function useInventory(
 
       return channel;
     },
-    [supabase, mutate]
+    [supabase, mutate, category] // Added category to dependencies
   );
 
   useEffect(() => {
-    const channelName = `realtime-items-${page ?? 1}-${Date.now()}`;
+    // Include category in channel name for proper subscription management
+    const channelName = `realtime-items-${page ?? 1}-${
+      category ?? "all"
+    }-${Date.now()}`;
     let channel: RealtimeChannel | null = null;
 
     try {
@@ -131,7 +153,6 @@ export function useInventory(
       });
     }
 
-    // Cleanup function
     return () => {
       if (channel) {
         console.log("Cleaning up channel:", channelName);
@@ -140,7 +161,7 @@ export function useInventory(
         });
       }
     };
-  }, [page, setupRealtimeSubscription, supabase]);
+  }, [page, category, setupRealtimeSubscription, supabase]); // Added category to dependencies
 
   return {
     inventory,
