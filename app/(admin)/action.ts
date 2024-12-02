@@ -32,6 +32,7 @@ export async function newInventory(data: InventoryFormValues) {
       description: data.description,
       quantity: data.quantity,
       branch: data.branch,
+      category: data.category,
     },
   ]);
 
@@ -60,6 +61,7 @@ export async function updateInventory(data: InventoryFormValues) {
         quantity: data.quantity,
         description: data.description,
         branch: data.branch,
+        category: data.category,
       })
       .eq("id", data.id);
 
