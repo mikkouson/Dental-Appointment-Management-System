@@ -85,7 +85,6 @@ export default function UserClient() {
               setOpen={setOpen}
               label={"New Service"}
             >
-              {" "}
               <NewServiceForm setOpen={setOpen} mutate={mutate} />
             </DrawerDialogDemo>
           </div>

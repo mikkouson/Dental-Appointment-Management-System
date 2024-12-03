@@ -9,6 +9,13 @@ interface PatientFieldsProps {
   form: UseFormReturn<InventoryFormValues>;
   onSubmit: (data: InventoryFormValues) => void;
 }
+const category = [
+  { id: "Disposable Supplies", name: "Disposable Supplies" },
+  { id: "Medical Instruments", name: "Medical Instruments" },
+  { id: "Orthodontic Supplies", name: "Orthodontic Supplies" },
+  { id: "Dental Tools", name: "Dental Tools" },
+  { id: "Protective Equipment", name: "Protective Equipment" },
+];
 
 const InventoryField = ({ form, onSubmit }: PatientFieldsProps) => {
   // Destructure isSubmitting from formState
@@ -20,6 +27,12 @@ const InventoryField = ({ form, onSubmit }: PatientFieldsProps) => {
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <Field form={form} name="name" label="Name" />
+          <Field
+            form={form}
+            data={category}
+            name={"category"}
+            label={"Category"}
+          />
 
           <Field form={form} name="quantity" label="Quantity" num={true} />
           <Field

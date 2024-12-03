@@ -1,4 +1,3 @@
-import { deleteService } from "@/app/(admin)/action";
 import type { Service } from "@/app/schema";
 import { useSetActiveAppointments } from "@/app/store";
 import { toast } from "@/components/hooks/use-toast";
@@ -37,6 +36,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
+import { deleteService } from "@/app/(admin)/services/action";
+
 type Column = ColumnDef<Service>;
 
 type DataTableProps = {
@@ -46,7 +47,6 @@ type DataTableProps = {
   mutate: any;
 };
 
-// In your DataTableDemo component
 export function DataTableDemo({
   columns,
   data,
@@ -85,7 +85,7 @@ export function DataTableDemo({
   });
 
   const handleClick = (row: Row<Service>) => {
-    setActive(row.original.id); // Set the clicked row as active
+    setActive(row.original.id);
   };
 
   const handleDelete = (id?: number) => {
@@ -114,13 +114,13 @@ export function DataTableDemo({
   };
 
   return (
-    <ScrollArea className="h-[calc(80vh-20px)]  rounded-md  border ">
+    <ScrollArea className="h-[calc(80vh-20px)] rounded-md border">
       <Table className="relative">
-        <TableHeader className=" bg-muted/70 ">
+        <TableHeader className="bg-muted/70">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <TableHead key={header.id}>
+              {headerGroup.headers.map((header, index) => (
+                <TableHead key={header.id} className={cn(index === 1 && "w-6")}>
                   {header.isPlaceholder ? null : (
                     <div className="truncate p-1 py-2">
                       {flexRender(
@@ -146,14 +146,17 @@ export function DataTableDemo({
                 )}
                 onClick={() => handleClick(row)}
               >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
+                {row.getVisibleCells().map((cell, index) => (
+                  <TableCell
+                    key={cell.id}
+                    className={cn(index === 0 && "w-12")}
+                  >
                     <div className="truncate p-1 py-2">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
                       )}
-                    </div>{" "}
+                    </div>
                   </TableCell>
                 ))}
                 <TableCell>
@@ -169,7 +172,6 @@ export function DataTableDemo({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <EditService data={row.original} mutate={mutate} />
-
                       <DropdownMenuSeparator />
                       <DeleteModal
                         label="service"

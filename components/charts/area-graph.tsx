@@ -32,13 +32,13 @@ const chartConfig = {
   },
   returneePatient: {
     label: "Returnee",
-    color: "hsl(var(--chart-4))",
+    color: "#FFB347", // Changed to a darker orange-yellow color
   },
 } satisfies ChartConfig;
 
 interface AreaGraphProps {
-  range: DateRange; // Accept range prop
-  data: any; // Accept data prop
+  range: DateRange;
+  data: any;
 }
 
 export function PatientChart({ range, data }: AreaGraphProps) {
@@ -48,7 +48,6 @@ export function PatientChart({ range, data }: AreaGraphProps) {
     const date = new Date(item.date);
     const day = date.toISOString().split("T")[0];
 
-    // Check if the date is within the specified range
     if (day >= range.start && day <= range.end) {
       if (!aggregatedData[day]) {
         aggregatedData[day] = { day, New: 0, Returnee: 0 };
@@ -92,7 +91,7 @@ export function PatientChart({ range, data }: AreaGraphProps) {
           <div className="flex items-center space-x-2">
             <span
               className="inline-block w-4 h-4 rounded-full"
-              style={{ backgroundColor: "hsl(var(--chart-1))" }}
+              style={{ backgroundColor: chartConfig.newPatient.color }}
             ></span>
             <div className="flex">
               <h2 className="text-lg font-semibold leading-none mr-2">
@@ -105,7 +104,7 @@ export function PatientChart({ range, data }: AreaGraphProps) {
           <div className="flex items-center space-x-2">
             <span
               className="inline-block w-4 h-4 rounded-full"
-              style={{ backgroundColor: "hsl(var(--chart-4))" }}
+              style={{ backgroundColor: chartConfig.returneePatient.color }}
             ></span>
             <div className="flex">
               <h2 className="text-lg font-semibold leading-none mr-2">

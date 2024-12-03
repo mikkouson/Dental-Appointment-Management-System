@@ -32,6 +32,7 @@ interface Branch {
 
 // Update the interface to match InventoryCol's updated_at type
 export interface InventoryColWithBranch extends Omit<InventoryCol, "branch"> {
+  category: string;
   branch: Branch;
 }
 
@@ -60,6 +61,7 @@ export function EditInventory({
     form.setValue("description", data.description);
     form.setValue("quantity", data.quantity);
     form.setValue("branch", data.branch.id);
+    form.setValue("category", data.category);
   };
 
   async function validateName(name: string): Promise<boolean> {
@@ -90,6 +92,7 @@ export function EditInventory({
       description: formData.description,
       quantity: formData.quantity,
       branch: formData.branch,
+      category: formData.category,
     };
 
     // For UI updates, include the branch object structure and updated_at

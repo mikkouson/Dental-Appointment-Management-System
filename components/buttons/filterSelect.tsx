@@ -1,7 +1,7 @@
 "use client";
 
 import { MultiSelect } from "@/components/multi-select";
-import { parseAsArrayOf, parseAsInteger, useQueryState } from "nuqs";
+import { parseAsArrayOf, parseAsString, useQueryState } from "nuqs";
 
 interface Option {
   name: string;
@@ -18,12 +18,11 @@ const FilterSelect = ({ options, placeholder, param }: SelectBranchProps) => {
   const [page, setPage] = useQueryState("page");
   const [selectedQuery, setSelectedQuery] = useQueryState(
     param,
-    parseAsArrayOf(parseAsInteger).withDefault([])
+    parseAsArrayOf(parseAsString).withDefault([])
   );
 
   const handleValueChange = (newSelectedValues: string[]) => {
-    const selectedNumbers = newSelectedValues.map((val) => Number(val));
-    setSelectedQuery(selectedNumbers);
+    setSelectedQuery(newSelectedValues);
     setPage(null);
   };
 

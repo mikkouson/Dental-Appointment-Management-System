@@ -4,143 +4,15 @@ import {
   DoctorSchema,
   InventoryFormValues,
   InventorySchema,
-  PatientFormValues,
-  PatientSchema,
-  ServiceFormValues,
-  ServiceSchema,
   ToothHistoryFormValue,
-  UpdateInventoryFormValues,
-  UpdateInventorySchema,
   UpdateUser,
   UpdateUserForm,
   UserForm,
 } from "@/app/types";
-import DentalAppointmentCancellationEmail from "@/components/emailTemplates/cancelAppointment";
-import DentalAppointmentEmail from "@/components/emailTemplates/newAppointment";
-import DentalAppointmentPendingEmail from "@/components/emailTemplates/pendingAppointment";
-import DentalAppointmentRejectionEmail from "@/components/emailTemplates/rejectAppointment";
 import { createAdminClient, createClient } from "@/utils/supabase/server";
-import moment from "moment";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import * as React from "react";
-import { Resend } from "resend";
 import { z } from "zod";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
-interface AppointmentActionProps {
-  aptId: number;
-}
-
-const schema = z.object({
-  id: z.number().optional(),
-  service: z.number({
-    required_error: "Please select an email to display.",
-  }),
-  branch: z.number({
-    required_error: "Please select an email to display.",
-  }),
-  date: z.date({
-    required_error: "A date of birth is required.",
-  }),
-  time: z.number({
-    required_error: "A date of birth is required.",
-  }),
-  type: z.string({
-    required_error: "A date of birth is required.",
-  }),
-  status: z.number({
-    required_error: "A date of birth is required.",
-  }),
-});
-
-type Inputs = z.infer<typeof schema>;
-
-interface AddressInput {
-  id?: number; // Changed from string to number
-  address: string;
-  latitude: number;
-  longitude: number;
-}
-
-interface PatientInput {
-  id: number; // Changed from string to number
-  name: string;
-  email: string;
-  sex: string;
-  phoneNumber: string;
-  dob: string;
-  status: string;
-  address: AddressInput;
-}
-
-// Service Actions
-
-export async function newService(data: ServiceFormValues) {
-  const result = ServiceSchema.safeParse(data);
-
-  if (!result.success) {
-    console.log("Validation errors:", result.error.format());
-    return;
-  }
-
-  const supabase = createClient();
-
-  const { error } = await supabase.from("services").insert([
-    {
-      name: data.name,
-      description: data.description,
-      price: data.price,
-    },
-  ]);
-
-  if (error) {
-    console.error("Error inserting patient:", error.message);
-  } else {
-    console.log("Patient data inserted successfully");
-  }
-}
-
-export async function deleteService(id: number) {
-  const supabase = createClient();
-  const { error } = await supabase
-    .from("services")
-    .update({
-      deleteOn: new Date().toISOString(),
-    })
-    .eq("id", id);
-  if (error) {
-    console.log("Error deleting patient", error.message);
-    throw error; // Throw the error to be handled by the caller
-  }
-}
-
-export async function updateService(data: ServiceFormValues) {
-  const result = ServiceSchema.safeParse(data);
-
-  if (!result.success) {
-    console.log("Validation errors:", result.error.format());
-    return;
-  }
-
-  const supabase = createClient();
-
-  // Update patient
-  const { error } = await supabase
-    .from("services")
-    .update({
-      name: data.name,
-      price: data.price,
-      description: data.description,
-    })
-    .eq("id", data.id);
-
-  if (error) {
-    console.error("Error updating patient:", error.message);
-  } else {
-    console.log("Patient data updated successfully");
-  }
-}
 
 // Inventory Actions
 
@@ -160,6 +32,7 @@ export async function newInventory(data: InventoryFormValues) {
       description: data.description,
       quantity: data.quantity,
       branch: data.branch,
+      category: data.category,
     },
   ]);
 
@@ -188,6 +61,7 @@ export async function updateInventory(data: InventoryFormValues) {
         quantity: data.quantity,
         description: data.description,
         branch: data.branch,
+        category: data.category,
       })
       .eq("id", data.id);
 
@@ -428,5 +302,71 @@ export async function updateDoctor(data: DoctorFormValues) {
     console.error("Error updating doctor data:", error.message);
   } else {
     console.log("Doctor data updated successfully");
+  }
+}
+// Define the response type for the upload action
+interface UploadServiceImageResponse {
+  data: {
+    path: string;
+  } | null;
+  error: Error | null;
+}
+
+export async function uploadServiceImage(
+  formData: FormData
+): Promise<UploadServiceImageResponse> {
+  try {
+    const file = formData.get("file") as File;
+    const userId = formData.get("userId") as string;
+
+    if (!file) {
+      throw new Error("No file provided");
+    }
+
+    // Get authenticated supabase client with server component
+    const supabase = await createClient();
+
+    // Get the current session to ensure user is authenticated
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session) {
+      throw new Error("Unauthorized");
+    }
+
+    // Generate unique filename
+    const fileExt = file.name.split(".").pop();
+    const fileName = `${userId}-${Date.now()}.${fileExt}`;
+    const filePath = `${userId}/${fileName}`;
+
+    // Upload file to Supabase Storage
+    const { data, error: uploadError } = await supabase.storage
+      .from("services")
+      .upload(filePath, file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    // Get public URL for the uploaded file
+    const { data: publicUrl } = supabase.storage
+      .from("services")
+      .getPublicUrl(filePath);
+
+    return {
+      data: {
+        path: publicUrl.publicUrl,
+      },
+      error: null,
+    };
+  } catch (error) {
+    return {
+      data: null,
+      error: error as Error,
+    };
   }
 }

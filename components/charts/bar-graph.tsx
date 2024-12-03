@@ -1,6 +1,6 @@
 import React from "react";
 import { TrendingDown, TrendingUp } from "lucide-react";
-import { CartesianGrid, Area, AreaChart, XAxis } from "recharts";
+import { CartesianGrid, Area, AreaChart, XAxis, YAxis } from "recharts";
 import {
   Card,
   CardContent,
@@ -88,6 +88,16 @@ export function RevenueGraph({ range, metrics }: RevenueGraphProps) {
     }))
     .sort((a, b) => moment(a.date).diff(moment(b.date)));
 
+  // Format currency for Y-axis (Philippine Peso)
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat("en-PH", {
+      style: "currency",
+      currency: "PHP",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -110,7 +120,7 @@ export function RevenueGraph({ range, metrics }: RevenueGraphProps) {
             margin={{
               top: 40,
               bottom: 0,
-              left: 12,
+              left: 32,
               right: 12,
             }}
           >
@@ -121,6 +131,12 @@ export function RevenueGraph({ range, metrics }: RevenueGraphProps) {
               axisLine={false}
               tickMargin={8}
               tickFormatter={(value) => moment(value).format("MMM D")}
+            />
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              tickFormatter={formatCurrency}
             />
             <ChartTooltip
               cursor={false}

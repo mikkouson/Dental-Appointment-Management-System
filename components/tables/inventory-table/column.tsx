@@ -37,9 +37,14 @@ export const columns: Column[] = [
     header: "Description",
   },
   {
+    accessorKey: "category",
+    header: "Category",
+  },
+  {
     accessorKey: "quantity",
     header: "Current Stock",
   },
+
   {
     id: "predicted_monthly_usage",
     header: () => <div className="text-center">Predicted Usage</div>,

@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { newService } from "@/app/(admin)/action";
 import { ServiceSchema } from "@/app/types";
 import ServicesFields from "./servicesField";
 import { toast } from "@/components/hooks/use-toast";
@@ -14,6 +13,7 @@ import { Service } from "@/app/schema";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { useService } from "@/components/hooks/useService";
+import { newService } from "@/app/(admin)/services/action";
 
 const fetcher = (url: string): Promise<any> =>
   fetch(url).then((res) => res.json());
@@ -44,57 +44,39 @@ export function NewServiceForm({ setOpen, mutate }: NewServiceFormProps) {
     );
   };
 
-  async function onSubmit(data: z.infer<typeof ServiceSchema>) {
-    const nameExists = await validateName(data.name);
-
-    if (nameExists) {
-      form.setError("name", {
-        type: "manual",
-        message: "Service already exists",
-      });
-      return;
-    }
-
-    // Optimistically update the UI without assigning a temporary id
-    const newItem = data; // Use the new data directly
-
-    interface ServiceData {
-      data: Service[];
-      count: number;
-    }
-
-    mutate(
-      (currentData: ServiceData) => ({
-        data: [newItem, ...currentData.data],
-        count: currentData.count + 1,
-      }),
-      false // Do not revalidate yet
-    );
-
-    setOpen(false); // Close the modal
-
-    toast({
-      className: cn(
-        "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
-      ),
-      variant: "success",
-      description: "Service added successfully.",
-      duration: 2000,
-    });
-
+  async function onSubmit(values: z.infer<typeof ServiceSchema>) {
     try {
-      await newService(data); // Make sure this function returns a promise
+      const formData = new FormData();
+      formData.append("name", values.name);
+      formData.append("description", values.description);
+      formData.append("price", values.price.toString());
+      if (values.image) {
+        formData.append("image", values.image);
+      }
 
-      mutate(); // Revalidate to ensure data consistency
-    } catch (error: any) {
-      // Revert the optimistic update in case of an error
-      mutate();
+      const result = await newService(formData);
+
+      if (result) {
+        form.reset();
+      }
+      setOpen(false); // Close the modal
+      toast({
+        className: cn(
+          "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
+        ),
+        variant: "success",
+        description: "Service updated successfully.",
+        duration: 2000,
+      });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "An unknown error occurred";
       toast({
         className: cn(
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
         ),
         variant: "destructive",
-        description: `Failed to add service: ${error.message}`,
+        description: `Failed to update service item: ${errorMessage}`,
         duration: 2000,
       });
     }
